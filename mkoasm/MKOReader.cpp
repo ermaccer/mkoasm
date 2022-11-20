@@ -21,7 +21,6 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
 
     bool build = std::filesystem::is_directory(m_szInputName);
     m_bBuildMode = build;
-    printf("is build %d\n", m_bBuildMode);
     m_bGameCube = isGameCube;
     game = _game;
     if (!build)
@@ -153,7 +152,6 @@ bool MKOReader::Read(const char* file)
         pFile.read(string_data.get(), header.string_data_size);
 
         unk_data = std::make_unique<char[]>(header.unknown_data_size);
-        printf("Reading %d bytes of unknown data\n", header.unknown_data_size);
         pFile.read(unk_data.get(), header.unknown_data_size);
 
         m_pDataStartOffset = (uint32_t)(pFile.tellg());
@@ -225,9 +223,6 @@ void MKOReader::ExtractData()
 {
     std::string output_folder = m_szInputName;
     output_folder = output_folder.substr(0, output_folder.length() - strlen(".mko"));
-
-    //output_folder += "_output";
-
 
     {
         if (!std::filesystem::exists(output_folder))
@@ -844,29 +839,6 @@ void MKOReader::ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functi
             data.clear();
             break;
         }
-
-       // printf("%d %d %d %d\n", bc.functionID, bc.isInternal, bc.numVariables, bc.unk2);
-
-       // // gc hack, probably need to improve mko reader
-       // if (m_bGameCube)
-       // {
-       //     int a1, a2;
-       //     pFile.read((char*)&a1, sizeof(int));
-       //     nBytesRead += pFile.gcount();
-       //     pFile.read((char*)&a2, sizeof(int));
-       //     nBytesRead += pFile.gcount();
-       //     SwapINT(&a1);
-       //     SwapINT(&a2);
-       //     bc.functionID = *(short*)(&a1);
-       //     bc.isInternal = *(short*)((int)&a1 + sizeof(short));
-       //     bc.numVariables = *(short*)(&a2);
-       //     bc.unk2 = *(short*)((int)&a2 + sizeof(short));
-       // }
-       // else
-       // {
-       //     pFile.read((char*)&bc, sizeof(mko_command));
-       //     nBytesRead += pFile.gcount();
-       // }
 
         mko_entry.size += pFile.gcount();
 
