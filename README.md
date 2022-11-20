@@ -13,7 +13,7 @@ Run without params to get usage.
 |       ---       |       ---       |       ---       |       ---       |       ---       |
 | MK Deadly Alliance | ❌ | ❌ | ❌| None |
 | MK Deception (Unchained) | ✔️ | ✔️ | ✔️| PS2, PSP, GC, XBOX (not tested) |
-| MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested )|
+| MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested)|
 
 Scripts from MKvsDC and onwards are totally unsuppported.
 
