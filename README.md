@@ -10,7 +10,7 @@ Run without params to get usage.
 # Support Table
 
 | Game | View | Extract | Decompile | Platforms |
-|       ---       ||       ---       ||       ---       ||       ---       ||       ---       |
+|       ---       |       ---       |       ---       |       ---       |       ---       |
 | MK Deadly Alliance | ❌ | ❌ | ❌| None |
 | MK Deception (Unchained) | ✔️ | ✔️ | ✔️| PS2, PSP, GC, XBOX (not tested) |
 | MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested )|
