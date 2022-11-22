@@ -15,7 +15,7 @@ Run without params to get usage.
 | MK Deception | ✔️ | ✔️ | ✔️| PS2, GC, XBOX (not tested) |
 | MK Unchained | ✔️ | ✔️ | ✔️| PSP|
 | MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested)|
-| MK VS DC | ✔️ | ❌ | ❌|PS3|
+| MK VS DC | ✔️ | ✔️ | ❌|PS3|
 
 
 

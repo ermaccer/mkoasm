@@ -66,6 +66,13 @@ public:
     std::vector<int> func_sizes;
 
 
+    // mk8 (Mortal Kombat vs DC Universe)
+    mko_header_mk8 mk8_header;
+    std::vector<mko_function_header_mk8> mk8_funcs;
+    std::vector<mko_variable_header_mk8> mk8_vars;
+    std::vector<mko_extern_mk8> mk8_externs;
+    std::vector<mko_asset_mk8> mk8_assets;
+
     std::unique_ptr<char[]> script_names;
     std::unique_ptr<char[]> string_data;
     std::unique_ptr<char[]> unk_data;
@@ -82,23 +89,32 @@ public:
     bool ReadMK8();
     int  GetAllFunctionsSize();
     int  GetAllVariablesSize();
-
+    int  GetAllVariablesSizeMK8();
+    int  GetAllFunctionsSizeMK8();
+    int  GetAllFunctionsUnkSizeMK8();
     std::string GetFileName();
 
     std::string GetFunctionName(int functionID);
+    std::string GetFunctionNameMK8(int functionID);
     uint32_t GetFunctionOffset(int functionID);
 
     std::string GetVariableName(int variableID);
-    uint32_t GetVariableOffset(int functionID);
+    std::string GetVariableNameMK8(int variableID);
+    uint32_t GetVariableOffset(int variableID);
+    uint32_t GetVariableOffsetMK8(int variableID);
 
     std::string GetString(int stringStart);
 
     void ExtractData();
-
+    void ExtractDataMK8();
     void ExtractVariables();
+    void ExtractVariablesMK8();
     void ExtractFunctions();
+    void ExtractFunctionsMK8();
     void DecompileFunction(int functionID);
     void UnpackVariable(int variableID);
+
+    void UnpackVariableMK8(int variableID);
 
     // unpackers
     void Unpack_Movelist(int variableID);
@@ -108,8 +124,16 @@ public:
     void Unpack_SList(int variableID);
     void Unpack_Attributes(int variableID);
 
+
+    // mk8 unpackers
+    void MK8_Unpack_RArt(int variableID);
+    void MK8_Unpack_Movelist(int variableID);
+    void MK8_Unpack_CHRBones(int variableID);
+
     void DecompileAllFunctions();
     void UnpackVariables();
+    void UnpackVariablesMK8();
+
 
     void PrintInfo();
     void DumpInfo(std::string name);

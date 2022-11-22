@@ -1,11 +1,6 @@
 #pragma once
 
 struct mko_header_mk8 {
-	int field0;
-	int field4;
-	int field8;
-	int field12;
-	unsigned int field16;
 	int functions;
 	int static_variables;
 	int externs;
@@ -21,11 +16,12 @@ struct mko_header_mk8 {
 
 struct mko_function_header_mk8 {
 	int nameOffset;
-	int field4;
+	int argTypeOffset;
 	int field8;
-	int field12;
+	int size;
 	int field16;
-	int field20;
+	// probably stack size?
+	int unkSize;
 	int field24;
 	int field28;
 	int id;
@@ -61,7 +57,7 @@ struct mko_asset_mk8 {
 
 struct mko_variable_header_mk8 {
 	int name_offset;
-	int field4;
-	int field8;
-	int field12;
+	int size;
+	int elemSize;
+	int offset;
 };

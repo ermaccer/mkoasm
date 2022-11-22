@@ -7,7 +7,8 @@
 #include "IniReader.h"
 #include <Windows.h>
 #include "code/misc.h"
-
+#include <algorithm>
+#include <string>
 
 MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
 {
@@ -199,15 +200,8 @@ bool MKOReader::ReadMK8()
     pFile.open(m_szInputName, std::ifstream::binary);
     if (pFile.is_open())
     {
-        mko_header_mk8 mk8_header;
         pFile.read((char*)&mk8_header, sizeof(mko_header_mk8));
 
-
-        SwapINT(&mk8_header.field0);
-        SwapINT(&mk8_header.field4);
-        SwapINT(&mk8_header.field8);
-        SwapINT(&mk8_header.field12);
-        SwapINT((int*)&mk8_header.field16);
         SwapINT(&mk8_header.functions);
         SwapINT(&mk8_header.static_variables);
         SwapINT(&mk8_header.externs);
@@ -227,10 +221,6 @@ bool MKOReader::ReadMK8()
             pFile.read(unkData.get(), size);
         }
 
-        std::vector<mko_function_header_mk8> mk8_funcs;
-        std::vector<mko_variable_header_mk8> mk8_vars;
-        std::vector<mko_extern_mk8> mk8_externs;
-        std::vector<mko_asset_mk8> mk8_assets;
 
         for (int i = 0; i < mk8_header.functions; i++)
         {
@@ -239,11 +229,11 @@ bool MKOReader::ReadMK8()
 
 
             SwapINT(&func.nameOffset);
-            SwapINT(&func.field4);
+            SwapINT(&func.argTypeOffset);
             SwapINT(&func.field8);
-            SwapINT(&func.field12);
+            SwapINT(&func.size);
             SwapINT(&func.field16);
-            SwapINT(&func.field20);
+            SwapINT(&func.unkSize);
             SwapINT(&func.field24);
             SwapINT(&func.field28);
             SwapINT(&func.id);
@@ -275,9 +265,9 @@ bool MKOReader::ReadMK8()
             pFile.read((char*)&var, sizeof(mko_variable_header_mk8));
 
             SwapINT(&var.name_offset);
-            SwapINT(&var.field4);
-            SwapINT(&var.field8);
-            SwapINT(&var.field12);
+            SwapINT(&var.size);
+            SwapINT(&var.elemSize);
+            SwapINT(&var.offset);
 
             mk8_vars.push_back(var);
         }
@@ -328,6 +318,9 @@ bool MKOReader::ReadMK8()
         pFile.read(string_data.get(), mk8_header.string_size);
 
 
+        m_pDataStartOffset = (uint32_t)(pFile.tellg());
+        m_pFunctionsStartOffset = m_pDataStartOffset + GetAllVariablesSizeMK8() + GetAllFunctionsUnkSizeMK8();
+
         printf("===========\n");
         printf("Header Info\n");
         printf("===========\n");
@@ -339,7 +332,11 @@ bool MKOReader::ReadMK8()
         for (unsigned int i = 0; i < mk8_funcs.size(); i++)
         {
             std::string func_name = (char*)(&string_data[0] + (mk8_funcs[i].nameOffset - 1));
-            printf("Function %04d - %s \t\n", i, func_name.c_str());
+            std::string arg_type = (char*)(&string_data[0] + (mk8_funcs[i].argTypeOffset- 1));
+            arg_type = arg_type.substr(0, arg_type.length() - 1);
+            std::replace(arg_type.begin(), arg_type.end(), '.', ',');
+
+            printf("Function %04d - %s(%s) \t\n", i, func_name.c_str(), arg_type.c_str());
         }
 
         printf("===========\n");
@@ -372,6 +369,8 @@ bool MKOReader::ReadMK8()
 
         printf("===========\n");
 
+        ExtractDataMK8();
+
         return true;
     }
     return false;
@@ -400,6 +399,31 @@ int MKOReader::GetAllVariablesSize()
     return nSize;
 }
 
+int MKOReader::GetAllVariablesSizeMK8()
+{
+    int nSize = 0;
+    for (unsigned int i = 0; i < mk8_vars.size(); i++)
+    {
+        nSize += mk8_vars[i].size;
+    }
+    return nSize;
+}
+
+int MKOReader::GetAllFunctionsSizeMK8()
+{
+    return 0;
+}
+
+int MKOReader::GetAllFunctionsUnkSizeMK8()
+{
+    int nSize = 0;
+    for (unsigned int i = 0; i < mk8_funcs.size(); i++)
+    {
+        nSize += mk8_funcs[i].unkSize;
+    }
+    return nSize;
+}
+
 std::string MKOReader::GetFileName()
 {
     std::string output = m_szInputName;
@@ -410,6 +434,12 @@ std::string MKOReader::GetFileName()
 std::string MKOReader::GetFunctionName(int functionID)
 {
     std::string func_name = (char*)(&script_names[0] + (funcs[functionID].name_offset - 1));
+    return func_name;
+}
+
+std::string MKOReader::GetFunctionNameMK8(int functionID)
+{
+    std::string func_name = (char*)(&string_data[0] + (mk8_funcs[functionID].nameOffset - 1));
     return func_name;
 }
 
@@ -427,9 +457,20 @@ std::string MKOReader::GetVariableName(int variableID)
     return var_name;
 }
 
+std::string MKOReader::GetVariableNameMK8(int variableID)
+{
+    std::string var_name = (char*)(&string_data[0] + (mk8_vars[variableID].name_offset - 1));
+    return var_name;
+}
+
 uint32_t MKOReader::GetVariableOffset(int variableID)
 {
     return (vars[variableID].offset * 4);
+}
+
+uint32_t MKOReader::GetVariableOffsetMK8(int variableID)
+{
+    return (mk8_vars[variableID].offset);
 }
 
 std::string MKOReader::GetString(int stringStart)
@@ -496,7 +537,7 @@ void MKOReader::ExtractData()
         std::filesystem::current_path("..");
     }
 
-    folderName = "funcs";
+    folderName = FUNCTIONFOLDER_NAME;
     {
         if (!std::filesystem::exists(folderName))
             std::filesystem::create_directory(folderName);
@@ -521,6 +562,65 @@ void MKOReader::ExtractData()
     }
 
 
+
+}
+
+void MKOReader::ExtractDataMK8()
+{
+    std::string output_folder = m_szInputName;
+    output_folder = output_folder.substr(0, output_folder.length() - strlen(".mko"));
+
+    {
+        if (!std::filesystem::exists(output_folder))
+            std::filesystem::create_directory(output_folder);
+
+        std::filesystem::current_path(output_folder);
+    }
+
+    std::string output = m_szInputName;
+    output = output.substr(0, output.length() - strlen(".mko"));
+
+
+
+    std::ofstream pData("string_data", std::ofstream::binary);
+    pData.write(string_data.get(), mk8_header.string_size);
+    pData.close();
+
+
+
+    std::string folderName = "unpacked";
+
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+        UnpackVariablesMK8();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = VARIABLESFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractVariablesMK8();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = FUNCTIONFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractFunctionsMK8();
+        std::filesystem::current_path("..");
+    }
 
 }
 
@@ -565,6 +665,27 @@ void MKOReader::ExtractVariables()
         oInfo.close();
 }
 
+void MKOReader::ExtractVariablesMK8()
+{
+    for (unsigned int i = 0; i < mk8_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + GetVariableOffsetMK8(i), pFile.beg);
+        int size = mk8_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = (char*)(&string_data[0] + (mk8_vars[i].name_offset - 1));
+
+        printf("Extracting variable %s %d [%d/%d]\n", var_name.c_str(), size, i + 1, mk8_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+
+    }
+}
+
 void MKOReader::ExtractFunctions()
 {
     pFile.seekg(m_pFunctionsStartOffset, pFile.beg);
@@ -601,6 +722,22 @@ void MKOReader::ExtractFunctions()
 
     if (oInfo)
         oInfo.close();
+}
+
+void MKOReader::ExtractFunctionsMK8()
+{
+    pFile.seekg(m_pFunctionsStartOffset, pFile.beg);
+    for (unsigned int i = 0; i < mk8_funcs.size(); i++)
+    {
+        int size = mk8_funcs[i].size;
+        std::string func_name = (char*)(&string_data[0] + (mk8_funcs[i].nameOffset - 1));
+
+        printf("Extracting function %s [%d/%d]\n", func_name.c_str(), i + 1, mk8_funcs.size());
+        std::ofstream oFile(func_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
 }
 
 void MKOReader::DecompileFunction(int functionID)
@@ -728,6 +865,19 @@ void MKOReader::UnpackVariable(int variableID)
         Unpack_SList(variableID);
     else  if (varName.find("_attributes") != std::string::npos)
         Unpack_Attributes(variableID);
+    std::cout << "Attempting to unpack " << varName << std::endl;
+}
+
+void MKOReader::UnpackVariableMK8(int variableID)
+{
+    std::string varName = GetVariableNameMK8(variableID);
+
+    if (varName.find("asset_package") != std::string::npos)
+        MK8_Unpack_RArt(variableID);
+    else if (varName.find("movelist") != std::string::npos)
+        MK8_Unpack_Movelist(variableID);
+    else if (varName.find("MKCharacterBones") != std::string::npos)
+        MK8_Unpack_CHRBones(variableID);
     std::cout << "Attempting to unpack " << varName << std::endl;
 }
 
@@ -924,6 +1074,81 @@ void MKOReader::Unpack_Attributes(int variableID)
     pUnpacked.close();
 }
 
+void MKOReader::MK8_Unpack_RArt(int variableID)
+{
+    std::string varName = GetVariableNameMK8(variableID);
+    pFile.seekg(m_pDataStartOffset + GetVariableOffsetMK8(variableID), pFile.beg);
+
+    std::string output = varName;
+    output += ".txt";
+    std::ofstream pUnpacked(output);
+    int data[3] = {};
+    pFile.read((char*)&data, sizeof(data));
+
+    for (int i = 0; i < 3; i++)
+        SwapINT(&data[i]);
+
+    for (int i = 0; i < 3; i++)
+    {
+        std::string str;
+          str = (char*)(&string_data[0] + (data[i]));
+        pUnpacked << str << std::endl;
+    }
+
+    pUnpacked.close();
+}
+
+void MKOReader::MK8_Unpack_Movelist(int variableID)
+{
+    std::string varName = GetVariableNameMK8(variableID);
+    pFile.seekg(m_pDataStartOffset + GetVariableOffsetMK8(variableID), pFile.beg);
+
+    std::string output = varName;
+    output += ".txt";
+    std::ofstream pUnpacked(output);
+
+    int numElems = mk8_vars[variableID].size / mk8_vars[variableID].elemSize;
+
+    for (int i = 0; i < numElems; i++)
+    {
+        int id[2];
+        pFile.read((char*)&id, sizeof(id));
+        SwapINT(&id[0]);
+        SwapINT(&id[1]);
+        std::string str, str2;
+        str = (char*)(&string_data[0] + id[0]);
+        str2 = (char*)(&string_data[0] + id[1]);
+        pUnpacked << str << " " << str2 << std::endl;
+    }
+
+    pUnpacked.close();
+}
+
+void MKOReader::MK8_Unpack_CHRBones(int variableID)
+{
+    std::string varName = GetVariableNameMK8(variableID);
+    pFile.seekg(m_pDataStartOffset + GetVariableOffsetMK8(variableID), pFile.beg);
+
+    std::string output = varName;
+    output += ".txt";
+    std::ofstream pUnpacked(output);
+
+    int numElems = mk8_vars[variableID].size / mk8_vars[variableID].elemSize;
+
+    for (int i = 0; i < numElems; i++)
+    {
+        int id[2];
+        pFile.read((char*)&id, sizeof(id));
+        SwapINT(&id[0]);
+        SwapINT(&id[1]);
+        std::string str;
+        str = (char*)(&string_data[0] + id[1]);
+        pUnpacked << str << std::endl;
+    }
+
+    pUnpacked.close();
+}
+
 void MKOReader::DecompileAllFunctions()
 {
     if (!IsDecompSupported())
@@ -937,6 +1162,12 @@ void MKOReader::UnpackVariables()
 {
     for (unsigned int i = 0; i < vars.size(); i++)
         UnpackVariable(i);
+}
+
+void MKOReader::UnpackVariablesMK8()
+{
+    for (unsigned int i = 0; i < mk8_vars.size(); i++)
+        UnpackVariableMK8(i);
 }
 
 
