@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 			<< "    -v  Only prints MKO information.\n"
 			<< "    -g  Gamecube/Wii file.\n"
 			<< "    -e  Extracts data only.\n"
-			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda.\n";
+			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc.\n";
 		return 1;
 	}
 
@@ -71,8 +71,12 @@ int main(int argc, char* argv[])
 	if (m_param == "mku") game = Game_Deception;
 	if (m_param == "mka") game = Game_Armageddon;
 	if (m_param == "mkda") game = Game_DeadlyAlliance;
+	if (m_param == "mkvsdc") game = Game_MKVSDC;
 
     MKOReader mko(path, _g_switch, game);
+
+	if (game == Game_MKVSDC)
+		return 0;
 
 	MKODict::InitDict(game);
 

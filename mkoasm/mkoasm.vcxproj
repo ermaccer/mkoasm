@@ -158,6 +158,7 @@
     <ClInclude Include="code\MKODict.h" />
     <ClInclude Include="code\MKScript.h" />
     <ClInclude Include="code\MKScriptTypes.h" />
+    <ClInclude Include="code\MKScript_MK8.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="ini.h" />
     <ClInclude Include="INIReader.h" />

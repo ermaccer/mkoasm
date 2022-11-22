@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "code/MKScript.h"
+#include "code/MKScript_MK8.h"
 #include <fstream>
 #include "code/MKScriptTypes.h"
 #include "code/MKODict.h"
@@ -78,6 +79,7 @@ public:
     MKOReader(const char* file, bool isGameCube = false, EGameMode game = Game_Deception);
 
     bool Read(const char* file);
+    bool ReadMK8();
     int  GetAllFunctionsSize();
     int  GetAllVariablesSize();
 

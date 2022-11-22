@@ -26,7 +26,12 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
     m_bGameCube = isGameCube;
     game = _game;
     if (!build)
-        m_bIsValid = Read(file);
+    {
+        if (game == Game_MKVSDC)
+            m_bIsValid = ReadMK8();
+        else
+         m_bIsValid = Read(file);
+    }
     else
         m_bIsValid = Build();
 
@@ -187,6 +192,189 @@ bool MKOReader::Read(const char* file)
         return true;
 	}
 	return false;
+}
+
+bool MKOReader::ReadMK8()
+{
+    pFile.open(m_szInputName, std::ifstream::binary);
+    if (pFile.is_open())
+    {
+        mko_header_mk8 mk8_header;
+        pFile.read((char*)&mk8_header, sizeof(mko_header_mk8));
+
+
+        SwapINT(&mk8_header.field0);
+        SwapINT(&mk8_header.field4);
+        SwapINT(&mk8_header.field8);
+        SwapINT(&mk8_header.field12);
+        SwapINT((int*)&mk8_header.field16);
+        SwapINT(&mk8_header.functions);
+        SwapINT(&mk8_header.static_variables);
+        SwapINT(&mk8_header.externs);
+        SwapINT(&mk8_header.assets);
+        SwapINT(&mk8_header.field36);
+        SwapINT(&mk8_header.field40);
+        SwapINT(&mk8_header.field44);
+        SwapINT(&mk8_header.string_size);
+        SwapINT(&mk8_header.field52);
+        SwapINT(&mk8_header.field56);
+
+
+        // same as mka
+        {
+            int size = mk8_header.functions * sizeof(int);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        std::vector<mko_function_header_mk8> mk8_funcs;
+        std::vector<mko_variable_header_mk8> mk8_vars;
+        std::vector<mko_extern_mk8> mk8_externs;
+        std::vector<mko_asset_mk8> mk8_assets;
+
+        for (int i = 0; i < mk8_header.functions; i++)
+        {
+            mko_function_header_mk8 func;
+            pFile.read((char*)&func, sizeof(mko_function_header_mk8));
+
+
+            SwapINT(&func.nameOffset);
+            SwapINT(&func.field4);
+            SwapINT(&func.field8);
+            SwapINT(&func.field12);
+            SwapINT(&func.field16);
+            SwapINT(&func.field20);
+            SwapINT(&func.field24);
+            SwapINT(&func.field28);
+            SwapINT(&func.id);
+            SwapINT(&func.numUnk);
+            SwapINT(&func.field40);
+
+            {
+                if (func.numUnk)
+                {
+                    int size = func.numUnk * sizeof(mko_function_header_mk8_unk);
+                    std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+                    pFile.read(unkData.get(), size);
+                }
+            }
+
+
+            mk8_funcs.push_back(func);
+        }
+
+        {
+            int size = mk8_header.static_variables * sizeof(int);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < mk8_header.static_variables; i++)
+        {
+            mko_variable_header_mk8 var;
+            pFile.read((char*)&var, sizeof(mko_variable_header_mk8));
+
+            SwapINT(&var.name_offset);
+            SwapINT(&var.field4);
+            SwapINT(&var.field8);
+            SwapINT(&var.field12);
+
+            mk8_vars.push_back(var);
+        }
+
+
+        {
+            int size = mk8_header.externs * sizeof(int);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        // new in mk8
+        for (int i = 0; i < mk8_header.externs; i++)
+        {
+            mko_extern_mk8 ext;
+            pFile.read((char*)&ext, sizeof(mko_extern_mk8));
+
+            SwapINT(&ext.nameOffset);
+            SwapINT(&ext.importName);
+            SwapINT((int*)&ext.field8);
+            SwapINT(&ext.field12);
+            SwapINT(&ext.field16);
+            SwapINT(&ext.field20);
+            mk8_externs.push_back(ext);
+        }
+       
+        {
+            int size = mk8_header.assets * sizeof(int);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        // new in mk8
+        for (int i = 0; i < mk8_header.assets; i++)
+        {
+            mko_asset_mk8 ass;
+            pFile.read((char*)&ass, sizeof(mko_asset_mk8));
+
+            SwapINT(&ass.nameOffset);
+            SwapINT(&ass.archiveNameOffset);
+            SwapINT(&ass.field8);
+
+            mk8_assets.push_back(ass);
+        }
+
+
+        string_data = std::make_unique<char[]>(mk8_header.string_size);
+        pFile.read(string_data.get(), mk8_header.string_size);
+
+
+        printf("===========\n");
+        printf("Header Info\n");
+        printf("===========\n");
+        printf("String data size        : \t%d\n", mk8_header.string_size);
+        printf("===========\n");
+        printf("Function Info\n");
+        printf("===========\n");
+        printf("Functions               : \t%d\n", mk8_header.functions);
+        for (unsigned int i = 0; i < mk8_funcs.size(); i++)
+        {
+            std::string func_name = (char*)(&string_data[0] + (mk8_funcs[i].nameOffset - 1));
+            printf("Function %04d - %s \t\n", i, func_name.c_str());
+        }
+
+        printf("===========\n");
+        printf("Variable Info\n");
+        printf("===========\n");
+        printf("Variables               : \t%d\n", mk8_header.static_variables);
+        for (unsigned int i = 0; i < mk8_vars.size(); i++)
+        {
+            std::string var_name = (char*)(&string_data[0] + (mk8_vars[i].name_offset - 1));
+            printf("Variable %04d - %s\n", i, var_name.c_str());
+        }
+
+        printf("===========\n");
+
+        printf("Externs               : \t%d\n", mk8_header.externs);
+        for (unsigned int i = 0; i < mk8_externs.size(); i++)
+        {
+            std::string ext_name = (char*)(&string_data[0] + (mk8_externs[i].nameOffset - 1));
+            std::string imp_name = (char*)(&string_data[0] + (mk8_externs[i].importName - 1));
+            printf("Extern %04d - %s\t from %s\n", i, ext_name.c_str(), imp_name.c_str());
+        }
+        printf("===========\n");
+        printf("Assets               : \t%d\n", mk8_header.assets);
+        for (unsigned int i = 0; i < mk8_assets.size(); i++)
+        {
+            std::string ass_name = (char*)(&string_data[0] + (mk8_assets[i].nameOffset - 1));
+            std::string arch_name = (char*)(&string_data[0] + (mk8_assets[i].archiveNameOffset - 1));
+            printf("Asset %04d - %s:%s\n", i, arch_name.c_str(), ass_name.c_str());
+        }
+
+        printf("===========\n");
+
+        return true;
+    }
+    return false;
 }
 
 int MKOReader::GetAllFunctionsSize()
@@ -1250,7 +1438,7 @@ MKOReader::operator bool()
 
 void MKOReader::SwapINT(int* value)
 {
-    if (m_bGameCube)
+    if (m_bGameCube || game == Game_MKVSDC)
         changeEndINT(value);
 }
 

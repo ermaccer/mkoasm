@@ -4,4 +4,5 @@ enum EGameMode {
     Game_Armageddon,
     Game_DeadlyAlliance,
     Game_Unchained,
+    Game_MKVSDC
 };
