@@ -10,14 +10,13 @@
 #include "code/MKScript.h"
 #include "MKOReader.h"
 
-
 int main(int argc, char* argv[])
 {
 	bool _d_switch = false;
 	bool _v_switch = false;
 	bool _e_switch = false;
 	bool _g_switch = false;
-	bool _a_switch = false;
+	std::string m_param;
 
 	if (argc == 1) {
 		std::cout << "Usage: mkoasm <optional params> <file>\n"
@@ -25,7 +24,7 @@ int main(int argc, char* argv[])
 			<< "    -v  Only prints MKO information.\n"
 			<< "    -g  Gamecube/Wii file.\n"
 			<< "    -e  Extracts data only.\n"
-			<< "    -a  Armageddon MKO.\n";
+			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda.\n";
 		return 1;
 	}
 
@@ -45,7 +44,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'g': _g_switch = true;
 			break;
-		case 'a': _a_switch = true;
+		case 'm':
+			i++;
+			m_param = argv[i];
 			break;
 		default:
 			std::cout << "ERROR: Param does not exist: " << argv[i] << std::endl;
@@ -64,12 +65,16 @@ int main(int argc, char* argv[])
 	if (!path)
 		return 0;
 
+	EGameMode game = Game_Deception;
 
+	if (m_param == "mkd") game = Game_Deception;
+	if (m_param == "mku") game = Game_Deception;
+	if (m_param == "mka") game = Game_Armageddon;
+	if (m_param == "mkda") game = Game_DeadlyAlliance;
 
-    MKOReader mko(path, _g_switch, _a_switch ? Game_Armageddon : Game_Deception);
+    MKOReader mko(path, _g_switch, game);
 
-	if (mko.game == Game_Deception)
-		MKODict::InitDict();
+	MKODict::InitDict(game);
 
 	if (mko && !mko.m_bBuildMode)
 	{

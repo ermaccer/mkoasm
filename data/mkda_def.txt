@@ -1,0 +1,51 @@
+; MKDA definition file
+; format: name id numArgs argTypes
+; 
+; 
+sleep 0 1 0
+true_branch 1 1 0
+branch 2 1 0
+exit_4 7 4 0 0 0 0
+exit_6 8 6 0 0 0 0 0 0
+blend_to_ani 9 3 0 0 1
+ani_to_frame_x 13 1 1
+ani_to_blend_frame 14 1 1
+slow_ani_x 15 2 1 1
+set_my_state 20 1 0
+set_my_secondary_state 21 1 0
+set_ani_speed 22 1 1
+init_ground_move 24 1 0
+init_air_move 27 1 0
+was_button_pressed 50 1 0
+force_away 56 4 1 0 1 0
+snd_req 61 1 0
+block_branch 73 1 0
+hit_branch 74 1 0
+super_charge_me 87 1 0
+disable_this_move_exec 91 2 
+myvel_my_angle_y 106 3 1 1 1
+ejb_call 107 1 0
+attack_to_frame_x2 117 8 0 1 1 1 1 0 0 0
+random_hit 127 1 0
+random_voice 128 1 0
+set_his_damage_multiplier 132 1 1
+nick_function 133 1 0
+bulvan_function 135 1 0
+ani_to_frame_x_col 138 6 1 0 1 1 0 1
+ani_col_abort 140 7 1 0 1 0 0 1 0
+trial_register_attack 164 2 0 0
+trial_increment_state_value 171 2 0 0
+drone_combo 175 4 0 0 0 0
+set_block_requirement 177 1 0
+camera_set_movement_mode 190 1 0
+camera_set_look_mode 191 1 0
+camera_set_glitch_flag 194 0
+camera_set_movement_rate 195 1 1
+camera_set_rotation_rate 196 1 1
+camera_set_lookat_focus 200 1 0
+camera_set_movement_focus 201 1 0
+camera_setup_radial_position 202 3 1 1 1
+camera_setup_tightrope_angle_offset 204 2 1 1
+add_move_desc 208 3 0 4 4
+set_attack_type 214 1 0
+

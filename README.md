@@ -11,8 +11,9 @@ Run without params to get usage.
 
 | Game | View | Extract | Decompile | Platforms |
 |       ---       |       ---       |       ---       |       ---       |       ---       |
-| MK Deadly Alliance | ❌ | ❌ | ❌| None |
-| MK Deception (Unchained) | ✔️ | ✔️ | ✔️| PS2, PSP, GC, XBOX (not tested) |
+| MK Deadly Alliance | ✔️ | ✔️ | ✔️| Only tested with PS2 |
+| MK Deception | ✔️ | ✔️ | ✔️| PS2, GC, XBOX (not tested) |
+| MK Unchained | ✔️ | ✔️ | ✔️| PSP|
 | MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested)|
 
 Scripts from MKvsDC and onwards are totally unsuppported.
@@ -20,7 +21,7 @@ Scripts from MKvsDC and onwards are totally unsuppported.
 
 # Decompilation
 
-mkoasm is able to decompile certain functions using a definition table (mkd_def.txt), 
+mkoasm is able to decompile certain functions using a definition table (depending on mode), 
 note the current definition table is made for MK Unchained! Functions after ID 600/700 are 
 offset by 4 in MKU.
 

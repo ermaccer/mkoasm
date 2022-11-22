@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "..\enums.h"
 
 enum EMKOFunctionArgumentDefinition_Type {
 	EMKOFAD_Integer,
@@ -24,7 +25,7 @@ struct MKOFunctionDefinition {
 class MKODict {
 public:
 	static std::vector<MKOFunctionDefinition> ms_vFunctions;
-	static void InitDict();
+	static void InitDict(EGameMode game);
 
 	static const char* GetInternalName(int functionID);
 

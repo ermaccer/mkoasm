@@ -28,9 +28,28 @@ const char* szInternalNames[] = {
 
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
 
-void MKODict::InitDict()
+void MKODict::InitDict(EGameMode game)
 {
-    FILE* pFile = fopen("mkd_def.txt", "rb");
+    const char* file = nullptr;
+    switch (game)
+    {
+    case Game_Deception:
+        file = "mkd_def.txt";
+        break;
+    case Game_Armageddon:
+        file = "mka_def.txt";
+        break;
+    case Game_DeadlyAlliance:
+        file = "mkda_def.txt";
+        break;
+    case Game_Unchained:
+        file = "mku_def.txt";
+        break;
+    default:
+        break;
+    }
+
+    FILE* pFile = fopen(file, "rb");
     if (pFile)
     {
         char szLine[2048];
@@ -83,6 +102,7 @@ void MKODict::InitDict()
         fclose(pFile);
     }
 }
+
 
 const char* MKODict::GetInternalName(int functionID)
 {

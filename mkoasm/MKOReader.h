@@ -2,10 +2,10 @@
 #include <vector>
 #include "code/MKScript.h"
 #include <fstream>
-#include "code/MKODict.h"
 #include "code/MKScriptTypes.h"
-#include "code/misc.h"
+#include "code/MKODict.h"
 
+#include "enums.h"
 
 #define VARIABLESFOLDER_NAME "vars"
 #define FUNCTIONFOLDER_NAME "funcs"
@@ -27,13 +27,8 @@ struct MKOCodeEntry {
     // debug/helper
     int offset;
     int size;
+    int localOffset;
 
-};
-
-
-enum EGameMode {
-    Game_Deception,
-    Game_Armageddon
 };
 
 struct MKOFunctionEntry {
@@ -76,7 +71,7 @@ public:
 
     mko_header header;
 
-    
+    int nBytesRead = 0;
 
     std::ifstream pFile;
 
@@ -119,10 +114,14 @@ public:
     void DumpHeader(std::string header);
 
     void ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functionID);
-
+    void ParseMKOCommand(mko_command& bc);
+    void ParseMKOCommand_MKDU(mko_command& bc);
+    void ParseMKOCommand_MKDA(mko_command& bc);
     // building
 
     bool Build();
+
+    bool IsDecompSupported();
 
     operator bool();
 
