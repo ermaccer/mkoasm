@@ -22,7 +22,7 @@ snd_req 61 1 0
 block_branch 73 1 0
 hit_branch 74 1 0
 super_charge_me 87 1 0
-disable_this_move_exec 91 2 
+disable_this_move_exec 91 2 0 0
 myvel_my_angle_y 106 3 1 1 1
 ejb_call 107 1 0
 attack_to_frame_x2 117 8 0 1 1 1 1 0 0 0
