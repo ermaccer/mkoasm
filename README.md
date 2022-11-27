@@ -9,6 +9,10 @@ Run without params to get usage.
 
 # Support Table
 
+**Note: There's no way to detect the format of the MKO script, use -m param to change
+game mode**
+
+
 | Game | View | Extract | Decompile | Platforms |
 |       ---       |       ---       |       ---       |       ---       |       ---       |
 | MK Deadly Alliance | ✔️ | ✔️ | ✔️| Only tested with PS2 |
@@ -19,7 +23,7 @@ Run without params to get usage.
 | MK9 | ✔️ | ✔️ | ❌| PC |
 
 
-Scripts from MK9 and onwards are totally unsuppported.
+Scripts from Injustice and onwards are totally unsuppported.
 
 
 # Decompilation
