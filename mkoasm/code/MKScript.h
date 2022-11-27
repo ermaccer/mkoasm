@@ -34,10 +34,3 @@ struct mko_command {
 	short numVariables;
 	short unk2;
 };
-
-
-enum mko_variable_type {
-	VAR_STRING_TABLE = 1,
-};
-
-const char* GetVariableTypeName(int id);

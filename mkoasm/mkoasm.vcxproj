@@ -146,7 +146,6 @@
     <ClCompile Include="code\FileFunctions.cpp" />
     <ClCompile Include="code\misc.cpp" />
     <ClCompile Include="code\MKODict.cpp" />
-    <ClCompile Include="code\MKScript.cpp" />
     <ClCompile Include="ini.c" />
     <ClCompile Include="INIReader.cpp" />
     <ClCompile Include="mkoasm.cpp" />
@@ -159,6 +158,7 @@
     <ClInclude Include="code\MKScript.h" />
     <ClInclude Include="code\MKScriptTypes.h" />
     <ClInclude Include="code\MKScript_MK8.h" />
+    <ClInclude Include="code\MKScript_MK9.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="ini.h" />
     <ClInclude Include="INIReader.h" />

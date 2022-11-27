@@ -27,6 +27,7 @@ const char* szInternalNames[] = {
 };
 
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
+std::vector<MidwayHashEntry> MKODict::ms_vHashes;
 
 void MKODict::InitDict(EGameMode game)
 {
@@ -48,6 +49,9 @@ void MKODict::InitDict(EGameMode game)
     default:
         break;
     }
+
+    if (file == nullptr)
+        return;
 
     FILE* pFile = fopen(file, "rb");
     if (pFile)
@@ -103,6 +107,32 @@ void MKODict::InitDict(EGameMode game)
     }
 }
 
+void MKODict::InitHashTable()
+{
+    FILE* pFile = fopen("hashtable.txt", "rb");
+    if (pFile)
+    {
+        char szLine[2048] = {};
+        char* tempLine;
+        int  errorCheck = 0;
+        while (fgets(szLine, sizeof(szLine), pFile))
+        {
+            if (szLine[0] == ';' || szLine[0] == '#' || szLine[0] == '\n')
+                continue;
+
+            char name[256] = {};
+            unsigned int hash = 0;
+            sscanf(szLine, "0x%X %s", &hash, &name);
+
+            MidwayHashEntry h;
+            h.hash = hash;
+            sprintf(h.name, name);
+            ms_vHashes.push_back(h);
+        }
+        fclose(pFile);
+    }
+}
+
 
 const char* MKODict::GetInternalName(int functionID)
 {
@@ -133,4 +163,31 @@ MKOFunctionDefinition MKODict::GetDefinition(int functionID)
     }
 
     return def;
+}
+
+std::string MKODict::GetHashString(unsigned int hash)
+{
+    static char tmp[256] = {};
+    sprintf(tmp, "0x%X", hash);
+    for (unsigned int i = 0; i < ms_vHashes.size(); i++)
+    {
+        if (ms_vHashes[i].hash == hash)
+        {
+            sprintf(tmp, ms_vHashes[i].name);
+            break;
+        }
+    }
+    return tmp;
+}
+
+bool MKODict::IsHashAvailable(unsigned int hash)
+{
+    for (unsigned int i = 0; i < ms_vHashes.size(); i++)
+    {
+        if (ms_vHashes[i].hash == hash)
+        {
+            return true;
+        }
+    }
+    return false;
 }

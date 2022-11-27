@@ -18,9 +18,6 @@
     <ClCompile Include="mkoasm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="code\MKScript.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="MKOReader.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="code\MKScript_MK8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MKScript_MK9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

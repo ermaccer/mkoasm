@@ -2,6 +2,7 @@
 #include <vector>
 #include "code/MKScript.h"
 #include "code/MKScript_MK8.h"
+#include "code/MKScript_MK9.h"
 #include <fstream>
 #include "code/MKScriptTypes.h"
 #include "code/MKODict.h"
@@ -64,6 +65,7 @@ public:
     std::vector<mko_variable_header> vars;
     std::vector<int> var_sizes;
     std::vector<int> func_sizes;
+    mko_header header;
 
 
     // mk8 (Mortal Kombat vs DC Universe)
@@ -73,11 +75,21 @@ public:
     std::vector<mko_extern_mk8> mk8_externs;
     std::vector<mko_asset_mk8> mk8_assets;
 
+    // mk9
+    mko_header_mk9 mk9_header;
+    std::vector<mko_function_header_mk9> mk9_funcs;
+    std::vector<mko_variable_header_mk9> mk9_vars;
+    std::vector<mko_variable_header_mk9> mk9_dyn_vars;
+    std::vector<mko_extern_mk9> mk9_externs;
+    std::vector<mko_asset_mk9> mk9_assets;
+    std::vector<mko_sound_asset_mk9> mk9_sounds;
+    std::vector<mko_unknown_mk9> mk9_unknowns;
+
     std::unique_ptr<char[]> script_names;
     std::unique_ptr<char[]> string_data;
     std::unique_ptr<char[]> unk_data;
 
-    mko_header header;
+
 
     int nBytesRead = 0;
 
@@ -87,6 +99,10 @@ public:
 
     bool Read(const char* file);
     bool ReadMK8();
+    bool ReadMK9();
+
+    std::string GetExtension();
+
     int  GetAllFunctionsSize();
     int  GetAllVariablesSize();
     int  GetAllVariablesSizeMK8();
@@ -96,26 +112,37 @@ public:
 
     std::string GetFunctionName(int functionID);
     std::string GetFunctionNameMK8(int functionID);
+    std::string GetFunctionNameMK9(int functionID);
+
     uint32_t GetFunctionOffset(int functionID);
 
     std::string GetVariableName(int variableID);
     std::string GetVariableNameMK8(int variableID);
+    std::string GetVariableNameMK9(int variableID);
+
     uint32_t GetVariableOffset(int variableID);
     uint32_t GetVariableOffsetMK8(int variableID);
+    uint32_t GetVariableOffsetMK9(int variableID);
 
     std::string GetString(int stringStart);
 
     void ExtractData();
+    void ExtractDataMKDADU();
     void ExtractDataMK8();
+    void ExtractDataMK9();
+
     void ExtractVariables();
     void ExtractVariablesMK8();
+    void ExtractVariablesMK9();
+
     void ExtractFunctions();
     void ExtractFunctionsMK8();
+    void ExtractFunctionsMK9();
     void DecompileFunction(int functionID);
     void UnpackVariable(int variableID);
 
     void UnpackVariableMK8(int variableID);
-
+    void UnpackVariableMK9(int variableID);
     // unpackers
     void Unpack_Movelist(int variableID);
     void Unpack_Styles(int variableID);
@@ -130,24 +157,39 @@ public:
     void MK8_Unpack_Movelist(int variableID);
     void MK8_Unpack_CHRBones(int variableID);
 
+    // mk9 unpackers
+    void MK9_Unpack_RArt(int variableID);
+    void MK9_Unpack_Movelist(int variableID);
+
+
     void DecompileAllFunctions();
     void UnpackVariables();
     void UnpackVariablesMK8();
-
+    void UnpackVariablesMK9();
 
     void PrintInfo();
-    void DumpInfo(std::string name);
+
+    void PrintInfoMKDADU();
+    void PrintInfoMK8();
+    void PrintInfoMK9();
+
+    void DumpInfoMKDADU(std::string name);
+    void DumpInfoMK8(std::string name);
+    void DumpInfoMK9(std::string name);
+
     void DumpHeader(std::string header);
 
     void ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functionID);
     void ParseMKOCommand(mko_command& bc);
     void ParseMKOCommand_MKDU(mko_command& bc);
     void ParseMKOCommand_MKDA(mko_command& bc);
+
     // building
 
     bool Build();
 
     bool IsDecompSupported();
+    bool Is64BitSupported();
 
     operator bool();
 

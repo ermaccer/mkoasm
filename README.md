@@ -16,7 +16,7 @@ Run without params to get usage.
 | MK Unchained | ✔️ | ✔️ | ✔️| PSP|
 | MK Armageddon | ✔️ | ✔️ | ❌|PS2, Wii (not tested), XBOX (not tested)|
 | MK VS DC | ✔️ | ✔️ | ❌|PS3|
-
+| MK9 | ✔️ | ✔️ | ❌| PC |
 
 
 Scripts from MK9 and onwards are totally unsuppported.
