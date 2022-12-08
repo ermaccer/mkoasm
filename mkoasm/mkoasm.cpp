@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
 	if (!path)
 		return 0;
 
-	EGameMode game = Game_Deception;
+	EGameMode game = Game_Unchained;
 
 	if (m_param == "mkd") game = Game_Deception;
-	if (m_param == "mku") game = Game_Deception;
+	if (m_param == "mku") game = Game_Unchained;
 	if (m_param == "mka") game = Game_Armageddon;
 	if (m_param == "mkda") game = Game_DeadlyAlliance;
 	if (m_param == "mkvsdc") game = Game_MKVSDC;

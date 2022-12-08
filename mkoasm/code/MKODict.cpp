@@ -1,5 +1,6 @@
 #include "MKODict.h"
 #include <memory>
+#include <algorithm>
 
 const char* szInternalNames[] = {
     "copy_register_to_instruction",
@@ -29,22 +30,30 @@ const char* szInternalNames[] = {
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
 std::vector<MidwayHashEntry> MKODict::ms_vHashes;
 
+#ifdef SORT_FUNCTIONS
+bool sort_functions(MKOFunctionDefinition& a, MKOFunctionDefinition& b)
+{
+    return b.functionID > a.functionID;
+}
+#endif
+
 void MKODict::InitDict(EGameMode game)
 {
     const char* file = nullptr;
+
     switch (game)
     {
     case Game_Deception:
-        file = "mkd_def.txt";
+        file = "data\\mkd_def.txt";
         break;
     case Game_Armageddon:
-        file = "mka_def.txt";
+        file = "data\\mka_def.txt";
         break;
     case Game_DeadlyAlliance:
-        file = "mkda_def.txt";
+        file = "data\\mkda_def.txt";
         break;
     case Game_Unchained:
-        file = "mku_def.txt";
+        file = "data\\mku_def.txt";
         break;
     default:
         break;
@@ -105,11 +114,26 @@ void MKODict::InitDict(EGameMode game)
         }
         fclose(pFile);
     }
+#ifdef SORT_FUNCTIONS
+    std::sort(ms_vFunctions.begin(), ms_vFunctions.end(), sort_functions);
+
+    for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
+    {
+        MKOFunctionDefinition def = {};
+        def = ms_vFunctions[i];
+        printf("%s %d %d ", def.name, def.functionID, def.num_arguments);
+        for (int a = 0; a < def.num_arguments; a++)
+        {
+            printf("%d ", def.args[a]);
+        }
+        printf("\n");
+    }
+#endif
 }
 
 void MKODict::InitHashTable()
 {
-    FILE* pFile = fopen("hashtable.txt", "rb");
+    FILE* pFile = fopen("data\\hashtable.txt", "rb");
     if (pFile)
     {
         char szLine[2048] = {};
@@ -136,7 +160,16 @@ void MKODict::InitHashTable()
 
 const char* MKODict::GetInternalName(int functionID)
 {
-    return szInternalNames[functionID - 1];
+    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+
+    if (functionID > internalSize)
+    {
+        static char buff[128] = {};
+        sprintf(buff, "internal_%d", functionID);
+        return buff;
+    }
+    else
+     return szInternalNames[functionID - 1];
 }
 
 bool MKODict::IsDefinitionAvailable(int functionID)

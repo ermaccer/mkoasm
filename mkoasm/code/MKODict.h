@@ -3,12 +3,15 @@
 #include <string>
 #include "..\enums.h"
 
+//#define SORT_FUNCTIONS
+
 enum EMKOFunctionArgumentDefinition_Type {
 	EMKOFAD_Integer,
 	EMKOFAD_Float,
 	EMKOFAD_Short,
 	EMKOFAD_UInt,
-	EMKOFAD_String
+	EMKOFAD_String,
+	EMKOFAD_Hex
 };
 
 struct MKOFunctionArgumentDefinition {

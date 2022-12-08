@@ -221,7 +221,13 @@ bool MKOReader::Read(const char* file)
         pFile.read(unk_data.get(), header.unknown_data_size);
 
         m_pDataStartOffset = (uint32_t)(pFile.tellg());
-        m_pFunctionsStartOffset = m_pDataStartOffset + GetAllVariablesSize();
+
+        if (game == Game_Armageddon)
+            m_pFunctionsStartOffset = m_pDataStartOffset + header.last_variable_offset - sizeof(int);
+        else
+            m_pFunctionsStartOffset = m_pDataStartOffset + GetAllVariablesSize();
+
+
         return true;
 	}
 	return false;
@@ -1051,13 +1057,21 @@ void MKOReader::ExtractVariablesMK9()
 
 void MKOReader::ExtractFunctions()
 {
-    pFile.seekg(m_pFunctionsStartOffset, pFile.beg);
+
     std::string hdr = "..\\";
     hdr += GetFileName() + "_header.ini";
     std::ofstream oInfo(hdr, std::ofstream::app);
     for (unsigned int i = 0; i < funcs.size(); i++)
     {
         int size = func_sizes[i];
+        if (game == Game_Armageddon)
+        {
+            pFile.seekg(m_pFunctionsStartOffset + (funcs[i].offset * 4), pFile.beg);
+            size = funcs[i].unknown;
+        }
+
+
+
         std::string func_name = (char*)(&script_names[0] + (funcs[i].name_offset - 1));
         float funcID = 0;
         if (!(game == Game_DeadlyAlliance))
@@ -1133,6 +1147,7 @@ void MKOReader::DecompileFunction(int functionID)
         for (int i = 0; i < codeData.size(); i++)
         {
             MKOCodeEntry c = codeData[i];
+
             MKOFunctionDefinition funcDef;
             bool definitionAvailable = false;
             if (c.arguments.size() > 0)
@@ -1156,6 +1171,7 @@ void MKOReader::DecompileFunction(int functionID)
                     pMKC << functionName << "(";
                 }
 
+
                 for (int a = 0; a < c.arguments.size(); a++)
                 {
                     if (definitionAvailable)
@@ -1176,10 +1192,11 @@ void MKOReader::DecompileFunction(int functionID)
                                     pMKC << c.arguments[a].integerData;
                             }
                             else
-                                   pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
+                                pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
 
                         }
-
+                        else if (funcDef.args[a] == EMKOFAD_Hex)
+                            pMKC << std::hex << "0x" << c.arguments[a].uintData << std::dec;
                         else
                             pMKC << c.arguments[a].integerData;
 
@@ -2083,17 +2100,23 @@ void MKOReader::ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functi
     pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffset(functionID), pFile.beg);
     nBytesRead = 0;
     int off = 0;
-    if (game = Game_DeadlyAlliance)
+    if (game == Game_DeadlyAlliance)
         off = sizeof(int);
 
-    while (nBytesRead < func_sizes[functionID] - off)
+    int size = func_sizes[functionID] - off;
+
+
+    while (nBytesRead < size)
     {
         MKOCodeEntry mko_entry = {};
         mko_command bc = {};
         if (mko_entry.offset == 0)
             mko_entry.offset = (int)pFile.tellg();
 
+
         ParseMKOCommand(bc);
+        if (bc.is_pad)
+            continue;
 
         if (bc.functionID  - 1 < 0)
         {
@@ -2125,11 +2148,16 @@ void MKOReader::ParseMKOCommand(mko_command& bc)
     switch (game)
     {
     case Game_Deception:
-    case Game_Unchained:
         ParseMKOCommand_MKDU(bc);
+        break;
+    case Game_Armageddon:
+        ParseMKOCommand_MKA(bc);
         break;
     case Game_DeadlyAlliance:
         ParseMKOCommand_MKDA(bc);
+        break;
+    case Game_Unchained:
+        ParseMKOCommand_MKDU(bc);
         break;
     default:
         break;
@@ -2141,15 +2169,53 @@ void MKOReader::ParseMKOCommand_MKDU(mko_command& bc)
     int a1, a2;
     pFile.read((char*)&a1, sizeof(int));
     nBytesRead += pFile.gcount();
+
+    SwapINT(&a1);
+
+    if (a1 == 0)
+    {
+        bc.is_pad = true;
+        return;
+    }
+
+
     pFile.read((char*)&a2, sizeof(int));
     nBytesRead += pFile.gcount();
-    SwapINT(&a1);
+
     SwapINT(&a2);
 
     bc.functionID = LOWORD(a1);
     bc.isInternal = HIWORD(a1);
     bc.numVariables = LOWORD(a2);
     bc.unk2 = HIWORD(a2);
+    bc.is_pad = false;
+}
+
+void MKOReader::ParseMKOCommand_MKA(mko_command& bc)
+{
+    int a1, a2;
+    pFile.read((char*)&a1, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a1);
+
+    if (a1 == 0)
+    {
+        bc.is_pad = true;
+        return;
+    }
+
+
+    pFile.read((char*)&a2, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a2);
+
+    bc.functionID = LOWORD(a1);
+    bc.isInternal = HIWORD(a1) == 0 ? -1 : HIWORD(a1);
+    bc.numVariables = LOWORD(a2);
+    bc.unk2 = HIWORD(a2);
+    bc.is_pad = false;
 }
 
 void MKOReader::ParseMKOCommand_MKDA(mko_command& bc)
@@ -2456,7 +2522,7 @@ bool MKOReader::IsDecompSupported()
         return true;
         break;
     case Game_Armageddon:
-        return false;
+        return true;
         break;
     case Game_DeadlyAlliance:
         return true;

@@ -55,7 +55,7 @@ public:
     bool m_bGameCube = false;
     bool m_bBuildMode = false;
 
-    EGameMode game = Game_Deception;
+    EGameMode game = Game_Unchained;
     std::string m_szInputName;
 
     uint32_t m_pDataStartOffset = 0;
@@ -67,6 +67,8 @@ public:
     std::vector<int> func_sizes;
     mko_header header;
 
+
+    std::vector<mko_function_header_mka> mka_funcs;
 
     // mk8 (Mortal Kombat vs DC Universe)
     mko_header_mk8 mk8_header;
@@ -182,6 +184,7 @@ public:
     void ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functionID);
     void ParseMKOCommand(mko_command& bc);
     void ParseMKOCommand_MKDU(mko_command& bc);
+    void ParseMKOCommand_MKA(mko_command& bc);
     void ParseMKOCommand_MKDA(mko_command& bc);
 
     // building

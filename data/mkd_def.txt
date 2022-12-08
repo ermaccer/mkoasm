@@ -2,97 +2,75 @@
 ; format: name id numArgs argTypes
 ; 
 ; 
-sleep 0 1 0
-branch 2 1 0
-true_branch 1 1 0
-ani_to_frame_x_col 238 7 1 0 1 1 0 1 0
-set_ani_speed 137 1 1
-attack_to_frame_x 29 8 0 1 1 1 1 0 0 0
-set_block_requirement 299 1 0
-snd_req 161 1 2
-set_my_secondary_state 136 1 0
-force_away 158 4 1 0 1 0
-ani_to_frame_x 128 1 1
-slow_ani_x 130 2 1 1
-blend_to_ani 13 3 0 0 1
-exit_6 11 6 0 0 0 0 0 0
-init_ground_move 139 0
-damage_him 200 1 1
-special_move_cam_setup 297 8 1 1 1 1 1 0 0 0
-block_branch 43 1 0
-miss_branch 42 1 0
-attack_opponent_with 70 3 0 0 0
-ani_to_blend_frame 129 1 1
-exit_attack_with 74 6 0 0 0 0 0 0
-function_1484 1484 3 3 3 0
-get_my_plyr_pdata 1554 0
-init_air_move 142 0
-ejb_call 210 1 0
-mku_1720 1720 2 1 0
-mku_1721 1721 0
-set_my_state 135 1 0
-disable_this_move_exec 196 2 0 0
-shake_hit_voice 172 4 0 1 0 0
-ani_to_end 155 0
-two_player_animation_match_attacker 27 2 0 1
-init_air_move_no_aniproc 143 0
-set_player_step 40 1 1
-randu 73 1 0
-get_current_player_number 75 0
-random_hit 174 1 0
-ck_item_obj 98 1 2
-get_new_mkobj 95 1 0
-set_obj_flag 102 3 3 0 0
-insert_item_obj 96 2 3 3
-function_1239 1239 3 0 1 0
-wait_to_land 206 0
-launch_me_up 150 2 1 1
-was_button_pressed 24 1 0
-was_button_and_direction 45 2 0 0
-step_throw_into_check 190 0
-random_voice 168 1 0
-exit_react 12 6 0 0 0 0 0 0
-shake_camera 159 2 0 1
+sleep 0 1 0 
+true_branch 1 1 0 
+branch 2 1 0 
+exit_6 11 6 0 0 0 0 0 0 
+exit_react 12 6 0 0 0 0 0 0 
+blend_to_ani 13 3 0 0 1 
+am_i_on_the_left 18 0 
+was_button_pressed 24 1 0 
+two_player_animation 26 2 0 1 
+two_player_animation_match_attacker 27 2 0 1 
+two_player_animation_flip 28 2 0 1 
+attack_to_frame_x 29 8 0 1 1 1 1 0 0 0 
+glitch_to_ani 33 2 0 0 
+glitch_him_to_ani 34 2 0 0 
+set_player_step 40 1 1 
+miss_branch 42 1 0 
+block_branch 43 1 0 
+was_button_and_direction 45 2 0 0 
+true_branch_next_style 48 1 0 
+if_switching_to 50 1 0 
+attack_opponent_with 70 3 0 0 0 
+randu 73 1 0 
+exit_attack_with 74 6 0 0 0 0 0 0 
+get_current_player_number 75 0 
+get_new_mkobj 95 1 0 
+insert_item_obj 96 2 3 3 
+ck_item_obj 98 1 2 
+destroy_item_obj 99 1 3 
+set_obj_flag 102 3 3 0 0 
+ani_to_frame_x 128 1 1 
+ani_to_blend_frame 129 1 1 
+slow_ani_x 130 2 1 1 
+set_my_state 135 1 0 
+set_my_secondary_state 136 1 0 
+set_ani_speed 137 1 1 
+init_ground_move 139 0 
+init_air_move 142 0 
+init_air_move_no_aniproc 143 0 
+launch_me_up 150 2 1 1 
+ani_to_end 155 0 
+force_away 158 4 1 0 1 0 
+shake_camera 159 2 0 1 
+snd_req 161 1 2 
+random_voice 168 1 0 
+shake_hit_voice 172 4 0 1 0 0 
+random_hit 174 1 0 
+plyr_snd_req 175 1 0 
+get_mode_of_play 178 0 
+stop_me 181 0 
+step_throw_into_check 190 0 
+disable_this_move_exec 196 2 0 0 
+damage_him 200 1 1 
+ejb_release_other_player 201 1 0 
 player_feet_land_chores 205 0 
-get_mode_of_play 178 0
-am_i_on_the_left 18 0
-two_player_animation_flip 28 2 0 1
-two_player_animation 26 2 0 1
-ejb_release_other_player 201 1 0
-destroy_item_obj 99 1 3
-mks_cloth_bones_init_by_tbl 304 2 0 0
-mks_mat_id_set_zbias 305 2 0 1
-mks_cb1_eq_cloth_bone 306 1 0
-mks_cb2_eq_cloth_bone 307 1 0
-mks_set_ground_y_all_cloth_bones 309 1 1
-mks_cb1_set_ground_y 310 1 0
-mks_insert_cloth_force_bones 308 2 1 1
-mks_cc1_eq_insert_cloth_coll 315 2 0 1
-mks_cc1_expand_cyl 316 2 1 1
-mks_cc1_insert_cb1 318 0
-mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0
-glitch_to_ani 33 2 0 0
-glitch_him_to_ani 34 2 0 0
-camera_set_speed_scalar 275 1 1
-plyr_snd_req 175 1 0
-myvel_my_angle_y 209 3 1 1 1
-collision_result_dont_care 1178 0
-stop_me 181 0
-if_switching_to 50 1 0
-true_branch_next_style 48 1 0
-start_projectile_from_plyr_bone 1241 6 3 0 4 1 1 0
-set_active_projectile_tracking_light 1210 1 0
-resume_effect_at_obj_bid 1231 5 3 0 3 0 0
-fx 1629 1 4
-create_step_fx 1616 2 0 4
-pfxhandle_spawn_at_bid_next 1484 3 3 3 0
-fx4script_pchr_jax_ground_punch 1721 0
-set_active_add_ang_y 1259 1 1
-set_active_projectile_hit_script 1245 1 0
-set_active_projectile_end_script 1246 1 0
-set_active_projectile_rx_info 1242 3 0 1 0
-obj_set_scale 814 2 3 0
-set_active_projectile_collision_info 1211 4 1 0 1 1
-set_active_projectile_sound 1256 3 0 0 0
-active_projectile_setup_done 1248 0
-get_bid_with_flip 1262 2 3 0
+wait_to_land 206 0 
+myvel_my_angle_y 209 3 1 1 1 
+ejb_call 210 1 0 
+ani_to_frame_x_col 238 7 1 0 1 1 0 1 0 
+camera_set_speed_scalar 275 1 1 
+special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
+set_block_requirement 299 1 0 
+mks_cloth_bones_init_by_tbl 304 2 0 0 
+mks_mat_id_set_zbias 305 2 0 1 
+mks_cb1_eq_cloth_bone 306 1 0 
+mks_cb2_eq_cloth_bone 307 1 0 
+mks_insert_cloth_force_bones 308 2 1 1 
+mks_set_ground_y_all_cloth_bones 309 1 1 
+mks_cb1_set_ground_y 310 1 0 
+mks_cc1_eq_insert_cloth_coll 315 2 0 1 
+mks_cc1_expand_cyl 316 2 1 1 
+mks_cc1_insert_cb1 318 0 
+mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0 

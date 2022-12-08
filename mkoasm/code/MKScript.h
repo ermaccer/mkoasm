@@ -20,6 +20,14 @@ struct mko_function_header {
 	int unknown; // post mkda
 };
 
+
+struct mko_function_header_mka {
+	int	name_offset;
+	int offset;
+	int unknown; // post mkda
+};
+
+
 struct mko_variable_header {
 	int name_offset;
 	int unknown;
@@ -33,4 +41,7 @@ struct mko_command {
 	short isInternal;
 	short numVariables;
 	short unk2;
+
+	// seems some characters use padding in scripts? no idea
+	bool is_pad;
 };
