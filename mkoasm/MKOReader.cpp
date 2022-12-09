@@ -1259,7 +1259,7 @@ void MKOReader::UnpackVariable(int variableID)
         Unpack_BList(variableID);
     else  if (varName.find("string_list") != std::string::npos)
         Unpack_SList(variableID);
-    else  if (varName.find("_attributes") != std::string::npos || varName.find("_hit") != std::string::npos)
+    else  if (varName.find("_attributes") != std::string::npos || varName.find("_second_hit") != std::string::npos)
         Unpack_Attributes(variableID);
     std::cout << "Attempting to unpack " << varName << std::endl;
 }
