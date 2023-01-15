@@ -1765,7 +1765,7 @@ void MKOReader::PrintInfoMK9()
             std::replace(arg_type.begin(), arg_type.end(), '.', ',');
         }
 
-        printf("Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str(), mk9_funcs[i].nameOffset);
+        printf("Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str());
     }
 
     printf("===========\n");
@@ -1994,7 +1994,7 @@ void MKOReader::DumpInfoMK9(std::string name)
                 std::replace(arg_type.begin(), arg_type.end(), '.', ',');
             }
 
-            sprintf(pInfo, "Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str(), mk9_funcs[i].nameOffset);
+            sprintf(pInfo, "Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str());
             oInfo << pInfo;
         }
 

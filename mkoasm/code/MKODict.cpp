@@ -137,7 +137,6 @@ void MKODict::InitHashTable()
     if (pFile)
     {
         char szLine[2048] = {};
-        char* tempLine;
         int  errorCheck = 0;
         while (fgets(szLine, sizeof(szLine), pFile))
         {
@@ -172,11 +171,45 @@ const char* MKODict::GetInternalName(int functionID)
      return szInternalNames[functionID - 1];
 }
 
+int MKODict::GetInternalID(const char* name)
+{
+    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+
+    for (int i = 0; i < internalSize; i++)
+    {
+        if (strcmp(name, szInternalNames[i]) == 0)
+            return i;
+    }
+    return 0;
+}
+
+bool MKODict::IsFunctionInternal(const char* name)
+{
+    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+
+    for (int i = 0; i < internalSize; i++)
+    {
+        if (strcmp(name, szInternalNames[i]) == 0)
+            return true;
+    }
+    return false;
+}
+
 bool MKODict::IsDefinitionAvailable(int functionID)
 {
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
         if (ms_vFunctions[i].functionID == functionID)
+            return true;
+    }
+    return false;
+}
+
+bool MKODict::IsDefinitionAvailable(const char* name)
+{
+    for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
+    {
+        if (strcmp(ms_vFunctions[i].name, name) == 0)
             return true;
     }
     return false;
@@ -189,6 +222,22 @@ MKOFunctionDefinition MKODict::GetDefinition(int functionID)
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
         if (ms_vFunctions[i].functionID == functionID)
+        {
+            def = ms_vFunctions[i];
+            break;
+        }
+    }
+
+    return def;
+}
+
+MKOFunctionDefinition MKODict::GetDefinition(const char* name)
+{
+    MKOFunctionDefinition def = {};
+
+    for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
+    {
+        if (strcmp(ms_vFunctions[i].name, name) == 0)
         {
             def = ms_vFunctions[i];
             break;

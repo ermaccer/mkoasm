@@ -16,6 +16,12 @@ enum EMKOFunctionArgumentDefinition_Type {
 
 struct MKOFunctionArgumentDefinition {
 	EMKOFunctionArgumentDefinition_Type type;
+	union argData {
+		float flt;
+		int integer;
+		unsigned int uint;
+		short word;
+	}data;
 };
 
 struct MKOFunctionDefinition {
@@ -40,9 +46,13 @@ public:
 	static void InitHashTable();
 
 	static const char* GetInternalName(int functionID);
+	static int GetInternalID(const char* name);
+	static bool IsFunctionInternal(const char* name);
 
 	static bool IsDefinitionAvailable(int functionID);
+	static bool IsDefinitionAvailable(const char* name);
 	static MKOFunctionDefinition GetDefinition(int functionID);
+	static MKOFunctionDefinition GetDefinition(const char* name);
 	static std::string GetHashString(unsigned int hash);
 	static bool IsHashAvailable(unsigned int hash);
 };

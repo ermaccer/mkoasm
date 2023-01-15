@@ -9,6 +9,8 @@
 
 #include "code/MKScript.h"
 #include "MKOReader.h"
+#include "compiler/MKOCompiler.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -16,6 +18,7 @@ int main(int argc, char* argv[])
 	bool _v_switch = false;
 	bool _e_switch = false;
 	bool _g_switch = false;
+	bool _c_switch = false;
 	std::string m_param;
 
 	if (argc == 1) {
@@ -24,6 +27,7 @@ int main(int argc, char* argv[])
 			<< "    -v  Only prints MKO information.\n"
 			<< "    -g  Gamecube/Wii file.\n"
 			<< "    -e  Extracts data only.\n"
+			<< "    -c  Compile specified file.\n"
 			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9\n";
 		return 1;
 	}
@@ -43,6 +47,8 @@ int main(int argc, char* argv[])
 		case 'e': _e_switch = true;
 			break;
 		case 'g': _g_switch = true;
+			break;
+		case 'c': _c_switch = true;
 			break;
 		case 'm':
 			i++;
@@ -74,11 +80,17 @@ int main(int argc, char* argv[])
 	if (m_param == "mkvsdc") game = Game_MKVSDC;
 	if (m_param == "mk9") game = Game_MK9;
 
-    MKOReader mko(path, _g_switch, game);
-
 	MKODict::InitDict(game);
 	if (game > Game_MKVSDC)
 		MKODict::InitHashTable();
+
+	if (_c_switch)
+	{
+		MKOCompiler::CompileFile(path);
+		return 0;
+	}
+
+	MKOReader mko(path, _g_switch, game);
 
 	if (mko && !mko.m_bBuildMode)
 	{

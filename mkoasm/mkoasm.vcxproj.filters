@@ -36,6 +36,9 @@
     <ClCompile Include="INIReader.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="compiler\MKOCompiler.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\MKScript.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="code\MKScript_MK9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="compiler\MKOCompiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
