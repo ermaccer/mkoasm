@@ -4,10 +4,33 @@
 ; 
 sleep 0 1 0 
 true_branch 1 1 0 
+branch 2 1 0 
+exit_6 11 6 0 0 0 0 0 0 
 was_button_pressed 16 1 0 
+attack_to_frame_x 26 8 0 1 1 1 1 0 0 0 
 exit_attack_with 44 6 0 0 0 0 0 0 
 attack_opponent_with 46 3 0 5 0 
 ani_to_frame_x 76 1 1 
 ani_to_blend_frame 77 1 1 
+set_my_state 83 1 0 
+set_my_secondary_state 87 1 0 
 set_ani_speed 88 1 1 
+init_ground_move 90 0 
+init_air_move 93 0 
 force_away 113 4 1 0 1 0 
+myvel_my_angle_y 157 3 1 1 1 
+ani_to_frame_x_col 190 7 1 0 1 1 0 1 0 
+set_block_requirement 199 1 0 
+mks_cloth_bones_init_by_tbl 232 1 5 
+mks_mat_id_set_zbias 233 2 0 1 
+mks_cb1_eq_cloth_bone 234 1 0 
+mks_cb2_eq_cloth_bone 235 1 0 
+mks_insert_cloth_force_bones 236 2 1 1 
+mks_set_ground_y_all_cloth_bones 237 1 1 
+mks_cb1_set_ground_y 238 1 0 
+mks_cc1_eq_insert_cloth_coll 243 2 0 1 
+mks_cc1_expand_cyl 244 2 1 1 
+mks_cc1_insert_cb1 246 0
+mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 249 0 
+collision_result_dont_care 398 0 
+mks_debug_display_cloth_ontop 482 1 0

@@ -1,4 +1,4 @@
-; MKU definition file
+; MKD definition file
 ; format: name id numArgs argTypes
 ; 
 ; 

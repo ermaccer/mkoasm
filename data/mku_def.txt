@@ -26,6 +26,7 @@ attack_opponent_with 70 3 0 0 0
 randu 73 1 0 
 exit_attack_with 74 6 0 0 0 0 0 0 
 get_current_player_number 75 0 
+trial_add_required_attack 84 2 0 0
 get_new_mkobj 95 1 0 
 insert_item_obj 96 2 3 3 
 ck_item_obj 98 1 2 
@@ -61,6 +62,8 @@ myvel_my_angle_y 209 3 1 1 1
 ejb_call 210 1 0 
 ani_to_frame_x_col 238 7 1 0 1 1 0 1 0 
 camera_set_speed_scalar 275 1 1 
+fade_to_black 279 2 0 0
+fade_from_black 280 2 0 0
 special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
 set_block_requirement 299 1 0 
 mks_cloth_bones_init_by_tbl 304 2 0 0 
@@ -74,6 +77,22 @@ mks_cc1_eq_insert_cloth_coll 315 2 0 1
 mks_cc1_expand_cyl 316 2 1 1 
 mks_cc1_insert_cb1 318 0 
 mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0 
+trial_set_num_rounds 559 1 0
+trial_set_round_timer 560 1 0
+trial_set_tick_function 561 1 0
+trial_set_ending_functions 562 2 0 0
+trial_show_text_window 563 6 5 1 1 1 0 0
+trial_show_spoken_text_window 564 9 5 1 1 1 0 0 0 0 0
+trial_add_required_sequence 568 2 0 0
+trial_set_type 565 1 0
+trial_add_success_condition 566 3 0 0 0
+trial_setup_onscreen_display_items 567 3 0 0 0
+trial_set_next_setup_function 570 1 0
+drone_set_difficulty_level 576 1 0 
+drone_apply_damage 591 2 0 1
+give_koin_award 597 2 0 5
+trial_get_background_root 600 0
+player_has_item 661 2 0 0
 obj_set_scale 814 2 3 0 
 collision_result_dont_care 1178 0 
 set_active_projectile_tracking_light 1210 1 0 
@@ -88,6 +107,7 @@ active_projectile_setup_done 1248 0
 set_active_projectile_sound 1256 3 0 0 0 
 set_active_add_ang_y 1259 1 1 
 get_bid_with_flip 1262 2 3 0 
+mks_debug_display_cloth_ontop 1264 1 0
 function_1484 1484 3 3 3 0 
 pfxhandle_spawn_at_bid_next 1484 3 3 3 0 
 get_my_plyr_pdata 1554 0 
