@@ -245,7 +245,8 @@ void MKOCompiler::CompileFile(const char* file)
 			{
 				SetColor(CT_Error);
 				printf("An error occured on line %d in \"%s\". Compilation stopped.\n", line, file);
-
+				oFile.close();
+				std::remove(output.c_str());
 				SetColor(CT_Reset);
 				break;
 			}

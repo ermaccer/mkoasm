@@ -42,6 +42,6 @@ struct mko_command {
 	short numVariables;
 	short unk2;
 
-	// seems some characters use padding in scripts? no idea
+	// padding for jumps
 	bool is_pad;
 };

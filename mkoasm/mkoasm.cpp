@@ -19,7 +19,9 @@ int main(int argc, char* argv[])
 	bool _e_switch = false;
 	bool _g_switch = false;
 	bool _c_switch = false;
+	bool _p_switch = false;
 	std::string m_param;
+	std::string a_param;
 
 	if (argc == 1) {
 		std::cout << "Usage: mkoasm <optional params> <file>\n"
@@ -28,6 +30,8 @@ int main(int argc, char* argv[])
 			<< "    -g  Gamecube/Wii file.\n"
 			<< "    -e  Extracts data only.\n"
 			<< "    -c  Compile specified file.\n"
+			<< "    -p  Pack variable.\n"
+			<< "    -a <arg> Argument for variable packer.\n"
 			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9\n";
 		return 1;
 	}
@@ -50,9 +54,15 @@ int main(int argc, char* argv[])
 			break;
 		case 'c': _c_switch = true;
 			break;
+		case 'p': _p_switch = true;
+			break;
 		case 'm':
 			i++;
 			m_param = argv[i];
+			break;
+		case 'a':
+			i++;
+			a_param = argv[i];
 			break;
 		default:
 			std::cout << "ERROR: Param does not exist: " << argv[i] << std::endl;
@@ -83,6 +93,13 @@ int main(int argc, char* argv[])
 	MKODict::InitDict(game);
 	if (game > Game_MKVSDC)
 		MKODict::InitHashTable();
+
+
+	if (_p_switch)
+	{
+		MKOReader::Pack(path, a_param, game);
+		return 0;
+	}
 
 	if (_c_switch)
 	{

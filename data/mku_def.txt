@@ -19,6 +19,7 @@ glitch_him_to_ani 34 2 0 0
 set_player_step 40 1 1 
 miss_branch 42 1 0 
 block_branch 43 1 0 
+hit_branch 44 1 0
 was_button_and_direction 45 2 0 0 
 true_branch_next_style 48 1 0 
 if_switching_to 50 1 0 
@@ -26,19 +27,22 @@ attack_opponent_with 70 3 0 0 0
 randu 73 1 0 
 exit_attack_with 74 6 0 0 0 0 0 0 
 get_current_player_number 75 0 
+get_plyr_pdata_flag 77 2 5 0 
 trial_add_required_attack 84 2 0 0
 get_new_mkobj 95 1 0 
 insert_item_obj 96 2 3 3 
 ck_item_obj 98 1 2 
 destroy_item_obj 99 1 3 
-set_obj_flag 102 3 3 0 0 
+set_obj_flag 102 3 5 0 0 
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
 slow_ani_x 130 2 1 1 
+slow_ani_x_if_miss 131 3 1 1 1
 set_my_state 135 1 0 
 set_my_secondary_state 136 1 0 
 set_ani_speed 137 1 1 
 init_ground_move 139 0 
+init_ground_move_no_aniproc 140 0
 init_air_move 142 0 
 init_air_move_no_aniproc 143 0 
 launch_me_up 150 2 1 1 
@@ -60,6 +64,7 @@ player_feet_land_chores 205 0
 wait_to_land 206 0 
 myvel_my_angle_y 209 3 1 1 1 
 ejb_call 210 1 0 
+set_his_damage_multiplier 234 1 1
 ani_to_frame_x_col 238 7 1 0 1 1 0 1 0 
 camera_set_speed_scalar 275 1 1 
 fade_to_black 279 2 0 0
@@ -75,7 +80,9 @@ mks_set_ground_y_all_cloth_bones 309 1 1
 mks_cb1_set_ground_y 310 1 0 
 mks_cc1_eq_insert_cloth_coll 315 2 0 1 
 mks_cc1_expand_cyl 316 2 1 1 
+mks_ccp1_eq_insert_cloth_coll_plane 317 5 0 1 0 1 1
 mks_cc1_insert_cb1 318 0 
+mks_ccp1_insert_cb1 319 0
 mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0 
 trial_set_num_rounds 559 1 0
 trial_set_round_timer 560 1 0
@@ -93,8 +100,16 @@ drone_apply_damage 591 2 0 1
 give_koin_award 597 2 0 5
 trial_get_background_root 600 0
 player_has_item 661 2 0 0
+do_victory_camera 734 1 0
+get_victory_flip_flags 737 0
+ani_1_frame 4 0
+ani_loop_more_frames 795 1 1
 obj_set_scale 814 2 3 0 
+player_area_collision_check 1168 5 1 1 0 0 0
+wait_for_collision_result 1176 0
+clear_collision_result 1177 0 
 collision_result_dont_care 1178 0 
+ani_x_more_frames 1199 1 1
 set_active_projectile_tracking_light 1210 1 0 
 set_active_projectile_collision_info 1211 4 1 0 1 1 
 resume_effect_at_obj_bid 1231 5 3 0 3 0 0 
@@ -108,10 +123,48 @@ set_active_projectile_sound 1256 3 0 0 0
 set_active_add_ang_y 1259 1 1 
 get_bid_with_flip 1262 2 3 0 
 mks_debug_display_cloth_ontop 1264 1 0
-function_1484 1484 3 3 3 0 
+check_to_register_miss 1411 0
+advance_to_weapon_style 1451 1 5
+spawn_blood_pool_at_bid 1463 3 5 0 0
+start_blood_particles 1465 4 0 0 5 5
+limb_sever_show_z_meat_chunks 1480 3 5 0 0
+limb_sever_throw_away 1482 3 5 0 0
 pfxhandle_spawn_at_bid_next 1484 3 3 3 0 
-get_my_plyr_pdata 1554 0 
+get_his_plyr_pdata 1557 0
+get_my_plyr_pdata 1558 0
 create_step_fx 1616 2 0 4 
+create_multiemit_step_fx 1617 3 0 4 0
+create_multiemit_parametric_fx 1619 3 0 4 0
+set_decal_plane 1620 1 0
+z_bias 1623 1 1
 fx 1629 1 4 
+emit_in_range 1632 3 0 1 1
+emit_color 1633 4 0 0 0 0
+emit_cuboid 1636 4 0 1 1 1
+emit_cartesian 1639 7 0 1 1 1 1 1 1
+emission_duration 1641 1 1
+texture_animation 1642 3 1 0 1
+emit_spherical 1644 2 0 1
+emit_value 1649 2 0 1
+emit_value_i 1650 2 0 0
+emit_roundrobin_mechanism 1651 2 0 0
+spawn_random_size 1657 1 0
+initial_add_v3 1671 2 0 0
+update_add 1674 2 0 0
+update_copy 1675 1 0
+update_add_constant_v3 1676 4 0 1 1 1
+update_add_constant 1677 2 0 1
+update_fade_alpha 1680 4 0 0 1 1
+update_fade_alpha2 1681 6 0 0 0 1 0 0
+update_lerp_color 1682 6 0 0 1 0 0 0
+update_bounce 1685 4 0 0 0 1
+udpate_roundrobin 1688 1 0
+kill_on_greater 1689 2 0 1
+kill_roundrobin 1691 1 0
+change_on_greater 1692 2 0 1
+change_on_less 1693 2 0 1
+change_on_y_less_than_field 1695 2 0 0
+kill_on_y_less_than_field 1696 2 0 0
+fx_set_render_priority 1702 2 5 0
 mku_1720 1720 2 1 0 
 mku_1721 1721 0 

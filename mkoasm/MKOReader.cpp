@@ -994,7 +994,7 @@ void MKOReader::ExtractVariables()
         if (oInfo) {
             oInfo << "[Variable" << std::to_string(i) << "]" << std::endl;
             oInfo << "Name = " << var_name << std::endl;
-            oInfo << "NameOffset = " << vars[i].name_offset << std::endl;
+          //  oInfo << "NameOffset = " << vars[i].name_offset << std::endl;
             oInfo << "NumElems = " << vars[i].numElems << std::endl;
             oInfo << "ScriptID = " << varID << std::endl;
             oInfo << "Unknown = " << vars[i].unknown << std::endl << std::endl;
@@ -1084,7 +1084,7 @@ void MKOReader::ExtractFunctions()
         if (oInfo) {
             oInfo << "[Function" << std::to_string(i) << "]" << std::endl;
             oInfo << "Name = " << func_name << std::endl;
-            oInfo << "NameOffset = " << funcs[i].name_offset << std::endl;
+          //  oInfo << "NameOffset = " << funcs[i].name_offset << std::endl;
             oInfo << "Unknown = " << funcs[i].unknown << std::endl;
             oInfo << "FunctionFloat = " << funcID << std::endl << std::endl;
         }
@@ -1308,31 +1308,39 @@ void MKOReader::Unpack_Movelist(int variableID)
 
         SwapINT(&mv.category);
         SwapINT(&mv.name);
-        SwapINT(&mv.unk);
+        SwapINT(&mv.tip);
         SwapINT(&mv.command);
-        SwapINT(&mv.unk2);
+        SwapINT(&mv.command2);
+        SwapINT(&mv.unk);
 
-        std::string type = "Style One";
-        if (mv.category == EMovelist_Style_One)
-            type = "Style One   \t";
-        if (mv.category == EMovelist_Style_Two)
-            type = "Style Two   \t";
-        if (mv.category == EMovelist_Style_Three)
-            type = "Style Three \t";
-        if (mv.category == EMovelist_SpecialMove)
-            type = "Special Move\t";
+        if (game == Game_Unchained)
+            pFile.seekg(-4, pFile.cur);
+
+        std::string type = std::to_string(mv.category);
 
         std::string str;
         std::string command;
+        std::string command2;
         if (mv.name > 0)
             str = (char*)(&string_data[0] + (mv.name - 1));
         if (mv.command > 0)
             command = (char*)(&string_data[0] + (mv.command - 1));
+        if (mv.command2 > 0)
+            command2 = (char*)(&string_data[0] + (mv.command2 - 1));
+        std::replace(str.begin(), str.end(), ' ', '_');
+        std::replace(command.begin(), command.end(), ' ', '_');
+        std::replace(command2.begin(), command2.end(), ' ', '_');
 
-        pMovelist << type << " " << str << " " << command << std::endl;
+        if (game == Game_Unchained)
+            command2 = command;
+        pMovelist << mv.category << " " << str << " " << command  << " " << command2 << " " << mv.unk << std::endl;
     }
     pMovelist.close();
 
+}
+
+void MKOReader::Unpack_MovelistU(int variableID)
+{
 }
 
 void MKOReader::Unpack_Styles(int variableID)
@@ -2370,6 +2378,49 @@ bool MKOReader::Build()
         std::filesystem::current_path("..");
     }
 
+    // make new names_data
+    {    
+        std::ofstream oFile("names_data", std::ofstream::binary);
+        int startingOffset = 1;
+
+        for (int i = 0; i < variables.size(); i++)
+        {
+            std::string name = variables[i].name;
+            variables[i].var.name_offset = startingOffset;
+            int len = name.length() + 1;
+            oFile.write(name.c_str(), len);
+
+            int pad = makePad(len, STRING_PAD_SIZE);
+            int size = pad - len;
+
+            if (size > 0)
+            {
+                std::unique_ptr<char[]> dummy = std::make_unique<char[]>(size);
+                oFile.write(dummy.get(), size);
+            }
+            startingOffset += pad;
+        }
+        for (int i = 0; i < functions.size(); i++)
+        {
+            std::string name = functions[i].name;
+            functions[i].func.name_offset = startingOffset;
+            int len = name.length() + 1;
+            oFile.write(name.c_str(), len);
+
+            int pad = makePad(len, STRING_PAD_SIZE);
+            int size = pad - len;
+
+            if (size > 0)
+            {
+                std::unique_ptr<char[]> dummy = std::make_unique<char[]>(size);
+                oFile.write(dummy.get(), size);
+            }
+            startingOffset += pad;
+        }
+        oFile.close();
+    }
+
+
     header.script_string_size = std::filesystem::file_size("names_data");
     header.string_data_size = std::filesystem::file_size("string_data");
     header.unknown_data_size = std::filesystem::file_size("unknown_data");
@@ -2543,6 +2594,121 @@ bool MKOReader::Is64BitSupported()
 #else
     return false;
 #endif
+}
+
+void MKOReader::Pack(std::string name, std::string param, EGameMode game)
+{
+    if (name.find("_movelist") != std::string::npos)
+    {
+        if (game == Game_Deception)
+          PackMovelistMKD(name, param);
+    }
+
+}
+
+void MKOReader::PackMovelistMKD(std::string name, std::string param)
+{
+    int startingPoint = 0;
+
+    if (param.length() > 0)
+        sscanf(param.c_str(), "%d", &startingPoint);
+
+    FILE* pFile = fopen(name.c_str(), "rb");
+
+    struct src_movelist {
+        type_movelist ent;
+        std::string name;
+        std::string command;
+        std::string command2;
+    };
+
+    std::string movelistName = name + "_movelist";
+    std::string strName = name + "_string_data";
+    std::ofstream stringData(strName, std::ofstream::binary);
+    std::ofstream movelistData(movelistName, std::ofstream::binary);
+    std::vector<src_movelist> movelist;
+    if (pFile)
+    {
+        char szLine[1024];
+
+        while (fgets(szLine, sizeof(szLine), pFile))
+        {
+            if (szLine[0] == ';' || szLine[0] == '#' || szLine[0] == '\n')
+                continue;
+
+            src_movelist mv;
+            char name[256] = {};
+            char command[64] = {};
+            char command2[64] = {};
+            mv.ent = {};
+            sscanf(szLine, "%d %s %s %s %d", &mv.ent.category, name, command, command2, &mv.ent.unk);
+            mv.name = name;
+            mv.command = command;
+            mv.command2 = command2;
+            std::replace(mv.name.begin(), mv.name.end(), '_', ' ');
+            std::replace(mv.command.begin(), mv.command.end(), '_', ' ');
+            std::replace(mv.command2.begin(), mv.command2.end(), '_', ' ');
+            movelist.push_back(mv);
+
+        }
+        int stringOffset = startingPoint;
+        for (int i = 0; i < movelist.size(); i++)
+        {
+            std::string name = movelist[i].name;
+            std::string cmd = movelist[i].command;
+            std::string cmd2 = movelist[i].command2;
+
+            movelist[i].ent.name = stringOffset;
+
+            // pad name
+            {
+                int len = name.length() + 1;
+                stringData.write(name.c_str(), len);
+                int pad = makePad(len, STRING_PAD_SIZE);
+                int size = pad - len;
+
+                if (size > 0)
+                {
+                    std::unique_ptr<char[]> dummy = std::make_unique<char[]>(size);
+                    stringData.write(dummy.get(), size);
+                }
+                stringOffset += pad;
+            }
+            movelist[i].ent.command = stringOffset;
+            // pad cmd
+            {
+                int len = cmd.length() + 1;
+                stringData.write(cmd.c_str(), len);
+                int pad = makePad(len, STRING_PAD_SIZE);
+                int size = pad - len;
+
+                if (size > 0)
+                {
+                    std::unique_ptr<char[]> dummy = std::make_unique<char[]>(size);
+                    stringData.write(dummy.get(), size);
+                }
+                stringOffset += pad;
+            }
+            movelist[i].ent.command2 = stringOffset;
+            // pad cmd2
+            {
+                int len = cmd2.length() + 1;
+                stringData.write(cmd2.c_str(), len);
+                int pad = makePad(len, STRING_PAD_SIZE);
+                int size = pad - len;
+
+                if (size > 0)
+                {
+                    std::unique_ptr<char[]> dummy = std::make_unique<char[]>(size);
+                    stringData.write(dummy.get(), size);
+                }
+                stringOffset += pad;
+            }
+
+            movelistData.write((char*)&movelist[i].ent, sizeof(type_movelist));
+        }
+    }
+
 }
 
 MKOReader::operator bool()

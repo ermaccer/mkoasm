@@ -12,6 +12,8 @@
 #define VARIABLESFOLDER_NAME "vars"
 #define FUNCTIONFOLDER_NAME "funcs"
 
+#define STRING_PAD_SIZE 4
+
 
 union MKOVariable {
     int integerData;
@@ -147,6 +149,7 @@ public:
     void UnpackVariableMK9(int variableID);
     // unpackers
     void Unpack_Movelist(int variableID);
+    void Unpack_MovelistU(int variableID);
     void Unpack_Styles(int variableID);
     void Unpack_RArt(int variableID);
     void Unpack_BList(int variableID);
@@ -193,6 +196,13 @@ public:
 
     bool IsDecompSupported();
     bool Is64BitSupported();
+
+
+    // packing
+
+    static void Pack(std::string name, std::string param,  EGameMode game);
+
+    static void PackMovelistMKD(std::string name, std::string param);
 
     operator bool();
 
