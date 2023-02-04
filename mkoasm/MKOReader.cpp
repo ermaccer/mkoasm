@@ -1261,6 +1261,8 @@ void MKOReader::UnpackVariable(int variableID)
         Unpack_SList(variableID);
     else  if (varName.find("_attributes") != std::string::npos || varName.find("_second_hit") != std::string::npos)
         Unpack_Attributes(variableID);
+    else  if (varName.find("_player_data") != std::string::npos)
+        Unpack_PlayerData_MKDU(variableID);
     std::cout << "Attempting to unpack " << varName << std::endl;
 }
 
@@ -1487,6 +1489,129 @@ void MKOReader::Unpack_Attributes(int variableID)
     pUnpacked << "field52 = " << attr.field52 << std::endl;
     pUnpacked << "field54 = " << attr.field54 << std::endl;
     pUnpacked << "field56 = " << attr.field56 << std::endl;
+    pUnpacked.close();
+}
+
+void MKOReader::Unpack_PlayerData_MKDU(int variableID)
+{
+    if (!(game == Game_Unchained || game == Game_Deception))
+        return;
+
+    std::string varName = GetVariableName(variableID);
+    pFile.seekg(m_pDataStartOffset + GetVariableOffset(variableID), pFile.beg);
+
+    std::string output = varName;
+    output += ".ini";
+    std::ofstream pUnpacked(output);
+    type_player_data data;
+    pFile.read((char*)&data, sizeof(type_player_data));
+
+   
+    {
+        pUnpacked << "[PrimaryInfo]" << std::endl;
+
+        std::string str;
+
+        if (data.primary.archiveNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.primary.archiveNameOffset - 1));
+
+        pUnpacked << "archive = " << str << std::endl;
+
+        if (data.primary.headNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.primary.headNameOffset - 1));
+
+        pUnpacked << "head = " << str << std::endl;
+
+        if (data.primary.animsNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.primary.animsNameOffset- 1));
+
+        pUnpacked << "anims = " << str << std::endl;
+
+        pUnpacked << "field12 = " << data.primary.field12 << std::endl;
+        pUnpacked << "field16 = " << data.primary.field16 << std::endl;
+        pUnpacked << "field20 = " << data.primary.field20 << std::endl;
+        pUnpacked << "field24 = " << data.primary.field24 << std::endl;
+        pUnpacked << "startupFunctionID = " << data.primary.startupFunctionID << std::endl;
+        pUnpacked << "reloadFunctionID = " << data.primary.reloadFunctionID << std::endl;
+    }
+    pUnpacked << std::endl;
+    {
+        pUnpacked << "[AlternateInfo]" << std::endl;
+
+        std::string str;
+
+        if (data.alt.archiveNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.alt.archiveNameOffset - 1));
+
+        pUnpacked << "archive = " << str << std::endl;
+
+        if (data.alt.headNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.alt.headNameOffset - 1));
+
+        pUnpacked << "head = " << str << std::endl;
+
+        if (data.alt.animsNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.alt.animsNameOffset - 1));
+
+        pUnpacked << "anims = " << str << std::endl;
+
+        pUnpacked << "field12 = " << data.alt.field12 << std::endl;
+        pUnpacked << "field16 = " << data.alt.field16 << std::endl;
+        pUnpacked << "field20 = " << data.alt.field20 << std::endl;
+        pUnpacked << "field24 = " << data.alt.field24 << std::endl;
+        pUnpacked << "startupFunctionID = " << data.alt.startupFunctionID << std::endl;
+        pUnpacked << "reloadFunctionID = " << data.alt.reloadFunctionID << std::endl;
+    }
+    pUnpacked << std::endl;
+
+    {
+        pUnpacked << "[Data]" << std::endl;
+
+        std::string str;
+
+        if (data.apArchiveNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.apArchiveNameOffset- 1));
+
+        pUnpacked << "apArchive = " << str << std::endl;
+
+        if (data.apHeadNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.apHeadNameOffset - 1));
+
+        pUnpacked << "apHead = " << str << std::endl;
+
+        if (data.apAltArchiveNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.apAltArchiveNameOffset - 1));
+
+        pUnpacked << "apAltArchive = " << str << std::endl;
+
+        if (data.apAltHeadNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.apAltHeadNameOffset - 1));
+
+        pUnpacked << "apAltHead = " << str << std::endl;
+
+        if (data.sharedArchiveNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.sharedArchiveNameOffset - 1));
+
+        pUnpacked << "sharedArchive = " << str << std::endl;
+
+        if (data.puzzleAnimNameOffset > 0)
+            str = (char*)(&string_data[0] + (data.puzzleAnimNameOffset- 1));
+
+        pUnpacked << "puzzleAnimArchive = " << str << std::endl;
+
+        pUnpacked << "specialsBankID = " << data.specialsSbankID<< std::endl;
+        pUnpacked << "winSoundID = " << data.winVoiceID << std::endl;
+        pUnpacked << "stylesVarID = " << data.stylesVariableID << std::endl;
+        pUnpacked << "fatalityDataVarID = " << data.fatDataVariableID << std::endl;
+
+        pUnpacked << "field104 = " << data.field104 << std::endl;
+        pUnpacked << "field112 = " << data.field112 << std::endl;
+        pUnpacked << "field116 = " << data.field116 << std::endl;
+        pUnpacked << "field120 = " << data.field120 << std::endl;
+        pUnpacked << "field124 = " << data.field124 << std::endl;
+
+    }
+ 
     pUnpacked.close();
 }
 

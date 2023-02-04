@@ -155,7 +155,7 @@ public:
     void Unpack_BList(int variableID);
     void Unpack_SList(int variableID);
     void Unpack_Attributes(int variableID);
-
+    void Unpack_PlayerData_MKDU(int variableID);
 
     // mk8 unpackers
     void MK8_Unpack_RArt(int variableID);
