@@ -30,6 +30,9 @@ mks_set_ground_y_all_cloth_bones 237 1 1
 mks_cb1_set_ground_y 238 1 0 
 mks_cc1_eq_insert_cloth_coll 243 2 0 1 
 mks_cc1_expand_cyl 244 2 1 1 
+mks_ccp1_eq_insert_cloth_coll_plane 245 5 0 1 0 1 1
+mks_cc1_expand_cyl 244 2 1 1 
 mks_cc1_insert_cb1 246 0
+mks_ccp1_insert_cb1 247 0
 mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 249 0 
 mks_debug_display_cloth_ontop 482 1 0
