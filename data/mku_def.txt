@@ -101,10 +101,12 @@ give_koin_award 597 2 0 5
 trial_get_background_root 600 0
 player_has_item 661 2 0 0
 do_victory_camera 734 1 0
+get_my_plyr_num 735 0
 get_victory_flip_flags 737 0
-ani_1_frame 4 0
+ani_1_frame 794 0
 ani_loop_more_frames 795 1 1
 obj_set_scale 814 2 3 0 
+sfrand 902 1 1
 player_area_collision_check 1168 5 1 1 0 0 0
 wait_for_collision_result 1176 0
 clear_collision_result 1177 0 
@@ -127,17 +129,25 @@ check_to_register_miss 1411 0
 advance_to_weapon_style 1451 1 5
 spawn_blood_pool_at_bid 1463 3 5 0 0
 start_blood_particles 1465 4 0 0 5 5
+fatality_explode_victim 1470 3 5 1 1
+start_gore2_pebbles 1473 11 0 0 5 5 5 0 0 0 5 5 5 
 limb_sever_show_z_meat_chunks 1480 3 5 0 0
 limb_sever_throw_away 1482 3 5 0 0
 pfxhandle_spawn_at_bid_next 1484 3 3 3 0 
+obj_set_pos 1538 2 5 0
+obj_get_pos 1539 2 5 0
 get_his_plyr_pdata 1557 0
 get_my_plyr_pdata 1558 0
+plyr_pdata_get_pchr 1569 1 5
+v3_sub_v3 1591 3 0 0 0
+v3_add_v3_scaled 1593 4 0 0 0 1
 create_step_fx 1616 2 0 4 
 create_multiemit_step_fx 1617 3 0 4 0
 create_multiemit_parametric_fx 1619 3 0 4 0
 set_decal_plane 1620 1 0
 z_bias 1623 1 1
 fx 1629 1 4 
+fx_by_owner 1631 2 0 0
 emit_in_range 1632 3 0 1 1
 emit_color 1633 4 0 0 0 0
 emit_cuboid 1636 4 0 1 1 1
@@ -150,11 +160,12 @@ emit_value_i 1650 2 0 0
 emit_roundrobin_mechanism 1651 2 0 0
 spawn_random_size 1657 1 0
 initial_add_v3 1671 2 0 0
+fx_reset 1662 1 5
 update_add 1674 2 0 0
 update_copy 1675 1 0
 update_add_constant_v3 1676 4 0 1 1 1
 update_add_constant 1677 2 0 1
-update_fade_alpha 1680 4 0 0 1 1
+update_fade_alpha 1680 4 0 0 0 1
 update_fade_alpha2 1681 6 0 0 0 1 0 0
 update_lerp_color 1682 6 0 0 1 0 0 0
 update_bounce 1685 4 0 0 0 1
@@ -166,5 +177,6 @@ change_on_less 1693 2 0 1
 change_on_y_less_than_field 1695 2 0 0
 kill_on_y_less_than_field 1696 2 0 0
 fx_set_render_priority 1702 2 5 0
+kitana_1717 1717 2 5 5
 mku_1720 1720 2 1 0 
 mku_1721 1721 0 

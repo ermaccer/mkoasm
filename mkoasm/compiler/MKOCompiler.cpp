@@ -121,22 +121,16 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 
 	if (def_available)
 	{
-		SetColor(CT_Error);
+		SetColor(CT_Warning);
 		if (numArgs > expectedArgs)
 		{
-			printf_s("ERROR: Too many arguments for %s! %d required, got %d.\n", functionName.c_str(), expectedArgs, numArgs);
-			error = true;
-
-			return;
+			printf_s("WARNING: Too many arguments for %s! %d required, got %d.\n", functionName.c_str(), expectedArgs, numArgs);
 		}
 
 
 		if (numArgs < expectedArgs)
 		{
-			printf_s("ERROR: Not enough arguments for %s! %d required, got %d.\n", functionName.c_str(), expectedArgs, numArgs);
-			error = true;
-
-			return;
+			printf_s("WARNING: Not enough arguments for %s! %d required, got %d.\n", functionName.c_str(), expectedArgs, numArgs);
 		}
 
 
