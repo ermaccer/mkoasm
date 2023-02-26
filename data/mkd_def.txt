@@ -82,25 +82,35 @@ mks_cb2_eq_cloth_bone 307 1 0
 mks_insert_cloth_force_bones 308 2 1 1 
 mks_set_ground_y_all_cloth_bones 309 1 1 
 mks_cb1_set_ground_y 310 1 0 
-mks_cc1_eq_insert_cloth_coll 315 2 0 1 
+mks_cc1_eq_insert_cloth_coll 315 5 0 1 1 1 1
 mks_cc1_expand_cyl 316 2 1 1 
 mks_ccp1_eq_insert_cloth_coll_plane 317 5 0 1 0 1 1
 mks_cc1_insert_cb1 318 0 
 mks_ccp1_insert_cb1 319 0
 do_victory_camera 726 1 0
+get_my_plyr_num 727 0
 get_victory_flip_flags 729 0
 ani_1_frame 786 0
 ani_loop_more_frames 787 1 1
-mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0 
+sfrand 894 1 1
 player_area_collision_check 1156 5 1 1 0 0 0
 wait_for_collision_result 1164 0
 clear_collision_result 1165 0 
 collision_result_dont_care 1166 0 
+ani_x_more_frames 1187 1 1
 mks_debug_display_cloth_ontop 1252 1 0
 check_to_register_miss 1398 0
 advance_to_weapon_style 1437 1 5
+start_blood_particles 1451 4 0 0 5 5
+fatality_explode_victim 1456 3 5 1 1
+start_gore2_pebbles 1459 11 0 0 5 5 5 0 0 0 5 5 5 
+obj_set_pos 1522 2 5 0
+obj_get_pos 1523 2 5 0
 get_his_plyr_pdata 1541 0
 get_my_plyr_pdata 1542 0
+plyr_pdata_get_pchr 1553 1 5
+v3_sub_v3 1574 3 0 0 0
+v3_add_v3_scaled 1576 4 0 0 0 1
 create_step_fx 1616 2 0 4 
 create_multiemit_step_fx 1617 3 0 4 0
 z_bias 1612 1 1
@@ -123,3 +133,4 @@ update_bounce 1674 4 0 0 0 1
 kill_on_greater 1678 2 0 1
 change_on_less 1682 2 0 1
 fx_set_render_priority 1691 2 5 0
+kitana_1717 1717 2 5 5

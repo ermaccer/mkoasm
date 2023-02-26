@@ -1334,7 +1334,11 @@ void MKOReader::Unpack_Movelist(int variableID)
         std::replace(command2.begin(), command2.end(), ' ', '_');
 
         if (game == Game_Unchained)
+        {
             command2 = command;
+            mv.unk = 0;
+        }
+
         pMovelist << mv.category << " " << str << " " << command  << " " << command2 << " " << mv.unk << std::endl;
     }
     pMovelist.close();
@@ -2761,7 +2765,7 @@ void MKOReader::PackMovelistMKD(std::string name, std::string param)
             if (szLine[0] == ';' || szLine[0] == '#' || szLine[0] == '\n')
                 continue;
 
-            src_movelist mv;
+            src_movelist mv = {};
             char name[256] = {};
             char command[64] = {};
             char command2[64] = {};
