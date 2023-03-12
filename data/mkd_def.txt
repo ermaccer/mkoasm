@@ -5,6 +5,7 @@
 sleep 0 1 0 
 true_branch 1 1 0 
 branch 2 1 0 
+script_exit 9 1 0
 exit_6 11 6 0 0 0 0 0 0 
 exit_react 12 6 0 0 0 0 0 0 
 blend_to_ani 13 3 0 0 1 
@@ -19,6 +20,7 @@ glitch_him_to_ani 34 2 0 0
 set_player_step 40 1 1 
 miss_branch 42 1 0 
 block_branch 43 1 0 
+hit_branch 44 1 0 
 was_button_and_direction 45 2 0 0 
 true_branch_next_style 48 1 0 
 if_switching_to 50 1 0 
@@ -32,7 +34,7 @@ get_plyr_pdata_flag 77 2 5 0
 get_new_mkobj 95 1 0 
 insert_item_obj 96 2 3 3 
 ck_item_obj 98 1 2 
-destroy_item_obj 99 1 3 
+destroy_item_obj 99 1 5 
 set_obj_flag 102 3 3 0 0 
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
@@ -45,6 +47,7 @@ init_ground_move_no_aniproc 140 0
 init_air_move 142 0 
 init_air_move_no_aniproc 143 0 
 launch_me_up 150 2 1 1 
+face_opponent_now 153 0
 ani_to_end 155 0 
 force_away 158 4 1 0 1 0 
 shake_camera 159 2 0 1 
@@ -57,12 +60,16 @@ get_mode_of_play 178 0
 stop_me 181 0 
 step_throw_into_check 190 0 
 disable_this_move_exec 196 2 0 0 
+damage_me 199 1 1
 damage_him 200 1 1 
 ejb_release_other_player 201 1 0 
 player_feet_land_chores 205 0 
 wait_to_land 206 0 
 myvel_my_angle_y 209 3 1 1 1 
 ejb_call 210 1 0 
+back_rollup_check 212 0
+face_bleed_me 227 1 0
+wall_eligible_on 228 0
 ani_to_frame_x_col 238 7 1 0 1 1 0 1 0 
 camera_set_movement_mode 250 1 0
 camera_set_look_mode 251 1 0
@@ -73,6 +80,7 @@ camera_setup_radial_position 268 3 1 1 1
 camera_setup_tightrope_angle_offset 269 2 1 1
 camera_special_function 270 1 0
 camera_set_speed_scalar 275 1 1 
+got_hit_fx 292 7 0 0 0 0 0 0 0
 special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
 set_block_requirement 299 1 0 
 mks_cloth_bones_init_by_tbl 304 2 0 0 
@@ -87,13 +95,19 @@ mks_cc1_expand_cyl 316 2 1 1
 mks_ccp1_eq_insert_cloth_coll_plane 317 5 0 1 0 1 1
 mks_cc1_insert_cb1 318 0 
 mks_ccp1_insert_cb1 319 0
+kick_the_camera 676 0
 do_victory_camera 726 1 0
 get_my_plyr_num 727 0
 get_victory_flip_flags 729 0
+high_flash_check 745 0
+medium_flash_check 746 0
 ani_1_frame 786 0
 ani_loop_more_frames 787 1 1
+load_aux_weapon 788 1 0
 sfrand 894 1 1
+player_area_collision_ticks 1106 6 1 1 0 1 0 1
 player_area_collision_check 1156 5 1 1 0 0 0
+reaction_sync_advance 1163 0
 wait_for_collision_result 1164 0
 clear_collision_result 1165 0 
 collision_result_dont_care 1166 0 
@@ -101,36 +115,54 @@ ani_x_more_frames 1187 1 1
 mks_debug_display_cloth_ontop 1252 1 0
 check_to_register_miss 1398 0
 advance_to_weapon_style 1437 1 5
+spawn_blood_pool_at_bid 1449 3 5 0 0
 start_blood_particles 1451 4 0 0 5 5
+start_blood_particles_scripts 1453 2 0 0
 fatality_explode_victim 1456 3 5 1 1
 start_gore2_pebbles 1459 11 0 0 5 5 5 0 0 0 5 5 5 
+limb_sever_show_z_meat_chunks 1466 3 5 0 0
+limb_sever_throw_away 1468 3 5 0 0
+pfxhandle_spawn_at_bid_next 1470 3 5 5 0 
+pfxhandle_spawn_at_bid_next_bind_render 1473 3 5 5 0
 obj_set_pos 1522 2 5 0
 obj_get_pos 1523 2 5 0
+get_his_plyr_obj 1537 0
+get_my_plyr_obj 1538 0
 get_his_plyr_pdata 1541 0
 get_my_plyr_pdata 1542 0
+plyr_pdata_get_plyr_obj 1547 1 5
+plyr_pdata_get_plyr_num 1551 1 5
 plyr_pdata_get_pchr 1553 1 5
 v3_sub_v3 1574 3 0 0 0
 v3_add_v3_scaled 1576 4 0 0 0 1
-create_step_fx 1616 2 0 4 
-create_multiemit_step_fx 1617 3 0 4 0
-z_bias 1612 1 1
-fx 1618 1 4 
-emit_in_range 1621 3 0 1 1
-emit_color 1622 4 0 0 0 0
-emit_cuboid 1625 4 0 1 1 1
-emit_cartesian 1628 7 0 1 1 1 1 1 1
-emission_duration 1630 1 1
-emit_value 1638 2 0 1
-emit_value_i 1639 2 0 0
-spawn_random_size 1646 1 0
-update_add 1663 2 0 0
-update_copy 1664 1 0
-update_add_constant_v3 1665 4 0 1 1 1
-update_add_constant 1666 2 0 1
-update_fade_alpha 1669 4 0 0 0 1
-update_fade_alpha2 1670 6 0 0 0 1 0 0
-update_bounce 1674 4 0 0 0 1
-kill_on_greater 1678 2 0 1
-change_on_less 1682 2 0 1
-fx_set_render_priority 1691 2 5 0
+create_step_fx 1599 2 0 0 
+fx 1612 1 0 
+fx_by_owner 1614 2 0 5
+emit_in_range 1615 3 0 1 1
+emit_color 1616 5 0 0 0 0 0
+emit_cuboid 1619 4 0 0 0 0
+emit_cartesian 1622 7 0 1 1 1 1 1 1
+emission_duration 1624 1 1
+emit_value 1632 2 0 1
+emit_value_i 1633 2 0 0
+fx_reset_emit 1648 1 5
+update_fade_alpha 1662 4 0 0 0 1
+update_fade_alpha2 1663 6 0 0 0 1 0 0
+update_add 1656 2 0 0
+update_copy 1657 1 0
+update_add_constant_v3 1658 4 0 1 1 1
+update_add_constant 1659 2 0 1
+update_fade_alpha2 1663 6 0 0 0 1 0 0
+update_bounce 1667 4 0 0 0 1
+kill_on_greater 1671 2 0 1
+change_on_greater 1674 2 0 1
+change_on_less 1675 2 0 1
+fx_set_render_priority 1684 2 5 0
+get_active_moveset_from_pdata 1695 1 5 
+advance_active_moveset 1696 1 5 
+load_and_set_refl_on_weapon 1697 0
 kitana_1717 1717 2 5 5
+jax_1720 1720 2 5 0 
+jax_1721 1721 0 
+; umkd
+jax_taunt 2001 0

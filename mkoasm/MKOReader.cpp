@@ -708,6 +708,18 @@ uint32_t MKOReader::GetFunctionOffset(int functionID)
     return (funcs[functionID].offset * 4) + 4;
 }
 
+uint32_t MKOReader::GetFunctionOffsetMK8(int functionID)
+{
+    uint32_t offset = m_pFunctionsStartOffset;
+    for (unsigned int i = 0; i < functionID; i++)
+    {
+        int size = mk8_funcs[i].size;
+        offset += size;
+    }
+
+    return offset;
+}
+
 std::string MKOReader::GetVariableName(int variableID)
 {
     std::string var_name = (char*)(&script_names[0] + (vars[variableID].name_offset - 1));
@@ -900,6 +912,18 @@ void MKOReader::ExtractDataMK8()
         std::filesystem::current_path(folderName);
 
         ExtractFunctionsMK8();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = "decompiled";
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        DecompileAllFunctionsMK8();
         std::filesystem::current_path("..");
     }
 
@@ -1239,6 +1263,110 @@ void MKOReader::DecompileFunction(int functionID)
                         pMKC << functionName << "();" << std::endl;
 
                 }
+            }
+        }
+        std::cout << "Decompiled " << output << std::endl;
+        pMKC.close();
+    }
+}
+
+void MKOReader::DecompileFunctionMK8(int functionID)
+{
+    std::vector<MKOCodeEntry_MK8> codeData;
+    ReadFunctionBytecode_MK8(codeData, functionID);
+
+    if (codeData.size() > 0)
+    {
+        std::string output = GetFunctionNameMK8(functionID);
+        output += ".c";
+        std::ofstream pMKC(output);
+
+        for (int i = 0; i < codeData.size(); i++)
+        {
+            MKOCodeEntry_MK8 c = codeData[i];
+
+            
+
+            MKOFunctionDefinition funcDef;
+            if (c.arguments.size() > 0)
+            {
+                {
+                    std::string functionName = "function";
+                    if (c.type == MK8_CT_INTERNAL)
+                        functionName = "internal";
+                    if (c.type == MK8_CT_STEP)
+                        functionName = "native";
+                    functionName += "_";
+                    int id = c.functionID - 1;
+                    if (c.type == MK8_CT_INTERNAL || c.type == MK8_CT_STEP)
+                        id += 1;
+
+                    functionName += std::to_string(id);
+
+
+
+                    if (c.type == MK8_CT_EXTERN)
+                    {
+                        std::string ext_name = (char*)(&string_data[0] + (mk8_externs[c.functionID - 1].nameOffset - 1));
+                        functionName = ext_name;
+                    }
+                    if (!(c.type == MK8_CT_EXTERN || c.type == MK8_CT_INTERNAL || c.type == MK8_CT_STEP))
+                    {
+                        functionName += "_t";
+                        functionName += std::to_string(c.type);
+                    }
+
+
+
+                    pMKC << functionName << "(";
+                }
+
+
+                for (int a = 0; a < c.arguments.size(); a++)
+                {
+                    {
+                        pMKC << c.arguments[a].integerData;
+                        if (a < c.arguments.size() - 1)
+                            pMKC << ", ";
+                    }
+
+                }
+                if (m_bDebugMKO)
+                    pMKC << "); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << ");" << std::endl;
+            }
+            else
+            {
+                std::string functionName = "function";
+                if (c.type == MK8_CT_INTERNAL)
+                    functionName = "internal";
+                if (c.type == MK8_CT_STEP)
+                    functionName = "native";
+                functionName += "_";
+                int id = c.functionID - 1;
+                if (c.type == MK8_CT_INTERNAL || c.type == MK8_CT_STEP)
+                    id += 1;
+
+                functionName += std::to_string(id);
+
+
+
+                if (c.type == MK8_CT_EXTERN)
+                {
+                    std::string ext_name = (char*)(&string_data[0] + (mk8_externs[c.functionID - 1].nameOffset - 1));
+                    functionName = ext_name;
+                }
+                if (!(c.type == MK8_CT_EXTERN || c.type == MK8_CT_INTERNAL || c.type == MK8_CT_STEP))
+                {
+                    functionName += "_t";
+                    functionName += std::to_string(c.type);
+                }
+
+                if (m_bDebugMKO)
+                    pMKC << functionName << "(); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << functionName << "();" << std::endl;
             }
         }
         std::cout << "Decompiled " << output << std::endl;
@@ -1754,6 +1882,15 @@ void MKOReader::DecompileAllFunctions()
 
     for (unsigned int i = 0; i < funcs.size(); i++)
         DecompileFunction(i);
+}
+
+void MKOReader::DecompileAllFunctionsMK8()
+{
+    if (!IsDecompSupported())
+        return;
+
+    for (unsigned int i = 0; i < mk8_funcs.size(); i++)
+        DecompileFunctionMK8(i);
 }
 
 void MKOReader::UnpackVariables()
@@ -2280,6 +2417,94 @@ void MKOReader::ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functi
     }
 }
 
+void MKOReader::ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID)
+{
+    pFile.seekg(GetFunctionOffsetMK8(functionID), pFile.beg);
+    nBytesRead = 0;
+
+    int size = mk8_funcs[functionID].size;
+
+
+    while (nBytesRead < size)
+    {
+        MKOCodeEntry_MK8 mko_entry = {};
+        mko_command_mk8 bc = {};
+        if (mko_entry.offset == 0)
+            mko_entry.offset = (int)pFile.tellg();
+
+
+        ParseMKOCommand_MK8(bc);
+        if (bc.is_pad)
+            continue;
+
+        mko_entry.size += pFile.gcount();
+
+        mko_entry.type = bc.functionType;
+        mko_entry.functionID = bc.functionID;
+        mko_entry.unk1 = bc.field0;
+        mko_entry.unk2 = bc.field4;
+        mko_entry.pad = bc.is_pad;
+
+
+        if (bc.numData > 0)
+        {
+            for (int i = 0; i < bc.numData - 1; i++)
+            {
+                MKOVariable var;
+                pFile.read((char*)&var, sizeof(MKOVariable));
+                SwapINT(&var.integerData);
+                nBytesRead += pFile.gcount();
+                mko_entry.size += pFile.gcount();
+                mko_entry.arguments.push_back(var);
+            }
+        }
+
+        data.push_back(mko_entry);
+    }
+}
+
+void MKOReader::ParseMKOCommand_MK8(mko_command_mk8& bc)
+{
+    int a1, a2, a3, a4;
+    pFile.read((char*)&a1, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a1);
+
+    if (a1 == 0)
+    {
+        bc.is_pad = true;
+        return;
+    }
+
+    pFile.read((char*)&a2, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a2);
+
+
+
+
+    pFile.read((char*)&a3, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a3);
+
+    pFile.read((char*)&a4, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+    SwapINT(&a4);
+
+    bc.field0 = a1;
+    bc.field4 = a2;
+    bc.numData = LOWORD(a3);
+    bc.functionID = LOWORD(a4);
+    bc.functionType = HIWORD(a4);
+
+
+
+}
+
 void MKOReader::ParseMKOCommand(mko_command& bc)
 {
     switch (game)
@@ -2710,6 +2935,8 @@ bool MKOReader::IsDecompSupported()
     case Game_Unchained:
         return true;
         break;
+    case Game_MKVSDC:
+        return true;
     default:
         break;
     }

@@ -35,6 +35,20 @@ struct MKOCodeEntry {
 
 };
 
+struct MKOCodeEntry_MK8 {
+    int functionID;
+    int type;
+    int unk1;
+    int unk2;
+    int pad;
+    std::vector<MKOVariable> arguments;
+
+    // debug/helper
+    int offset;
+    int size;
+    int localOffset;
+};
+
 struct MKOFunctionEntry {
     std::string name;
     mko_function_header func = {};
@@ -119,6 +133,7 @@ public:
     std::string GetFunctionNameMK9(int functionID);
 
     uint32_t GetFunctionOffset(int functionID);
+    uint32_t GetFunctionOffsetMK8(int functionID);
 
     std::string GetVariableName(int variableID);
     std::string GetVariableNameMK8(int variableID);
@@ -143,6 +158,7 @@ public:
     void ExtractFunctionsMK8();
     void ExtractFunctionsMK9();
     void DecompileFunction(int functionID);
+    void DecompileFunctionMK8(int functionID);
     void UnpackVariable(int variableID);
 
     void UnpackVariableMK8(int variableID);
@@ -168,6 +184,7 @@ public:
 
 
     void DecompileAllFunctions();
+    void DecompileAllFunctionsMK8();
     void UnpackVariables();
     void UnpackVariablesMK8();
     void UnpackVariablesMK9();
@@ -190,6 +207,8 @@ public:
     void ParseMKOCommand_MKA(mko_command& bc);
     void ParseMKOCommand_MKDA(mko_command& bc);
 
+    void ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID);
+    void ParseMKOCommand_MK8(mko_command_mk8& bc);
     // building
 
     bool Build();

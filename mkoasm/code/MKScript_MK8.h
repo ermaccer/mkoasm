@@ -61,3 +61,26 @@ struct mko_variable_header_mk8 {
 	int elemSize;
 	int offset;
 };
+
+enum mko_command_mk8_type {
+	MK8_CT_INTERNAL = 0,
+	MK8_CT_STEP = 0x4000,
+	MK8_CT_EXTERN = 0x8000,
+};
+
+struct mko_command_mk8_bytecode {
+	int field0;
+	int field4;
+	int data; // first half - numData, second half - unknown, but seems to be same as previous mks
+	int commandData; // first half - func id, second is type;
+
+	// var data
+};
+struct mko_command_mk8 {
+	int field0;
+	int field4;
+	int numData;
+	int functionID;
+	int functionType;
+	bool is_pad;
+};
