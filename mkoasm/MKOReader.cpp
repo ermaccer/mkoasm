@@ -188,8 +188,12 @@ bool MKOReader::Read(const char* file)
             else
                 next_size = vars[i + 1].offset * 4;
 
+
             int cur_size = vars[i].offset * 4;
             int newSize = next_size - cur_size - 4;
+
+            if (newSize < 0)
+                newSize = 0;
 
             var_sizes.push_back(newSize);
         }
@@ -1008,6 +1012,8 @@ void MKOReader::ExtractVariables()
         int size = var_sizes[i];
         if (size < 0)
             size = 0;
+        if (game == Game_Armageddon)
+          pFile.seekg(m_pDataStartOffset + GetVariableOffset(i) - 4, pFile.beg);
 
         std::string var_name = (char*)(&script_names[0] + (vars[i].name_offset - 1));
         int varID = 0;
@@ -1018,7 +1024,6 @@ void MKOReader::ExtractVariables()
         if (oInfo) {
             oInfo << "[Variable" << std::to_string(i) << "]" << std::endl;
             oInfo << "Name = " << var_name << std::endl;
-          //  oInfo << "NameOffset = " << vars[i].name_offset << std::endl;
             oInfo << "NumElems = " << vars[i].numElems << std::endl;
             oInfo << "ScriptID = " << varID << std::endl;
             oInfo << "Unknown = " << vars[i].unknown << std::endl << std::endl;
