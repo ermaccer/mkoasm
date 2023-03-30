@@ -1,6 +1,7 @@
 sleep 0 1 0 
 true_branch 1 1 0 
 branch 2 1 0 
+script_return 8 0
 script_exit 9 1 0
 exit_6 11 6 0 0 0 0 0 0 
 exit_react 12 6 0 0 0 0 0 0 
@@ -26,11 +27,12 @@ exit_attack_with 74 6 0 0 0 0 0 0
 get_current_player_number 75 0 
 get_plyr_pdata_flag 77 2 5 0 
 trial_add_required_attack 84 2 0 0
-get_new_mkobj 95 1 0 
-insert_item_obj 96 2 3 3 
+get_new_mkobj 95 1 5 
+insert_item_obj 96 2 5 5 
 ck_item_obj 98 1 2 
 destroy_item_obj 99 1 5
 set_obj_flag 102 3 5 0 0 
+update_mkobj 103 1 5
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
 slow_ani_x 130 2 1 1 
@@ -55,12 +57,14 @@ plyr_snd_req 175 1 0
 get_mode_of_play 178 0 
 stop_me 181 0 
 step_throw_into_check 190 0 
+clear_my_face_opponent_flag 193 0
 disable_this_move_exec 196 2 0 0 
 damage_me 199 1 1
 damage_him 200 1 1 
 ejb_release_other_player 201 1 0 
 player_feet_land_chores 205 0 
 wait_to_land 206 0 
+rotate_towards_him 208 1 1
 myvel_my_angle_y 209 3 1 1 1 
 ejb_call 210 1 0 
 back_rollup_check 212 0
@@ -72,6 +76,7 @@ camera_set_speed_scalar 275 1 1
 fade_to_black 279 2 0 0
 fade_from_black 280 2 0 0
 got_hit_fx 292 7 0 0 0 0 0 0 0
+whoosh_fx 296 1 0
 special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
 set_block_requirement 299 1 0 
 mks_cloth_bones_init_by_tbl 304 2 0 0 
@@ -109,10 +114,13 @@ get_my_plyr_num 735 0
 get_victory_flip_flags 737 0
 high_flash_check 753 0
 medium_flash_check 754 0
+get_my_particle_player_bank_num 760 0
+plyr_start_script_in_proc 784 2 0 0
 ani_1_frame 794 0
 ani_loop_more_frames 795 1 1 
 load_aux_weapon 796 1 0
 obj_set_scale 814 2 3 0 
+restart_effect 880 1 0
 sfrand 902 1 1
 player_area_collision_ticks 1118 6 1 1 0 1 0 1
 player_area_collision_check 1168 5 1 1 0 0 0
@@ -121,20 +129,30 @@ wait_for_collision_result 1176 0
 clear_collision_result 1177 0 
 collision_result_dont_care 1178 0 
 ani_x_more_frames 1199 1 1
+get_projectile_script_plyr_num 1201 0
+get_projectile_script_plyr_pdata 1203 0
 set_active_projectile_tracking_light 1210 1 0 
 set_active_projectile_collision_info 1211 4 1 0 1 1 
-resume_effect_at_obj_bid 1231 5 3 0 3 0 0 
+resume_effect_at_obj_bid 1231 5 5 0 5 0 0 
 function_1239 1239 3 0 1 0 
-start_projectile_from_plyr_bone 1241 6 3 0 4 1 1 0 
+start_projectile_from_plyr_bone 1241 6 5 0 4 1 1 0 
 set_active_projectile_rx_info 1242 3 0 1 0 
+set_active_projectile_not_duckable 1243 0 
 set_active_projectile_hit_script 1245 1 0 
 set_active_projectile_end_script 1246 1 0 
 active_projectile_setup_done 1248 0 
+set_active_projectile_target_ground 1250 3 1 1 1
 set_active_projectile_sound 1256 3 0 0 0 
 set_active_add_ang_y 1259 1 1 
 get_bid_with_flip 1262 2 3 0 
 mks_debug_display_cloth_ontop 1264 1 0
+bgnd_get_float 1269 1 0
+destroy_mkobj 1313 1 5
+pfx_plyr_bankowner 1388 1 5
+insert_particle_mkobj 1399 1 5
 check_to_register_miss 1411 0
+limb_sever_update_slide_end_coeff 1427 2 5 1
+limb_sever_find_existing_update_proc 1429 3 5 0 0
 advance_to_weapon_style 1451 1 5
 spawn_blood_pool_at_bid 1463 3 5 0 0
 start_blood_particles 1465 4 0 0 5 5
@@ -143,7 +161,9 @@ fatality_explode_victim 1470 3 5 1 1
 start_gore2_pebbles 1473 11 0 0 5 5 5 0 0 0 5 5 5 
 limb_sever_show_z_meat_chunks 1480 3 5 0 0
 limb_sever_throw_away 1482 3 5 0 0
+pfx_spawn_at_bid 1483 3 0 5 0
 pfxhandle_spawn_at_bid_next 1484 3 5 5 0 
+pfxhandle_spawn_at_bid 1485 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1487 3 5 5 0
 obj_set_pos 1538 2 5 0
 obj_get_pos 1539 2 5 0
@@ -151,14 +171,16 @@ get_his_plyr_obj 1553 0
 get_my_plyr_obj 1554 0
 get_his_plyr_pdata 1557 0
 get_my_plyr_pdata 1558 0
+plyr_pdata_get_his_plyr_pdata 1562 1 5
 plyr_pdata_get_plyr_obj 1563 1 5
 plyr_pdata_get_plyr_num 1567 1 5
 plyr_pdata_get_pchr 1569 1 5
+get_bone_world_pos 1580 3 5 0 0
 v3_sub_v3 1591 3 0 0 0
 v3_add_v3_scaled 1593 4 0 0 0 1
 create_step_fx 1616 2 0 0 
-create_multiemit_step_fx 1617 3 0 4 0
-create_multiemit_parametric_fx 1619 3 0 4 0
+create_multiemit_step_fx 1617 3 0 0 0
+create_multiemit_parametric_fx 1619 3 0 0 0
 set_decal_plane 1620 1 0
 z_bias 1623 1 1
 fx 1629 1 0 
@@ -176,6 +198,9 @@ emit_roundrobin_mechanism 1651 2 0 0
 spawn_random_size 1657 1 0
 initial_add_v3 1671 2 0 0
 fx_reset 1662 1 5
+fx_next_emitter 1663 1 0
+fx_resume_emit 1664 1 0
+fx_pause_emit 1665 1 5
 fx_reset_emit 1666 1 5
 update_add 1674 2 0 0
 update_copy 1675 1 0
@@ -192,10 +217,14 @@ change_on_greater 1692 2 0 1
 change_on_less 1693 2 0 1
 change_on_y_less_than_field 1695 2 0 0
 kill_on_y_less_than_field 1696 2 0 0
+fx_set_param_v3 1698 5 5 0 1 1 1
 fx_set_render_priority 1702 2 5 0
 get_active_moveset_from_pdata 1713 1 5 
 advance_active_moveset 1714 1 5 
 load_and_set_refl_on_weapon 1715 0
 kitana_1717 1717 2 5 5
+frost_1718 1718 0 
+frost_1719 1719 1 5 
 jax_1720 1720 2 5 0 
-jax_1721 1721 0  
+jax_1721 1721 0 
+
