@@ -1,3 +1,7 @@
+; MKU definition file
+; format: name id numArgs argTypes
+; 
+; 
 sleep 0 1 0 
 true_branch 1 1 0 
 branch 2 1 0 
@@ -119,7 +123,7 @@ plyr_start_script_in_proc 784 2 0 0
 ani_1_frame 794 0
 ani_loop_more_frames 795 1 1 
 load_aux_weapon 796 1 0
-obj_set_scale 814 2 3 0 
+obj_set_scale 814 2 5 0 
 restart_effect 880 1 0
 sfrand 902 1 1
 player_area_collision_ticks 1118 6 1 1 0 1 0 1
@@ -135,7 +139,7 @@ set_active_projectile_tracking_light 1210 1 0
 set_active_projectile_collision_info 1211 4 1 0 1 1 
 resume_effect_at_obj_bid 1231 5 5 0 5 0 0 
 function_1239 1239 3 0 1 0 
-start_projectile_from_plyr_bone 1241 6 5 0 4 1 1 0 
+start_projectile_from_plyr_bone 1241 6 5 0 0 1 1 0 
 set_active_projectile_rx_info 1242 3 0 1 0 
 set_active_projectile_not_duckable 1243 0 
 set_active_projectile_hit_script 1245 1 0 
@@ -144,7 +148,7 @@ active_projectile_setup_done 1248 0
 set_active_projectile_target_ground 1250 3 1 1 1
 set_active_projectile_sound 1256 3 0 0 0 
 set_active_add_ang_y 1259 1 1 
-get_bid_with_flip 1262 2 3 0 
+get_bid_with_flip 1262 2 5 0 
 mks_debug_display_cloth_ontop 1264 1 0
 bgnd_get_float 1269 1 0
 destroy_mkobj 1313 1 5
@@ -178,6 +182,7 @@ plyr_pdata_get_pchr 1569 1 5
 get_bone_world_pos 1580 3 5 0 0
 v3_sub_v3 1591 3 0 0 0
 v3_add_v3_scaled 1593 4 0 0 0 1
+bind_to_bone 1615 1 0
 create_step_fx 1616 2 0 0 
 create_multiemit_step_fx 1617 3 0 0 0
 create_multiemit_parametric_fx 1619 3 0 0 0
@@ -187,21 +192,26 @@ fx 1629 1 0
 fx_by_owner 1631 2 0 5
 emit_in_range 1632 3 0 1 1
 emit_color 1633 5 0 0 0 0
+emit_uv 1634 3 0 0 0
 emit_cuboid 1636 4 0 1 1 1
 emit_cartesian 1639 7 0 1 1 1 1 1 1
+emit_cylindrical 1640 8 0 0 1 0 1 1 0 1
 emission_duration 1641 1 1
 texture_animation 1642 3 1 0 1
 emit_spherical 1644 2 0 1
+emit_from_pos 1647 7 0 0 0 0 1 1 1
 emit_value 1649 2 0 1
 emit_value_i 1650 2 0 0
 emit_roundrobin_mechanism 1651 2 0 0
 spawn_random_size 1657 1 0
-initial_add_v3 1671 2 0 0
 fx_reset 1662 1 5
 fx_next_emitter 1663 1 0
 fx_resume_emit 1664 1 0
 fx_pause_emit 1665 1 5
 fx_reset_emit 1666 1 5
+set_cycle_emission 1668 1 0
+initial_add_v3 1671 2 0 0
+initial_set_float 1672 3 0 0 0
 update_add 1674 2 0 0
 update_copy 1675 1 0
 update_add_constant_v3 1676 4 0 1 1 1
@@ -209,7 +219,9 @@ update_add_constant 1677 2 0 1
 update_fade_alpha 1680 4 0 0 0 1
 update_fade_alpha2 1681 6 0 0 0 1 0 0
 update_lerp_color 1682 6 0 0 1 0 0 0
+update_texanim_hold 1684 5 0 0 1 0 0
 update_bounce 1685 4 0 0 0 1
+update_attract 1686 3 0 0 1
 udpate_roundrobin 1688 1 0
 kill_on_greater 1689 2 0 1
 kill_roundrobin 1691 1 0
