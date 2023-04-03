@@ -27,6 +27,7 @@ struct MKOFunctionArgumentDefinition {
 struct MKOFunctionDefinition {
 	char name[256] = {};
 	int functionID;
+	int functionSet;
 	int num_arguments;
 	std::vector<EMKOFunctionArgumentDefinition_Type> args;
 };
@@ -40,6 +41,8 @@ struct MidwayHashEntry {
 
 class MKODict {
 public:
+	static EGameMode ms_gameMode;
+
 	static std::vector<MKOFunctionDefinition> ms_vFunctions;
 	static std::vector<MidwayHashEntry> ms_vHashes;
 	static void InitDict(EGameMode game);
@@ -49,9 +52,9 @@ public:
 	static int GetInternalID(const char* name);
 	static bool IsFunctionInternal(const char* name);
 
-	static bool IsDefinitionAvailable(int functionID);
+	static bool IsDefinitionAvailable(int functionID, int functionSet = 0);
 	static bool IsDefinitionAvailable(const char* name);
-	static MKOFunctionDefinition GetDefinition(int functionID);
+	static MKOFunctionDefinition GetDefinition(int functionID, int functionSet = 0);
 	static MKOFunctionDefinition GetDefinition(const char* name);
 	static std::string GetHashString(unsigned int hash);
 	static bool IsHashAvailable(unsigned int hash);

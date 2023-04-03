@@ -32,11 +32,11 @@ randu 73 1 0
 exit_attack_with 74 6 0 0 0 0 0 0 
 get_current_player_number 75 0 
 get_plyr_pdata_flag 77 2 5 0 
-get_new_mkobj 95 1 0 
+get_new_mkobj 95 1 5 
 insert_item_obj 96 2 5 5 
 ck_item_obj 98 1 2 
 destroy_item_obj 99 1 5 
-set_obj_flag 102 3 3 0 0 
+set_obj_flag 102 3 5 0 0 
 update_mkobj 103 1 5
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
@@ -125,7 +125,7 @@ get_projectile_script_plyr_num 1189 0
 get_projectile_script_plyr_pdata 1191 0
 set_active_projectile_tracking_light 1198 1 0 
 set_active_projectile_collision_info 1199 4 1 0 1 1
-resume_effect_at_obj_bid 1219 5 5 0 5 0 0  
+resume_effect_at_obj_bid 1219 5 5 5 5 0 0  
 start_projectile_from_plyr_bone 1229 6 5 0 0 1 1 0 
 set_active_projectile_rx_info 1230 3 0 1 0 
 set_active_projectile_not_duckable 1231 0 
@@ -179,7 +179,7 @@ fx_by_owner 1614 2 0 5
 emit_in_range 1615 3 0 1 1
 emit_color 1616 5 0 0 0 0 0
 emit_uv 1617 3 0 0 0
-emit_cuboid 1619 4 0 0 0 0
+emit_cuboid 1619 4 0 1 1 1
 emit_cartesian 1622 7 0 1 1 1 1 1 1
 emit_cylindrical 1623 8 0 0 1 0 1 1 0 1
 emission_duration 1624 1 1
@@ -200,7 +200,7 @@ update_add 1656 2 0 0
 update_copy 1657 1 0
 update_add_constant_v3 1658 4 0 1 1 1
 update_add_constant 1659 2 0 1
-update_fade_alpha 1662 4 0 0 0 1
+update_fade_alpha 1662 4 0 0 1 1
 update_fade_alpha2 1663 6 0 0 0 1 0 0
 update_texanim_hold 1666 5 0 0 1 0 0
 update_bounce 1667 4 0 0 0 1

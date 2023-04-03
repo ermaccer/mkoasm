@@ -25,10 +25,14 @@ const char* szInternalNames[] = {
     "copy_stream_to_address",
     "get_bit_field",
     "set_bit_field",
+    // new in MKA
+    "load_string_variable",
 };
 
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
 std::vector<MidwayHashEntry> MKODict::ms_vHashes;
+
+EGameMode MKODict::ms_gameMode;
 
 #ifdef SORT_FUNCTIONS
 bool sort_functions(MKOFunctionDefinition& a, MKOFunctionDefinition& b)
@@ -62,6 +66,8 @@ void MKODict::InitDict(EGameMode game)
     if (file == nullptr)
         return;
 
+    ms_gameMode = game;
+
     FILE* pFile = fopen(file, "rb");
     if (pFile)
     {
@@ -79,6 +85,14 @@ void MKODict::InitDict(EGameMode game)
                 std::unique_ptr<int[]> argTypes;
                 int funcID = -1;
                 int numArgs = 0;
+                int funcSet = 0;
+
+                if (game == Game_Armageddon)
+                {
+                    tempLine = strtok(NULL, " ");
+                    sscanf(tempLine, "%d", &funcSet);
+                }
+
                 tempLine = strtok(NULL, " ");
                 sscanf(tempLine, "%d", &funcID);
                 tempLine = strtok(NULL, " ");
@@ -103,6 +117,7 @@ void MKODict::InitDict(EGameMode game)
                 sprintf(def.name, name);
                 def.num_arguments = numArgs;
                 def.functionID = funcID;
+                def.functionSet = funcSet;
 
                 for (int i = 0; i < numArgs; i++)
                 {
@@ -195,13 +210,22 @@ bool MKODict::IsFunctionInternal(const char* name)
     return false;
 }
 
-bool MKODict::IsDefinitionAvailable(int functionID)
+bool MKODict::IsDefinitionAvailable(int functionID, int functionSet)
 {
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
-        if (ms_vFunctions[i].functionID == functionID)
-            return true;
+        if (ms_gameMode == Game_Armageddon)
+        {
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet)
+                return true;
+        }
+        else
+        {
+            if (ms_vFunctions[i].functionID == functionID)
+                return true;
+        }
     }
+
     return false;
 }
 
@@ -215,17 +239,29 @@ bool MKODict::IsDefinitionAvailable(const char* name)
     return false;
 }
 
-MKOFunctionDefinition MKODict::GetDefinition(int functionID)
+MKOFunctionDefinition MKODict::GetDefinition(int functionID, int functionSet)
 {
     MKOFunctionDefinition def = {};
 
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
-        if (ms_vFunctions[i].functionID == functionID)
+        if (ms_gameMode == Game_Armageddon)
         {
-            def = ms_vFunctions[i];
-            break;
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet)
+            {
+                def = ms_vFunctions[i];
+                break;
+            }
         }
+        else
+        {
+            if (ms_vFunctions[i].functionID == functionID)
+            {
+                def = ms_vFunctions[i];
+                break;
+            }
+        }
+
     }
 
     return def;

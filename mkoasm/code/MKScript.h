@@ -41,6 +41,8 @@ struct mko_command {
 	short isInternal;
 	short numVariables;
 	short unk2;
+	// new in mka
+	short functionSet;
 
 	// padding for jumps
 	bool is_pad;

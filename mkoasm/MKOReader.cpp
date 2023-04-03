@@ -1186,15 +1186,34 @@ void MKOReader::DecompileFunction(int functionID)
                 else
                 {
                     std::string functionName = "function";
-                    functionName += "_";
-                    functionName += std::to_string(c.functionID - 1);
 
-                    if (MKODict::IsDefinitionAvailable(c.functionID - 1))
-                    {
-                        funcDef = MKODict::GetDefinition(c.functionID - 1);
-                        functionName = funcDef.name;
-                        definitionAvailable = true;
+                   if (game == Game_Armageddon)
+                   {
+                       functionName += "_";
+                       functionName += std::to_string(c.functionSet);
+                       functionName += "_";
+                       functionName += std::to_string(c.functionID - 1);
+    
+                       if (MKODict::IsDefinitionAvailable(c.functionID - 1, c.functionSet))
+                       {
+                           funcDef = MKODict::GetDefinition(c.functionID - 1, c.functionSet);
+                           functionName = funcDef.name;
+                           definitionAvailable = true;
+                       }
+                   }
+                   else
+                   {
+                        functionName += "_";
+                        functionName += std::to_string(c.functionID - 1);
+
+                        if (MKODict::IsDefinitionAvailable(c.functionID - 1))
+                        {
+                            funcDef = MKODict::GetDefinition(c.functionID - 1);
+                            functionName = funcDef.name;
+                            definitionAvailable = true;
+                        }
                     }
+
 
 
                     pMKC << functionName << "(";
@@ -1252,14 +1271,32 @@ void MKOReader::DecompileFunction(int functionID)
                 else
                 {
                     std::string functionName = "function";
-                    functionName += "_";
-                    functionName += std::to_string(c.functionID - 1);
 
-                    if (MKODict::IsDefinitionAvailable(c.functionID - 1))
+                    if (game == Game_Armageddon)
                     {
-                        funcDef = MKODict::GetDefinition(c.functionID - 1);
-                        functionName = funcDef.name;
-                        definitionAvailable = true;
+                        functionName += "_";
+                        functionName += std::to_string(c.functionSet);
+                        functionName += "_";
+                        functionName += std::to_string(c.functionID - 1);
+
+                        if (MKODict::IsDefinitionAvailable(c.functionID - 1, c.functionSet))
+                        {
+                            funcDef = MKODict::GetDefinition(c.functionID - 1, c.functionSet);
+                            functionName = funcDef.name;
+                            definitionAvailable = true;
+                        }
+                    }
+                    else
+                    {
+                        functionName += "_";
+                        functionName += std::to_string(c.functionID - 1);
+
+                        if (MKODict::IsDefinitionAvailable(c.functionID - 1))
+                        {
+                            funcDef = MKODict::GetDefinition(c.functionID - 1);
+                            functionName = funcDef.name;
+                            definitionAvailable = true;
+                        }
                     }
 
                     if (m_bDebugMKO)
@@ -2408,6 +2445,8 @@ void MKOReader::ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functi
 
         mko_entry.isInternal = bc.isInternal < 0;
         mko_entry.functionID = bc.functionID;
+        if (game == Game_Armageddon)
+          mko_entry.functionSet = bc.functionSet;
 
         for (int i = 0; i < bc.numVariables; i++)
         {
@@ -2578,11 +2617,15 @@ void MKOReader::ParseMKOCommand_MKA(mko_command& bc)
 
     SwapINT(&a2);
 
+    int funcSet = HIBYTE(HIWORD(a1));
+
+
     bc.functionID = LOWORD(a1);
-    bc.isInternal = HIWORD(a1) == 0 ? -1 : HIWORD(a1);
+    bc.isInternal = funcSet == 0 ? -1 : 1;
     bc.numVariables = LOWORD(a2);
     bc.unk2 = HIWORD(a2);
     bc.is_pad = false;
+    bc.functionSet = funcSet;
 }
 
 void MKOReader::ParseMKOCommand_MKDA(mko_command& bc)

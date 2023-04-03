@@ -25,6 +25,7 @@ union MKOVariable {
 
 struct MKOCodeEntry {
     int functionID;
+    int functionSet;
     bool isInternal;
     std::vector<MKOVariable> arguments;
 
