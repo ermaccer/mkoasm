@@ -72,6 +72,7 @@ rotate_towards_him 208 1 1
 myvel_my_angle_y 209 3 1 1 1 
 ejb_call 210 1 0 
 back_rollup_check 212 0
+weapon_trail_off 223 0
 face_bleed_me 227 1 0
 wall_eligible_on 228 0
 ani_to_frame_x_col 238 7 1 0 1 1 0 1 0 
@@ -122,7 +123,10 @@ clear_collision_result 1165 0
 collision_result_dont_care 1166 0 
 ani_x_more_frames 1187 1 1
 get_projectile_script_plyr_num 1189 0
+get_projectile_his_plyr_num 1190 0
 get_projectile_script_plyr_pdata 1191 0
+get_projectile_script_last_pos 1192 1 0
+get_projectile_script_velocity 1193 1 0
 set_active_projectile_tracking_light 1198 1 0 
 set_active_projectile_collision_info 1199 4 1 0 1 1
 resume_effect_at_obj_bid 1219 5 5 5 5 0 0  
@@ -137,6 +141,7 @@ set_active_projectile_sound 1244 3 0 0 0
 get_bid_with_flip 1250 2 5 0 
 mks_debug_display_cloth_ontop 1252 1 0
 bgnd_get_float 1257 1 0
+get_player_number 1297 1 5
 destroy_mkobj 1301 1 5
 pfx_plyr_bankowner 1375 1 5
 insert_particle_mkobj 1386 1 5
@@ -190,7 +195,7 @@ emit_value_i 1633 2 0 0
 spawn_random_size 1639 1 0
 fx_reset 1644 1 5
 fx_next_emitter 1645 1 0
-fx_resume_emit 1646 1 0
+fx_resume_emit 1646 1 5
 fx_pause_emit 1647 1 5
 fx_reset_emit 1648 1 5
 set_cycle_emission 1650 1 0
@@ -219,6 +224,8 @@ frost_1718 1718 0
 frost_1719 1719 1 5 
 jax_1720 1720 2 5 0 
 jax_1721 1721 0 
+blaze_start_flaming_limbs 1725 1 5
+blaze_reset_flaming_limbs 1726 1 5
 ; umkd
 jax_taunt 2001 0
 freeze_victim 2002 0
