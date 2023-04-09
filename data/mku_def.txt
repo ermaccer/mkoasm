@@ -196,7 +196,7 @@ z_bias 1623 1 1
 fx 1629 1 0 
 fx_by_owner 1631 2 0 5
 emit_in_range 1632 3 0 1 1
-emit_color 1633 5 0 0 0 0
+emit_color 1633 5 0 0 0 0 0
 emit_uv 1634 3 0 0 0
 emit_cuboid 1636 4 0 1 1 1
 emit_cartesian 1639 7 0 1 1 1 1 1 1
