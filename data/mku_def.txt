@@ -95,8 +95,14 @@ set_block_requirement 299 1 0
 mks_cloth_bones_init_by_tbl 304 2 0 0
 mks_mat_id_set_zbias 305 2 0 1
 mks_cb1_eq_cloth_bone 306 1 0
+mks_cb2_eq_cloth_bone 307 1 0
+mks_insert_cloth_force_bones 308 2 1 1
 mks_set_ground_y_all_cloth_bones 309 1 1
 mks_cb1_set_ground_y 310 1 1
+mks_cc1_eq_insert_cloth_coll 315 2 0 1
+mks_cc1_expand_cyl 316 2 1 1 
+mks_cc1_insert_cb1 318 0
+mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 321 0
 jab_attach_point_light_to_obj_bone 555 3 0 5 0
 jab_spawn_point_light_at_world_pos 556 2 0 0
 trial_set_num_rounds 559 1 0
@@ -247,6 +253,7 @@ emit_in_range 1632 3 0 1 1
 emit_color 1633 5 0 0 0 0 0
 emit_uv 1634 3 0 0 0
 emit_cuboid 1636 4 0 1 1 1
+emit_disc2 1638 6 0 0 0 1 1 1
 emit_cartesian 1639 7 0 1 1 1 1 1 1
 emit_cylindrical 1640 8 0 0 1 0 1 1 0 1
 emission_duration 1641 1 1
