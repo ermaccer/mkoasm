@@ -27,6 +27,8 @@ was_button_and_direction 45 2 0 0
 ani_col_abort 46 7 1 0 1 1 0 1 0
 true_branch_next_style 48 1 0 
 if_switching_to 50 1 0 
+camera_set_lookat_focus 58 1 0
+camera_set_movement_focus 59 1 0
 attack_opponent_with 70 3 0 0 0 
 randu 73 1 0 
 exit_attack_with 74 6 0 0 0 0 0 0 
@@ -35,7 +37,7 @@ get_plyr_pdata_flag 77 2 5 0
 trial_add_required_attack 84 2 0 0
 get_new_mkobj 95 1 5 
 insert_item_obj 96 2 5 5 
-ck_item_obj 98 1 2 
+ck_item_obj 98 1 5 
 destroy_item_obj 99 1 5
 set_obj_flag 102 3 5 0 0 
 update_mkobj 103 1 5
@@ -171,7 +173,6 @@ set_active_projectile_tracking_light 1210 1 0
 set_active_projectile_collision_info 1211 4 1 0 1 1 
 resume_effect_at_obj_bid 1231 5 5 0 5 0 0 
 resume_effect_at_plyr_num_bid 1232 5 5 0 5 0 0
-function_1239 1239 3 0 1 0 
 start_projectile_from_plyr_bone 1241 6 5 0 0 1 1 0 
 set_active_projectile_rx_info 1242 3 0 1 0 
 set_active_projectile_not_duckable 1243 0 
@@ -195,7 +196,7 @@ plyr_turn_off_mirrorguy 1420 1 5
 plyr_turn_off_shadowbox 1422 1 5
 set_pdata_anim_step 1425 2 5 1
 limb_sever_update_slide_end_coeff 1427 2 5 1
-limb_sever_set_motion 1428 10 5 0 0 1 5 0 1 0 1 0 0
+limb_sever_set_motion 1428 11 5 0 0 1 5 0 1 0 1 0 0 0
 limb_sever_find_existing_update_proc 1429 3 5 0 0
 ft_fake_bone_matcher 1438 8 5 5 0 0 0 0 0 0
 play_his_random_voice 1445 1 0
@@ -230,8 +231,8 @@ plyr_pdata_get_plyr_num 1567 1 5
 plyr_pdata_get_pchr 1569 1 5
 obj_set_pos_vel 1574 2 5 0
 obj_set_ang_vel 1575 2 5 0
-bone_matcher_parent_set_offset 1578 5 5 0
-bone_matcher_child_set_offset 1579 5 5 0
+bone_matcher_parent_set_offset 1578 2 5 0 
+bone_matcher_child_set_offset 1579 2 5 0
 get_bone_world_pos 1580 3 5 0 0
 mkobj_get_matrix 1586 1 5
 v3_x_mat 1590 3 0 0 5

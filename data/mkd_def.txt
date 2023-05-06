@@ -10,6 +10,7 @@ script_exit 9 1 0
 exit_6 11 6 0 0 0 0 0 0 
 exit_react 12 6 0 0 0 0 0 0 
 blend_to_ani 13 3 0 0 1 
+am_i_flipped 15 00
 am_i_on_the_left 18 0 
 was_button_pressed 24 1 0 
 two_player_animation 26 2 0 1 
@@ -23,6 +24,7 @@ miss_branch 42 1 0
 block_branch 43 1 0 
 hit_branch 44 1 0 
 was_button_and_direction 45 2 0 0 
+ani_col_abort 46 7 1 0 1 1 0 1 0
 true_branch_next_style 48 1 0 
 if_switching_to 50 1 0 
 camera_set_lookat_focus 58 1 0
@@ -32,15 +34,19 @@ randu 73 1 0
 exit_attack_with 74 6 0 0 0 0 0 0 
 get_current_player_number 75 0 
 get_plyr_pdata_flag 77 2 5 0 
+trial_add_required_attack 84 2 0 0
 get_new_mkobj 95 1 5 
 insert_item_obj 96 2 5 5 
-ck_item_obj 98 1 2 
+ck_item_obj 98 1 5 
 destroy_item_obj 99 1 5 
 set_obj_flag 102 3 5 0 0 
 update_mkobj 103 1 5
+start_gusher 112 5 5 5 0 0 0
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
 slow_ani_x 130 2 1 1 
+slow_ani_x_if_miss 131 3 1 1 1
+back_to_normal 134 0
 set_my_state 135 1 0 
 set_my_secondary_state 136 1 0 
 set_ani_speed 137 1 1 
@@ -48,6 +54,7 @@ init_ground_move 139 0
 init_ground_move_no_aniproc 140 0
 init_air_move 142 0 
 init_air_move_no_aniproc 143 0 
+init_3d_move 145 0
 launch_me_up 150 2 1 1 
 face_opponent_now 153 0
 ani_to_end 155 0 
@@ -55,11 +62,13 @@ force_away 158 4 1 0 1 0
 shake_camera 159 2 0 1 
 snd_req 161 1 2 
 random_voice 168 1 0 
+snd_stop 170 1 5
 shake_hit_voice 172 4 0 1 0 0 
 random_hit 174 1 0 
 plyr_snd_req 175 1 0 
 get_mode_of_play 178 0 
 stop_me 181 0 
+random_voice_him 188 1 0
 step_throw_into_check 190 0 
 clear_my_face_opponent_flag 193 0
 disable_this_move_exec 196 2 0 0 
@@ -72,6 +81,7 @@ rotate_towards_him 208 1 1
 myvel_my_angle_y 209 3 1 1 1 
 ejb_call 210 1 0 
 back_rollup_check 212 0
+set_ani_weight 221 1 1
 weapon_trail_off 223 0
 face_bleed_me 227 1 0
 wall_eligible_on 228 0
@@ -89,22 +99,29 @@ got_hit_fx 292 7 0 0 0 0 0 0 0
 whoosh_fx 296 1 0
 special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
 set_block_requirement 299 1 0 
-mks_cloth_bones_init_by_tbl 304 2 0 0 
-mks_mat_id_set_zbias 305 2 0 1 
-mks_cb1_eq_cloth_bone 306 1 0 
-mks_cb2_eq_cloth_bone 307 1 0 
-mks_insert_cloth_force_bones 308 2 1 1 
-mks_set_ground_y_all_cloth_bones 309 1 1 
-mks_cb1_set_ground_y 310 1 0 
-mks_cc1_eq_insert_cloth_coll 315 5 0 1 1 1 1
-mks_cc1_expand_cyl 316 2 1 1 
-mks_ccp1_eq_insert_cloth_coll_plane 317 5 0 1 0 1 1
-mks_cc1_insert_cb1 318 0 
-mks_ccp1_insert_cb1 319 0
+; clothing stuff
+mks_cloth_bones_init_by_tbl 302 2 0 0
+mks_mat_id_set_zbias 303 2 0 1
+mks_cb1_eq_cloth_bone 304 1 0
+mks_cb2_eq_cloth_bone 305 1 0
+mks_insert_cloth_force_bones 306 2 1 1
+mks_set_ground_y_all_cloth_bones 307 1 1
+mks_cb1_set_ground_y 308 1 1
+mks_cc1_eq_insert_cloth_coll 313 2 0 1
+mks_cc1_expand_cyl 314 2 1 1 
+mks_cc1_insert_cb1 316 0
+mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 319 0
+; end clothing
+jab_attach_point_light_to_obj_bone 552 3 0 5 0
+jab_spawn_point_light_at_world_pos 553 2 0 0
 kick_the_camera 676 0
+get_collision_result 711 0
+taunt_increase_life 712 2 1 1
+face_ang_from_pos_to_him 720 3 5 0 0
 do_victory_camera 726 1 0
 get_my_plyr_num 727 0
 get_victory_flip_flags 729 0
+do_i_have_life_left 732 0
 high_flash_check 745 0
 medium_flash_check 746 0
 get_my_particle_player_bank_num 752 0
@@ -115,7 +132,10 @@ load_aux_weapon 788 1 0
 obj_set_scale 806 2 5 0 
 restart_effect 872 1 0
 sfrand 894 1 1
+get_adjusted_speed 1105 2 1 1
 player_area_collision_ticks 1106 6 1 1 0 1 0 1
+pan_vol_pitch_snd_req 1136 4 0 0 1 1
+local_collision_allowed_plyr_pdata 1141 0
 player_area_collision_check 1156 5 1 1 0 0 0
 reaction_sync_advance 1163 0
 wait_for_collision_result 1164 0
@@ -130,6 +150,7 @@ get_projectile_script_velocity 1193 1 0
 set_active_projectile_tracking_light 1198 1 0 
 set_active_projectile_collision_info 1199 4 1 0 1 1
 resume_effect_at_obj_bid 1219 5 5 5 5 0 0  
+resume_effect_at_plyr_num_bid 1220 5 5 0 5 0 0
 start_projectile_from_plyr_bone 1229 6 5 0 0 1 1 0 
 set_active_projectile_rx_info 1230 3 0 1 0 
 set_active_projectile_not_duckable 1231 0 
@@ -142,13 +163,26 @@ get_bid_with_flip 1250 2 5 0
 mks_debug_display_cloth_ontop 1252 1 0
 bgnd_get_float 1257 1 0
 get_player_number 1297 1 5
+obj_set_gravity 1299 2 5 1
+obj_turn_gravity_off 1300 1 5
 destroy_mkobj 1301 1 5
 pfx_plyr_bankowner 1375 1 5
 insert_particle_mkobj 1386 1 5
 check_to_register_miss 1398 0
+plyr_turn_off_mirrorguy 1407 1 5
+plyr_turn_off_shadowbox 1409 1 5
+set_pdata_anim_step 1412 2 5 1
 limb_sever_update_slide_end_coeff 1414 2 5 1
+limb_sever_set_motion 1415 11 5 0 0 1 5 0 1 0 1 0 0 0
 limb_sever_find_existing_update_proc 1416 3 5 0 0
+ft_fake_bone_matcher 1425 8 5 5 0 0 0 0 0 0
+play_his_random_voice 1432 1 0
+play_his_snd_req 1433 1 0
 advance_to_weapon_style 1437 1 5
+show_single_weapon 1440 2 5 0
+weapon_reflection_show_hide 1441 3 5 0 0
+weapon_bm_ignore 1443 2 0 0
+bone_matcher_set_ang_pos 1444 6 5 5 0 0 0 0 0
 spawn_blood_pool_at_bid 1449 3 5 0 0
 start_blood_particles 1451 4 0 0 5 5
 start_blood_particles_scripts 1453 2 0 0
@@ -162,6 +196,8 @@ pfxhandle_spawn_at_bid 1471 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1473 3 5 5 0
 obj_set_pos 1522 2 5 0
 obj_get_pos 1523 2 5 0
+obj_set_ang 1524 2 5 0
+obj_get_ang 1525 2 5 0
 get_his_plyr_obj 1537 0
 get_my_plyr_obj 1538 0
 get_his_plyr_pdata 1541 0
@@ -170,9 +206,19 @@ plyr_pdata_get_his_plyr_pdata 1546 1 5
 plyr_pdata_get_plyr_obj 1547 1 5
 plyr_pdata_get_plyr_num 1551 1 5
 plyr_pdata_get_pchr 1553 1 5
+obj_set_pos_vel 1558 2 5 0
+obj_set_ang_vel 1559 2 5 0
+bone_matcher_parent_set_offset 1562 2 5 0
+bone_matcher_child_set_offset 1563 2 5 0
 get_bone_world_pos 1564 3 5 0 0
+mkobj_get_matrix 1569 1 5
+v3_x_mat 1573 3 0 0 5
 v3_sub_v3 1574 3 0 0 0
+v3_add_v3 1575 3 0 0 0
 v3_add_v3_scaled 1576 4 0 0 0 1
+scale_v3 1577 3 0 0 5
+normalize_v3 1578 1 0
+length_v3 1592 1 0
 bind_to_bone 1598 1 0
 create_step_fx 1599 2 0 0 
 create_multiemit_step_fx 1600 3 0 0 0
@@ -185,6 +231,7 @@ emit_in_range 1615 3 0 1 1
 emit_color 1616 5 0 0 0 0 0
 emit_uv 1617 3 0 0 0
 emit_cuboid 1619 4 0 1 1 1
+emit_disc2 1621 6 0 0 0 1 1 1
 emit_cartesian 1622 7 0 1 1 1 1 1 1
 emit_cylindrical 1623 8 0 0 1 0 1 1 0 1
 emission_duration 1624 1 1
@@ -207,6 +254,7 @@ update_add_constant_v3 1658 4 0 1 1 1
 update_add_constant 1659 2 0 1
 update_fade_alpha 1662 4 0 0 1 1
 update_fade_alpha2 1663 6 0 0 0 1 0 0
+update_lerp_color 1664 6 0 0 1 0 0 0
 update_texanim_hold 1666 5 0 0 1 0 0
 update_bounce 1667 4 0 0 0 1
 update_attract 1668 3 0 0 1
@@ -226,6 +274,10 @@ jax_1720 1720 2 5 0
 jax_1721 1721 0 
 blaze_start_flaming_limbs 1725 1 5
 blaze_reset_flaming_limbs 1726 1 5
+; gc ported to umkd 
+get_taunts_performed 1900 0
+increment_taunts_performed 1901 0
 ; umkd
 jax_taunt 2001 0
 freeze_victim 2002 0
+force_fatality_end 2003 0
