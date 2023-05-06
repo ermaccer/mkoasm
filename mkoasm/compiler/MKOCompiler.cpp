@@ -146,7 +146,7 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 	int a2 = MAKELONG(numArgs, -1);
 	file.write((char*)&a2, sizeof(int));
 
-	for (int i = 0; i < argsData.size(); i++)
+	for (unsigned int i = 0; i < argsData.size(); i++)
 	{
 		MKOFunctionArgumentDefinition arg = argsData[i];
 		switch (arg.type)

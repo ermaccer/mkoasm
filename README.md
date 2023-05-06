@@ -20,10 +20,10 @@ game mode**
 | MK Unchained | ✔️ | ✔️ | ✔️| PSP|
 | MK Armageddon | ✔️ | ✔️ | ✔️|PS2, Wii (not tested), XBOX (not tested)|
 | MK VS DC | ✔️ | ✔️ | ✔️|PS3|
-| MK9 | ✔️ | ⚠ | ❌| PC, functions aren't extracted properly |
+| MK9 | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
+| Injustice | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
 
-
-Scripts from Injustice and onwards are totally unsuppported.
+Scripts from MKX and onwards are totally unsuppported.
 
 
 # Decompilation
@@ -71,3 +71,6 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
  - Added seperate sounds asset section which includes character specific sounds
  - Added variable name hashing (FNV1)
  - Added tweakvars section which allows quick access to important variables
+
+## Injustice
+ - Basically identical to MK9 structure wise

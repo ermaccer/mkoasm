@@ -3,6 +3,7 @@
 #include "code/MKScript.h"
 #include "code/MKScript_MK8.h"
 #include "code/MKScript_MK9.h"
+#include "code/MKScript_DCF.h"
 #include <fstream>
 #include "code/MKScriptTypes.h"
 #include "code/MKODict.h"
@@ -105,6 +106,18 @@ public:
     std::vector<mko_sound_asset_mk9> mk9_sounds;
     std::vector<mko_unknown_mk9> mk9_unknowns;
 
+    // dcf1 (injustice)
+
+
+    mko_header_dcf dcf_header;
+    std::vector<mko_function_header_mk9> dcf_funcs;
+    std::vector<mko_variable_header_mk9> dcf_vars;
+    std::vector<mko_variable_header_mk9> dcf_dyn_vars;
+    std::vector<mko_extern_mk9> dcf_externs;
+    std::vector<mko_asset_dcf> dcf_assets;
+    std::vector<mko_sound_asset_mk9>dcf_sounds;
+
+
     std::unique_ptr<char[]> script_names;
     std::unique_ptr<char[]> string_data;
     std::unique_ptr<char[]> unk_data;
@@ -120,6 +133,8 @@ public:
     bool Read(const char* file);
     bool ReadMK8();
     bool ReadMK9();
+    bool ReadDCF();
+
 
     std::string GetExtension();
 
@@ -133,6 +148,7 @@ public:
     std::string GetFunctionName(int functionID);
     std::string GetFunctionNameMK8(int functionID);
     std::string GetFunctionNameMK9(int functionID);
+    std::string GetFunctionNameDCF(int functionID);
 
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);
@@ -140,10 +156,13 @@ public:
     std::string GetVariableName(int variableID);
     std::string GetVariableNameMK8(int variableID);
     std::string GetVariableNameMK9(int variableID);
+    std::string GetVariableNameDCF(int variableID);
 
     uint32_t GetVariableOffset(int variableID);
     uint32_t GetVariableOffsetMK8(int variableID);
     uint32_t GetVariableOffsetMK9(int variableID);
+    uint32_t GetVariableOffsetDCF(int variableID);
+
 
     std::string GetString(int stringStart);
 
@@ -151,20 +170,29 @@ public:
     void ExtractDataMKDADU();
     void ExtractDataMK8();
     void ExtractDataMK9();
+    void ExtractDataDCF();
+
 
     void ExtractVariables();
     void ExtractVariablesMK8();
     void ExtractVariablesMK9();
+    void ExtractVariablesDCF();
 
     void ExtractFunctions();
     void ExtractFunctionsMK8();
     void ExtractFunctionsMK9();
+    void ExtractFunctionsDCF();
+
+
     void DecompileFunction(int functionID);
     void DecompileFunctionMK8(int functionID);
     void UnpackVariable(int variableID);
 
     void UnpackVariableMK8(int variableID);
     void UnpackVariableMK9(int variableID);
+    void UnpackVariableDCF(int variableID);
+
+
     // unpackers
     void Unpack_Movelist(int variableID);
     void Unpack_MovelistU(int variableID);
@@ -190,16 +218,20 @@ public:
     void UnpackVariables();
     void UnpackVariablesMK8();
     void UnpackVariablesMK9();
+    void UnpackVariablesDCF();
 
     void PrintInfo();
 
     void PrintInfoMKDADU();
     void PrintInfoMK8();
     void PrintInfoMK9();
+    void PrintInfoDCF();
 
     void DumpInfoMKDADU(std::string name);
     void DumpInfoMK8(std::string name);
     void DumpInfoMK9(std::string name);
+    void DumpInfoDCF(std::string name);
+
 
     void DumpHeader(std::string header);
 
