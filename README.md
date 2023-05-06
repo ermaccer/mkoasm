@@ -44,7 +44,7 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
  - First version of MKO (cmo) script format
  - Only functions can be used
  - No variables
- - Heavyily dependant on executable functions for almost everything
+ - Heavily dependant on executable functions for almost everything
 
 ## MK Deception
  - Added static variables
