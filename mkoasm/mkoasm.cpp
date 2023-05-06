@@ -32,7 +32,12 @@ int main(int argc, char* argv[])
 			<< "    -c  Compile specified file.\n"
 			<< "    -p  Pack variable.\n"
 			<< "    -a <arg> Argument for variable packer.\n"
-			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, inj\n";
+			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, inj\n"
+#ifdef _M_X64
+			<< "	X64 modes: mkx (mk10)\n"
+#endif // _M_X64
+			;
+
 		return 1;
 	}
 
@@ -71,6 +76,23 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	EGameMode game = Game_Unchained;
+
+	if (m_param == "mkd") game = Game_Deception;
+	if (m_param == "mku") game = Game_Unchained;
+	if (m_param == "mka") game = Game_Armageddon;
+	if (m_param == "mkda") game = Game_DeadlyAlliance;
+	if (m_param == "mkvsdc") game = Game_MKVSDC;
+	if (m_param == "mk9") game = Game_MK9;
+	if (m_param == "inj") game = Game_Injustice;
+	if (m_param == "mkx" || m_param == "mk10") game = Game_MK10;
+
+	if (game == Game_MK10 && !MKOReader::Is64BitSupported())
+	{
+		std::cout << "ERROR: MK10+ is only supported in 64bit version of mkoasm!" << std::endl;
+		return 0;
+	}
+
 
 	const char* path = nullptr;
 	if (argc > 2)
@@ -81,15 +103,6 @@ int main(int argc, char* argv[])
 	if (!path)
 		return 0;
 
-	EGameMode game = Game_Unchained;
-
-	if (m_param == "mkd") game = Game_Deception;
-	if (m_param == "mku") game = Game_Unchained;
-	if (m_param == "mka") game = Game_Armageddon;
-	if (m_param == "mkda") game = Game_DeadlyAlliance;
-	if (m_param == "mkvsdc") game = Game_MKVSDC;
-	if (m_param == "mk9") game = Game_MK9;
-	if (m_param == "inj") game = Game_Injustice;
 
 	MKODict::InitDict(game);
 	if (game > Game_MKVSDC)

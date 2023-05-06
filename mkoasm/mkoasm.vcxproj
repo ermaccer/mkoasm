@@ -161,6 +161,7 @@
     <ClInclude Include="code\MKScript.h" />
     <ClInclude Include="code\MKScriptTypes.h" />
     <ClInclude Include="code\MKScript_DCF.h" />
+    <ClInclude Include="code\MKScript_MK10.h" />
     <ClInclude Include="code\MKScript_MK8.h" />
     <ClInclude Include="code\MKScript_MK9.h" />
     <ClInclude Include="compiler\MKOCompiler.h" />

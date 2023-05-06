@@ -4,6 +4,7 @@
 #include "code/MKScript_MK8.h"
 #include "code/MKScript_MK9.h"
 #include "code/MKScript_DCF.h"
+#include "code/MKScript_MK10.h"
 #include <fstream>
 #include "code/MKScriptTypes.h"
 #include "code/MKODict.h"
@@ -21,6 +22,10 @@ union MKOVariable {
     float floatData;
     unsigned short shortData;
     unsigned int uintData;
+#ifdef _M_X64
+    int64 qwordData;
+#endif // _X_M64
+
 };
 
 
@@ -40,6 +45,21 @@ struct MKOCodeEntry {
 struct MKOCodeEntry_MK8 {
     int functionID;
     int type;
+    int unk1;
+    int unk2;
+    int pad;
+    std::vector<MKOVariable> arguments;
+
+    // debug/helper
+    int offset;
+    int size;
+    int localOffset;
+};
+
+
+struct MKOCodeEntry_MK10 {
+    int type;
+    int subType;
     int unk1;
     int unk2;
     int pad;
@@ -76,8 +96,8 @@ public:
     EGameMode game = Game_Unchained;
     std::string m_szInputName;
 
-    uint32_t m_pDataStartOffset = 0;
-    uint32_t m_pFunctionsStartOffset = 0;
+    uintptr_t m_pDataStartOffset = 0;
+    uintptr_t m_pFunctionsStartOffset = 0;
 
     std::vector<mko_function_header> funcs;
     std::vector<mko_variable_header> vars;
@@ -107,16 +127,26 @@ public:
     std::vector<mko_unknown_mk9> mk9_unknowns;
 
     // dcf1 (injustice)
-
-
     mko_header_dcf dcf_header;
     std::vector<mko_function_header_mk9> dcf_funcs;
     std::vector<mko_variable_header_mk9> dcf_vars;
     std::vector<mko_variable_header_mk9> dcf_dyn_vars;
     std::vector<mko_extern_mk9> dcf_externs;
     std::vector<mko_asset_dcf> dcf_assets;
-    std::vector<mko_sound_asset_mk9>dcf_sounds;
+    std::vector<mko_sound_asset_mk9> dcf_sounds;
 
+    // mk10
+    mko_header_mk10 mk10_header;
+    std::vector<mko_function_header_mk10> mk10_funcs;
+    std::vector<mko_variable_header_mk10> mk10_vars;
+    std::vector<mko_variable_header_mk10> mk10_dyn_vars;
+    std::vector<mko_extern_mk10> mk10_externs;
+    std::vector<mko_extern_var_mk10> mk10_extern_vars;
+    std::vector<mko_source_header_mk10> mk10_srcs;
+    std::vector<mko_asset_mk10> mk10_assets;
+    std::vector<mko_fixup_mk10> mk10_fixup;
+    std::unique_ptr<char[]> mk10_pointers;
+    std::unique_ptr<char[]> mk10_tweakstring_data;
 
     std::unique_ptr<char[]> script_names;
     std::unique_ptr<char[]> string_data;
@@ -134,6 +164,7 @@ public:
     bool ReadMK8();
     bool ReadMK9();
     bool ReadDCF();
+    bool ReadMK10();
 
 
     std::string GetExtension();
@@ -149,20 +180,25 @@ public:
     std::string GetFunctionNameMK8(int functionID);
     std::string GetFunctionNameMK9(int functionID);
     std::string GetFunctionNameDCF(int functionID);
+    std::string GetFunctionNameMK10(int functionID);
+
 
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);
+    uintptr_t GetFunctionOffsetMK10(int functionID);
 
     std::string GetVariableName(int variableID);
     std::string GetVariableNameMK8(int variableID);
     std::string GetVariableNameMK9(int variableID);
     std::string GetVariableNameDCF(int variableID);
+    std::string GetVariableNameMK10(int variableID);
+
 
     uint32_t GetVariableOffset(int variableID);
     uint32_t GetVariableOffsetMK8(int variableID);
     uint32_t GetVariableOffsetMK9(int variableID);
     uint32_t GetVariableOffsetDCF(int variableID);
-
+    uint32_t GetVariableOffsetMK10(int variableID);
 
     std::string GetString(int stringStart);
 
@@ -171,27 +207,32 @@ public:
     void ExtractDataMK8();
     void ExtractDataMK9();
     void ExtractDataDCF();
-
+    void ExtractDataMK10();
 
     void ExtractVariables();
     void ExtractVariablesMK8();
     void ExtractVariablesMK9();
     void ExtractVariablesDCF();
+    void ExtractVariablesMK10();
+
 
     void ExtractFunctions();
     void ExtractFunctionsMK8();
     void ExtractFunctionsMK9();
     void ExtractFunctionsDCF();
-
+    void ExtractFunctionsMK10();
 
     void DecompileFunction(int functionID);
     void DecompileFunctionMK8(int functionID);
+    void DecompileFunctionMK10(int functionID);
+
+
     void UnpackVariable(int variableID);
 
     void UnpackVariableMK8(int variableID);
     void UnpackVariableMK9(int variableID);
     void UnpackVariableDCF(int variableID);
-
+    void UnpackVariableMK10(int variableID);
 
     // unpackers
     void Unpack_Movelist(int variableID);
@@ -215,10 +256,12 @@ public:
 
     void DecompileAllFunctions();
     void DecompileAllFunctionsMK8();
+    void DecompileAllFunctionsMK10();
     void UnpackVariables();
     void UnpackVariablesMK8();
     void UnpackVariablesMK9();
     void UnpackVariablesDCF();
+    void UnpackVariablesMK10();
 
     void PrintInfo();
 
@@ -226,12 +269,13 @@ public:
     void PrintInfoMK8();
     void PrintInfoMK9();
     void PrintInfoDCF();
+    void PrintInfoMK10();
 
     void DumpInfoMKDADU(std::string name);
     void DumpInfoMK8(std::string name);
     void DumpInfoMK9(std::string name);
     void DumpInfoDCF(std::string name);
-
+    void DumpInfoMK10(std::string name);
 
     void DumpHeader(std::string header);
 
@@ -243,12 +287,15 @@ public:
 
     void ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID);
     void ParseMKOCommand_MK8(mko_command_mk8& bc);
+
+    void ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, int functionID);
+    void ParseMKOCommand_MK10(mko_command_mk10& bc);
     // building
 
     bool Build();
 
     bool IsDecompSupported();
-    bool Is64BitSupported();
+    static bool Is64BitSupported();
 
 
     // packing

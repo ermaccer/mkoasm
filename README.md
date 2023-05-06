@@ -22,6 +22,7 @@ game mode**
 | MK VS DC | ✔️ | ✔️ | ✔️|PS3|
 | MK9 | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
 | Injustice | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
+| Mortal Kombat X | ✔️ | ✔️ | ✔️| PC|
 
 Scripts from MKX and onwards are totally unsuppported.
 
@@ -29,7 +30,7 @@ Scripts from MKX and onwards are totally unsuppported.
 # Decompilation
 
 MKOASM is able to decompile functions for supported games using definition tables, there's a table
-with plenty of functions for every supported game (except MKvsDC) which should produce human readable
+with plenty of functions for every supported game (except MKvsDC+) which should produce human readable
 output.
 
 

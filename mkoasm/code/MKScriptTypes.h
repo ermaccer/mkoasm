@@ -1,5 +1,11 @@
 #pragma once
 
+#ifndef _M_X64
+typedef int int64;
+#else
+typedef __int64 int64;
+#endif
+
 enum EMovelistTypes {
 	EMovelist_Style_One,
 	EMovelist_Style_Two,
