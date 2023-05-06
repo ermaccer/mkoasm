@@ -126,18 +126,22 @@ bool MKOReader::Read(const char* file)
 
             if (game == Game_Armageddon)
             {
+                std::vector<int> funcLinks;
+
                 int field12, field16;
                 pFile.read((char*)&field12, sizeof(int));
                 pFile.read((char*)&field16, sizeof(int));
 
                 SwapINT(&field12);
                 SwapINT(&field16);
-                if (field16 > 0)
+                for (int a = 0; a < field16; a++)
                 {
-                    int size = field16 * sizeof(int);
-                    std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
-                    pFile.read(unkData.get(),size);
+                    int funcLink = 0;
+                    pFile.read((char*)&funcLink, sizeof(int));
+                    SwapINT(&funcLink);
+                    funcLinks.push_back(funcLink);
                 }
+                mka_funcLinks.push_back(funcLinks);
             }
 
             funcs.push_back(func);
@@ -163,16 +167,20 @@ bool MKOReader::Read(const char* file)
 
             if (game == Game_Armageddon)
             {
+                std::vector<int> varLinks;
+
                 int field16;
                 pFile.read((char*)&field16, sizeof(int));
 
                 SwapINT(&field16);
-                if (field16 > 0)
+                for (int a = 0; a < field16; a++)
                 {
-                    int size = field16 * sizeof(int);
-                    std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
-                    pFile.read(unkData.get(), size);
+                    int varLink = 0;
+                    pFile.read((char*)&varLink, sizeof(int));
+                    SwapINT(&varLink);
+                    varLinks.push_back(varLink);
                 }
+                mka_varLinks.push_back(varLinks);
             }
 
             vars.push_back(var);
@@ -1026,7 +1034,31 @@ void MKOReader::ExtractVariables()
             oInfo << "Name = " << var_name << std::endl;
             oInfo << "NumElems = " << vars[i].numElems << std::endl;
             oInfo << "ScriptID = " << varID << std::endl;
-            oInfo << "Unknown = " << vars[i].unknown << std::endl << std::endl;
+            oInfo << "Unknown = " << vars[i].unknown << std::endl;
+
+            if (game == Game_Armageddon)
+            {
+                oInfo << "NumLinks = " << mka_varLinks[i].size() << std::endl;;
+
+                for (unsigned int a = 0; a < mka_varLinks[i].size(); a++)
+                {
+                    int link = mka_varLinks[i][a];
+
+                    int linkVal = LOWORD(link);
+                    int linkType = HIWORD(link);
+
+                    if (linkType & 0x8000)
+                        oInfo << "Link" << a << " = " << linkVal << " [VAR] " << "; " << GetVariableName(linkVal - 1) << std::endl;
+                    else
+                    {
+                        std::string link_name = (char*)(&string_data[0] + (linkVal));
+                        oInfo << "Link" << a << " = " << link_name << " [STR]" << std::endl;
+                    }
+                    
+                }
+            }
+
+            oInfo << std::endl;
 
         }
 
@@ -1113,9 +1145,33 @@ void MKOReader::ExtractFunctions()
         if (oInfo) {
             oInfo << "[Function" << std::to_string(i) << "]" << std::endl;
             oInfo << "Name = " << func_name << std::endl;
-          //  oInfo << "NameOffset = " << funcs[i].name_offset << std::endl;
             oInfo << "Unknown = " << funcs[i].unknown << std::endl;
-            oInfo << "FunctionFloat = " << funcID << std::endl << std::endl;
+            oInfo << "FunctionFloat = " << funcID << std::endl;
+
+
+            if (game == Game_Armageddon)
+            {
+                oInfo << "NumLinks = " << mka_funcLinks[i].size() << std::endl;
+
+                for (unsigned int a = 0; a < mka_funcLinks[i].size(); a++)
+                {
+                    int link = mka_funcLinks[i][a];
+
+                    int linkVal = LOWORD(link);
+                    int linkType = HIWORD(link);
+
+                    if (linkType & 0x8000)
+                        oInfo << "Link" << a << " = " << linkVal << " [VAR] " << "; " << GetVariableName(linkVal - 1) << std::endl;
+                    else
+                    {
+                        std::string link_name = (char*)(&string_data[0] + (linkVal));
+                        oInfo << "Link" << a << " = " << link_name << " [STR]" << std::endl;
+                    }
+
+                }
+            }
+
+            oInfo << std::endl;
         }
 
 

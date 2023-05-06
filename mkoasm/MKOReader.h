@@ -85,7 +85,8 @@ public:
     mko_header header;
 
 
-    std::vector<mko_function_header_mka> mka_funcs;
+    std::vector<std::vector<int>> mka_funcLinks;
+    std::vector<std::vector<int>> mka_varLinks;
 
     // mk8 (Mortal Kombat vs DC Universe)
     mko_header_mk8 mk8_header;
