@@ -2055,7 +2055,11 @@ void MKOReader::PrintInfoMKDADU()
     for (unsigned int i = 0; i < funcs.size(); i++)
     {
         std::string func_name = (char*)(&script_names[0] + (funcs[i].name_offset - 1));
-        printf("Function %04d - %s \t Size: %d Unk: %d Offset: %d\n", i, func_name.c_str(), func_sizes[i], funcs[i].unknown, funcs[i].offset * 4);
+        printf("Function %04d - %s \t Size: %d Unk: %d Offset: %d", i, func_name.c_str(), func_sizes[i], funcs[i].unknown, funcs[i].offset * 4);
+        if (game == Game_Armageddon)
+            printf(" Links: %d\n", mka_funcLinks[i].size());
+        else
+            printf("\n");
     }
     printf("===========\n");
     printf("Variable Info\n");
@@ -2064,7 +2068,11 @@ void MKOReader::PrintInfoMKDADU()
     for (unsigned int i = 0; i < vars.size(); i++)
     {
         std::string var_name = (char*)(&script_names[0] + (vars[i].name_offset - 1));
-        printf("Variable %04d - %s \t Size: %d Elements: %d Offset: %d\n", i, var_name.c_str(), var_sizes[i], vars[i].numElems, vars[i].offset * 4);
+        printf("Variable %04d - %s \t Size: %d Elements: %d Offset: %d", i, var_name.c_str(), var_sizes[i], vars[i].numElems, vars[i].offset * 4);
+        if (game == Game_Armageddon)
+            printf(" Links: %d\n", mka_varLinks[i].size());
+        else
+            printf("\n");
     }
 }
 
@@ -2233,7 +2241,14 @@ void MKOReader::DumpInfoMKDADU(std::string name)
         for(unsigned int i = 0; i < funcs.size(); i++)
         {
             std::string func_name = (char*)(&script_names[0] + (funcs[i].name_offset - 1));
-            sprintf(pInfo, "Function %04d - %s \t Size: %d Unk: %d Offset: %d\n", i, func_name.c_str(), func_sizes[i], funcs[i].unknown, funcs[i].offset * 4);
+            sprintf(pInfo, "Function %04d - %s \t Size: %d Unk: %d Offset: %d", i, func_name.c_str(), func_sizes[i], funcs[i].unknown, funcs[i].offset * 4);
+            oInfo << pInfo;
+
+            if (game == Game_Armageddon)
+                sprintf(pInfo, " Links: %d\n", mka_funcLinks[i].size());
+            else
+                sprintf(pInfo, "\n");
+
             oInfo << pInfo;
         }
         sprintf(pInfo, "===========\n");
@@ -2249,7 +2264,14 @@ void MKOReader::DumpInfoMKDADU(std::string name)
         for (unsigned int i = 0; i < vars.size(); i++)
         {
             std::string var_name = (char*)(&script_names[0] + (vars[i].name_offset - 1));
-            sprintf(pInfo, "Variable %04d - %s \t Size: %d Elements: %d Offset: %d\n", i, var_name.c_str(), var_sizes[i], vars[i].numElems, vars[i].offset * 4);
+            sprintf(pInfo, "Variable %04d - %s \t Size: %d Elements: %d Offset: %d", i, var_name.c_str(), var_sizes[i], vars[i].numElems, vars[i].offset * 4);
+            oInfo << pInfo;
+
+            if (game == Game_Armageddon)
+                sprintf(pInfo, " Links: %d\n", mka_varLinks[i].size());
+            else
+                sprintf(pInfo, "\n");
+
             oInfo << pInfo;
         }
         oInfo.close();
