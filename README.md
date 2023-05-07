@@ -20,7 +20,7 @@ game mode**
 | MK Unchained | ✔️ | ✔️ | ✔️| PSP|
 | MK Armageddon | ✔️ | ✔️ | ✔️|PS2, Wii (not tested), XBOX (not tested)|
 | MK VS DC | ✔️ | ✔️ | ✔️|PS3|
-| MK9 | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
+| MK9 | ✔️ | ✔️ | ✔️| PC |
 | Injustice | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| PC|
 
