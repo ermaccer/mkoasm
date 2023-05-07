@@ -1440,6 +1440,20 @@ std::string MKOReader::GetFunctionNameMK11(int functionID)
     return func_name;
 }
 
+int MKOReader::GetFunctionIDWithHashMK11(unsigned int hash)
+{
+    int id = -1;
+    for (unsigned int i = 0; i < mk11_funcs.size(); i++)
+    {
+        if (mk11_funcs[i].functionHash == hash)
+        {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
 
 uint32_t MKOReader::GetFunctionOffset(int functionID)
 {
@@ -2884,9 +2898,9 @@ void MKOReader::DecompileFunctionMK10(int functionID)
                         functionName += "_t";
                         functionName += std::to_string(c.type);
                         functionName += "_s";
-                        functionName += std::to_string(c.subType);
+                        functionName += std::to_string(c.functionSet);
                         functionName += "_i";
-                        functionName += std::to_string(c.unk2);
+                        functionName += std::to_string(c.functionID);
                     }
                     pMKC << functionName << "(";
                 }
@@ -2927,9 +2941,9 @@ void MKOReader::DecompileFunctionMK10(int functionID)
                     functionName += "_t";
                     functionName += std::to_string(c.type);
                     functionName += "_s";
-                    functionName += std::to_string(c.subType);
+                    functionName += std::to_string(c.functionSet);
                     functionName += "_i";
-                    functionName += std::to_string(c.unk2);
+                    functionName += std::to_string(c.functionID);
                 }
 
                 pMKC << functionName << "(";
@@ -2966,9 +2980,9 @@ void MKOReader::DecompileFunctionDCF2(int functionID)
                 functionName += "_t";
                 functionName += std::to_string(c.type);
                 functionName += "_s";
-                functionName += std::to_string(c.subType);
+                functionName += std::to_string(c.functionSet);
                 functionName += "_i";
-                functionName += std::to_string(c.unk2);
+                functionName += std::to_string(c.functionID);
                 pMKC << functionName << "(";
 
                 for (int a = 0; a < c.arguments.size(); a++)
@@ -2991,9 +3005,9 @@ void MKOReader::DecompileFunctionDCF2(int functionID)
                 functionName += "_t";
                 functionName += std::to_string(c.type);
                 functionName += "_s";
-                functionName += std::to_string(c.subType);
+                functionName += std::to_string(c.functionSet);
                 functionName += "_i";
-                functionName += std::to_string(c.unk2);
+                functionName += std::to_string(c.functionID);
 
                 pMKC << functionName << "(";
 
@@ -3022,6 +3036,8 @@ void MKOReader::DecompileFunctionMK11(int functionID)
         for (int i = 0; i < codeData.size(); i++)
         {
             MKOCodeEntry_MK10 c = codeData[i];
+            MKOFunctionDefinition funcDef;
+            bool definitionAvailable = false;
 
             if (c.arguments.size() > 0)
             {
@@ -3029,13 +3045,52 @@ void MKOReader::DecompileFunctionMK11(int functionID)
                 functionName += "_t";
                 functionName += std::to_string(c.type);
                 functionName += "_s";
-                functionName += std::to_string(c.subType);
+                functionName += std::to_string(c.functionSet);
                 functionName += "_i";
-                functionName += std::to_string(c.unk2);
+                functionName += std::to_string(c.functionID);
+
+                if (MKODict::IsDefinitionAvailable(c.functionID, c.functionSet, c.type))
+                {
+                    funcDef = MKODict::GetDefinition(c.functionID, c.functionSet, c.type);
+                    functionName = funcDef.name;
+                    definitionAvailable = true;
+                }
                 pMKC << functionName << "(";
 
                 for (int a = 0; a < c.arguments.size(); a++)
                 {
+                    if (definitionAvailable)
+                    {
+                        if (funcDef.args[a] == EMKOFAD_Float)
+                            pMKC << c.arguments[a].floatData;
+                        else if (funcDef.args[a] == EMKOFAD_Short)
+                            pMKC << c.arguments[a].shortData;
+                        else if (funcDef.args[a] == EMKOFAD_UInt)
+                            pMKC << c.arguments[a].uintData;
+                        else if (funcDef.args[a] == EMKOFAD_String)
+                            pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
+                        else if (funcDef.args[a] == EMKOFAD_Hex)
+                            pMKC << std::hex << "0x" << c.arguments[a].uintData << std::dec;
+                        else if (funcDef.args[a] == EMKOFAD_Hash)
+                            pMKC << MKODict::GetHashString(c.arguments[a].uintData);
+                        else if (funcDef.args[a] == EMKOFAD_HashFunction)
+                            pMKC << MKODict::GetFunctionHashString(c.arguments[a].uintData);
+                        else if (funcDef.args[a] == EMKOFAD_ScriptHashFunction)
+                        {
+                            unsigned int fHash = c.arguments[a].uintData;
+                            int id = GetFunctionIDWithHashMK11(fHash);
+                            if (id >= 0)
+                                pMKC << GetFunctionNameMK11(id);
+                            else
+                                pMKC << MKODict::GetHashString(fHash);
+                        }
+                        else
+                            pMKC << c.arguments[a].integerData;
+
+                        if (a < c.arguments.size() - 1)
+                            pMKC << ", ";
+                    }
+                    else
                     {
                         pMKC << c.arguments[a].integerData;
                         if (a < c.arguments.size() - 1)
@@ -3054,9 +3109,9 @@ void MKOReader::DecompileFunctionMK11(int functionID)
                 functionName += "_t";
                 functionName += std::to_string(c.type);
                 functionName += "_s";
-                functionName += std::to_string(c.subType);
+                functionName += std::to_string(c.functionSet);
                 functionName += "_i";
-                functionName += std::to_string(c.unk2);
+                functionName += std::to_string(c.functionID);
 
                 pMKC << functionName << "(";
 
@@ -5126,9 +5181,9 @@ void MKOReader::ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, 
         mko_entry.size += pFile.gcount();
 
         mko_entry.type = bc.type;
-        mko_entry.subType = bc.subType;
+        mko_entry.functionSet = bc.subType;
         mko_entry.unk1 = bc.field10;
-        mko_entry.unk2 = bc.field14;
+        mko_entry.functionID = bc.field14;
         mko_entry.pad = bc.is_pad;
 
 
@@ -5171,9 +5226,9 @@ void MKOReader::ReadFunctionBytecode_DCF2(std::vector<MKOCodeEntry_MK10>& data, 
         mko_entry.size += pFile.gcount();
 
         mko_entry.type = bc.type;
-        mko_entry.subType = bc.subType;
+        mko_entry.functionSet = bc.subType;
         mko_entry.unk1 = bc.field10;
-        mko_entry.unk2 = bc.field14;
+        mko_entry.functionID = bc.field14;
         mko_entry.pad = bc.is_pad;
 
 
@@ -5216,9 +5271,9 @@ void MKOReader::ReadFunctionBytecode_MK11(std::vector<MKOCodeEntry_MK10>& data, 
         mko_entry.size += pFile.gcount();
 
         mko_entry.type = bc.type;
-        mko_entry.subType = bc.subType;
+        mko_entry.functionSet = bc.subType;
         mko_entry.unk1 = bc.field10;
-        mko_entry.unk2 = bc.field14;
+        mko_entry.functionID = bc.field14;
         mko_entry.pad = bc.is_pad;
 
 

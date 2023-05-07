@@ -11,7 +11,10 @@ enum EMKOFunctionArgumentDefinition_Type {
 	EMKOFAD_Short,
 	EMKOFAD_UInt,
 	EMKOFAD_String,
-	EMKOFAD_Hex
+	EMKOFAD_Hex,
+	EMKOFAD_Hash,
+	EMKOFAD_HashFunction,
+	EMKOFAD_ScriptHashFunction
 };
 
 struct MKOFunctionArgumentDefinition {
@@ -27,6 +30,7 @@ struct MKOFunctionArgumentDefinition {
 struct MKOFunctionDefinition {
 	char name[256] = {};
 	int functionID;
+	int functionType;
 	int functionSet;
 	int num_arguments;
 	std::vector<EMKOFunctionArgumentDefinition_Type> args;
@@ -46,8 +50,10 @@ public:
 
 	static std::vector<MKOFunctionDefinition> ms_vFunctions;
 	static std::vector<HashEntry> ms_vHashes;
+	static std::vector<HashEntry> ms_vFunctionHashes;
 	static void InitDict(EGameMode game);
 	static void InitHashTable();
+	static void InitFunctionHashes();
 
 	static void hash2txt();
 	static void txt2hash();
@@ -56,10 +62,11 @@ public:
 	static int GetInternalID(const char* name);
 	static bool IsFunctionInternal(const char* name);
 
-	static bool IsDefinitionAvailable(int functionID, int functionSet = 0);
+	static bool IsDefinitionAvailable(int functionID, int functionSet = 0, int functionType = 0);
 	static bool IsDefinitionAvailable(const char* name);
-	static MKOFunctionDefinition GetDefinition(int functionID, int functionSet = 0);
+	static MKOFunctionDefinition GetDefinition(int functionID, int functionSet = 0, int functionType = 0);
 	static MKOFunctionDefinition GetDefinition(const char* name);
 	static std::string GetHashString(unsigned int hash);
+	static std::string GetFunctionHashString(unsigned int hash);
 	static bool IsHashAvailable(unsigned int hash);
 };

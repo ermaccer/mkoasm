@@ -78,9 +78,9 @@ struct MKOCodeEntry_MK9 {
 
 struct MKOCodeEntry_MK10 {
     int type;
-    int subType;
+    int functionSet;
     int unk1;
-    int unk2;
+    int functionID;
     int pad;
     std::vector<MKOVariable> arguments;
 
@@ -236,6 +236,7 @@ public:
     std::string GetFunctionNameDCF2(int functionID);
     int         GetFunctionIDWithHashDCF2(unsigned int hash);
     std::string GetFunctionNameMK11(int functionID);
+    int         GetFunctionIDWithHashMK11(unsigned int hash);
 
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);

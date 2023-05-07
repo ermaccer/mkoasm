@@ -33,7 +33,7 @@ const char* szInternalNames[] = {
 
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
 std::vector<HashEntry> MKODict::ms_vHashes;
-
+std::vector<HashEntry> MKODict::ms_vFunctionHashes;
 EGameMode MKODict::ms_gameMode;
 
 #ifdef SORT_FUNCTIONS
@@ -61,6 +61,9 @@ void MKODict::InitDict(EGameMode game)
     case Game_Unchained:
         file = "data\\mku_def.txt";
         break;
+    case Game_MK11:
+        file = "data\\mk11_def.txt";
+        break;
     default:
         break;
     }
@@ -70,6 +73,7 @@ void MKODict::InitDict(EGameMode game)
 
     ms_gameMode = game;
 
+    printf("Reading: %s\n", file);
     FILE* pFile = fopen(file, "rb");
     if (pFile)
     {
@@ -88,8 +92,15 @@ void MKODict::InitDict(EGameMode game)
                 int funcID = -1;
                 int numArgs = 0;
                 int funcSet = 0;
+                int funcType = 0;
 
-                if (game == Game_Armageddon)
+                if (game == Game_MK11)
+                {
+                    tempLine = strtok(NULL, " ");
+                    sscanf(tempLine, "%d", &funcType);
+                }
+
+                if (game == Game_Armageddon || game == Game_MK11)
                 {
                     tempLine = strtok(NULL, " ");
                     sscanf(tempLine, "%d", &funcSet);
@@ -120,6 +131,7 @@ void MKODict::InitDict(EGameMode game)
                 def.num_arguments = numArgs;
                 def.functionID = funcID;
                 def.functionSet = funcSet;
+                def.functionType = funcType;
 
                 for (int i = 0; i < numArgs; i++)
                 {
@@ -150,6 +162,7 @@ void MKODict::InitDict(EGameMode game)
 
 void MKODict::InitHashTable()
 {
+    InitFunctionHashes();
     std::ifstream pFile("data\\hashdb.bin", std::ifstream::binary);
 
     if (pFile)
@@ -173,9 +186,36 @@ void MKODict::InitHashTable()
     std::cout << "INFO: Read " << ms_vHashes.size() << " hash entries!" << std::endl;
 }
 
+void MKODict::InitFunctionHashes()
+{
+    FILE* pFile = fopen("data\\function_hash_list.txt", "rb");
+    if (pFile)
+    {
+        char szLine[2048] = {};
+        char* tempLine;
+        int  errorCheck = 0;
+        while (fgets(szLine, sizeof(szLine), pFile))
+        {
+            if (szLine[0] == ';' || szLine[0] == '#' || szLine[0] == '\n')
+                continue;
+
+            char name[256] = {};
+            unsigned int hash = 0;
+            sscanf(szLine, "0x%X %s", &hash, &name);
+
+            HashEntry h;
+            h.hash = hash;
+            sprintf(h.name, name);
+            ms_vFunctionHashes.push_back(h);
+        }
+        fclose(pFile);
+    }
+
+}
+
 void MKODict::hash2txt()
 {
-
+  
 }
 
 void MKODict::txt2hash()
@@ -252,11 +292,16 @@ bool MKODict::IsFunctionInternal(const char* name)
     return false;
 }
 
-bool MKODict::IsDefinitionAvailable(int functionID, int functionSet)
+bool MKODict::IsDefinitionAvailable(int functionID, int functionSet, int functionType)
 {
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
-        if (ms_gameMode == Game_Armageddon)
+        if (ms_gameMode == Game_MK11)
+        {
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
+                return true;
+        }
+        else if (ms_gameMode == Game_Armageddon)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet)
                 return true;
@@ -281,12 +326,20 @@ bool MKODict::IsDefinitionAvailable(const char* name)
     return false;
 }
 
-MKOFunctionDefinition MKODict::GetDefinition(int functionID, int functionSet)
+MKOFunctionDefinition MKODict::GetDefinition(int functionID, int functionSet, int functionType)
 {
     MKOFunctionDefinition def = {};
 
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
+        if (ms_gameMode == Game_MK11)
+        {
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
+            {
+                def = ms_vFunctions[i];
+                break;
+            }
+        }
         if (ms_gameMode == Game_Armageddon)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet)
@@ -334,6 +387,21 @@ std::string MKODict::GetHashString(unsigned int hash)
         if (ms_vHashes[i].hash == hash)
         {
             sprintf(tmp, ms_vHashes[i].name);
+            break;
+        }
+    }
+    return tmp;
+}
+
+std::string MKODict::GetFunctionHashString(unsigned int hash)
+{
+    static char tmp[256] = {};
+    sprintf(tmp, "0x%X", hash);
+    for (unsigned int i = 0; i < ms_vFunctionHashes.size(); i++)
+    {
+        if (ms_vFunctionHashes[i].hash == hash)
+        {
+            sprintf(tmp, ms_vFunctionHashes[i].name);
             break;
         }
     }
