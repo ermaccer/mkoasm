@@ -30,6 +30,8 @@ game mode**
 | Injustice | ✔️ | ⚠ | ❌| ❌ | PC |
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
 
+**Mortal Kombat X and up requires x64 version of mkoasm!**
+
 Scripts from Injustice 2 and onwards are totally unsuppported.
 
 
@@ -73,6 +75,7 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
 ## MK VS DC
  - Added imports from other MKOs
  - Added assets section, which replaces previously hardcoded asset tables
+ - Changed bytecode format
 
 ## MK 9
  - Added seperate sounds asset section which includes character specific sounds
@@ -82,3 +85,8 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
 
 ## Injustice
  - Basically identical to MK9 structure wise
+
+## Mortal Kombat X
+ - Changed bytecode format
+ - Tweakvars exported to a seperate file
+ - Merged sounds section with assets like in MKvsDC
