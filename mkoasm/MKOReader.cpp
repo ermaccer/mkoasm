@@ -61,8 +61,10 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
             m_bIsValid = ReadMK10();
             break;
         case Game_Injustice2:
+            m_bIsValid = ReadDCF2();
             break;
         case Game_MK11:
+            m_bIsValid = ReadMK11();
             break;
         default:
             break;
@@ -985,8 +987,8 @@ bool MKOReader::ReadMK10()
         string_data = std::make_unique<char[]>(mk10_header.string_size);
         pFile.read(string_data.get(), mk10_header.string_size);
 
-        mk10_tweakstring_data = std::make_unique<char[]>(mk10_header.tweakvars_stringSize);
-        pFile.read(mk10_tweakstring_data.get(), mk10_header.tweakvars_stringSize);
+        tweakstring_data = std::make_unique<char[]>(mk10_header.tweakvars_stringSize);
+        pFile.read(tweakstring_data.get(), mk10_header.tweakvars_stringSize);
 
         m_pDataStartOffset = (uintptr_t)(pFile.tellg());
         m_pFunctionsStartOffset = m_pDataStartOffset + mk10_header.stack_size;
@@ -999,6 +1001,306 @@ bool MKOReader::ReadMK10()
             pFile.read((char*)&fix, sizeof(mko_fixup_mk10));
 
             mk10_fixup.push_back(fix);
+        }
+
+        return true;
+    }
+    return false;
+}
+
+bool MKOReader::ReadDCF2()
+{
+    pFile.open(m_szInputName, std::ifstream::binary);
+    if (pFile.is_open())
+    {
+        int is_raw;
+        unsigned int hash;
+        pFile.read((char*)&is_raw, sizeof(int));
+        pFile.read((char*)&hash, sizeof(int));
+
+        if (!is_raw)
+        {
+            std::cout << "ERROR: Compressed DCF2 mkos are not supported!" << std::endl;
+            return false;
+        }
+
+
+        pFile.read((char*)&dcf2_header, sizeof(mko_header_dcf2));
+        m_pFunctionsStartOffset = (uintptr_t)pFile.tellg();
+        pFile.seekg(dcf2_header.bytecodeSize, pFile.cur);
+
+
+        // padding
+        {
+            int64 size = (dcf2_header.functions) * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+
+        for (int i = 0; i < dcf2_header.functions; i++)
+        {
+            mko_function_header_mk10 func;
+            pFile.read((char*)&func, sizeof(mko_function_header_mk10));
+            dcf2_funcs.push_back(func);
+
+            for (int a = 0; a < func.local_fixup_count; a++)
+            {
+                mko_fixup_mk10 local_fixup;
+                pFile.read((char*)&local_fixup, sizeof(mko_fixup_mk10));
+            }
+
+        }
+
+        {
+            int64 size = dcf2_header.static_variables * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < dcf2_header.static_variables; i++)
+        {
+            mko_variable_header_mk10 var;
+            pFile.read((char*)&var, sizeof(mko_variable_header_mk10));
+
+            dcf2_vars.push_back(var);
+        }
+
+
+        {
+            int64 size = dcf2_header.dynamic_variables * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < dcf2_header.dynamic_variables; i++)
+        {
+            mko_variable_header_mk10 var;
+            pFile.read((char*)&var, sizeof(mko_variable_header_mk10));
+
+            dcf2_dyn_vars.push_back(var);
+        }
+
+
+        {
+            int64 size = dcf2_header.externs * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < dcf2_header.externs; i++)
+        {
+            mko_extern_mk10 ext;
+            pFile.read((char*)&ext, sizeof(mko_extern_mk10));
+
+            dcf2_externs.push_back(ext);
+        }
+
+        for (int i = 0; i < dcf2_header.extern_variables; i++)
+        {
+            mko_extern_var_mk10 var;
+            pFile.read((char*)&var, sizeof(mko_extern_var_mk10));
+
+            dcf2_extern_vars.push_back(var);
+        }
+
+        for (int i = 0; i < dcf2_header.numSource; i++)
+        {
+            mko_source_header_mk10 src;
+            pFile.read((char*)&src, sizeof(mko_source_header_mk10));
+
+            dcf2_srcs.push_back(src);
+        }
+
+        dcf2_pointers = std::make_unique<char[]>(dcf2_header.total_pointers * 8);
+        pFile.read(dcf2_pointers.get(), dcf2_header.total_pointers * 8);
+
+        {
+            int64 size = dcf2_header.assets * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < dcf2_header.assets; i++)
+        {
+            mko_asset_mk10 ass;
+            pFile.read((char*)&ass, sizeof(mko_asset_mk10));
+
+            dcf2_assets.push_back(ass);
+        }
+
+
+        string_data = std::make_unique<char[]>(dcf2_header.string_size);
+        pFile.read(string_data.get(), dcf2_header.string_size);
+
+        tweakstring_data = std::make_unique<char[]>(dcf2_header.tweakvars_stringSize);
+        pFile.read(tweakstring_data.get(), dcf2_header.tweakvars_stringSize);
+
+        m_pDataStartOffset = (uintptr_t)(pFile.tellg());
+
+        pFile.seekg(dcf2_header.stack_size, pFile.cur);
+
+        for (int i = 0; i < dcf2_header.fixups; i++)
+        {
+            mko_fixup_mk10 fix;
+            pFile.read((char*)&fix, sizeof(mko_fixup_mk10));
+
+            dcf2_fixup.push_back(fix);
+        }
+
+        for (int i = 0; i < dcf2_header.tweakvars; i++)
+        {
+            mko_tweakvar_dcf2 twk;
+            pFile.read((char*)&twk, sizeof(mko_tweakvar_dcf2));
+
+            dcf2_tweakvar.push_back(twk);
+        }
+
+        return true;
+    }
+    return false;
+}
+
+bool MKOReader::ReadMK11()
+{
+    pFile.open(m_szInputName, std::ifstream::binary);
+    if (pFile.is_open())
+    {
+        int is_raw;
+        unsigned int hash;
+        pFile.read((char*)&is_raw, sizeof(int));
+        pFile.read((char*)&hash, sizeof(int));
+
+        if (!is_raw)
+        {
+            std::cout << "ERROR: Compressed MK11 mkos are not supported!" << std::endl;
+            return false;
+        }
+
+
+        pFile.read((char*)&mk11_header, sizeof(mko_header_dcf2));
+        m_pFunctionsStartOffset = (uintptr_t)pFile.tellg();
+        pFile.seekg(mk11_header.bytecodeSize, pFile.cur);
+
+
+        // padding
+        {
+            int64 size = (mk11_header.functions) * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+
+        for (int i = 0; i < mk11_header.functions; i++)
+        {
+            mko_function_header_mk11 func;
+            pFile.read((char*)&func, sizeof(mko_function_header_mk11));
+            mk11_funcs.push_back(func);
+
+        }
+
+        {
+            int64 size = mk11_header.static_variables * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < mk11_header.static_variables; i++)
+        {
+            mko_variable_header_mk10 var;
+            pFile.read((char*)&var, sizeof(mko_variable_header_mk10));
+
+            mk11_vars.push_back(var);
+        }
+
+
+        {
+            int64 size = mk11_header.dynamic_variables * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < mk11_header.dynamic_variables; i++)
+        {
+            mko_variable_header_mk10 var;
+            pFile.read((char*)&var, sizeof(mko_variable_header_mk10));
+
+            mk11_dyn_vars.push_back(var);
+        }
+
+
+        {
+            int64 size = mk11_header.externs * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < mk11_header.externs; i++)
+        {
+            mko_extern_mk11 ext;
+            pFile.read((char*)&ext, sizeof(mko_extern_mk11));
+
+            mk11_externs.push_back(ext);
+        }
+
+        for (int i = 0; i < mk11_header.extern_variables; i++)
+        {
+            mko_extern_var_mk11 var;
+            pFile.read((char*)&var, sizeof(mko_extern_var_mk11));
+
+            mk11_extern_vars.push_back(var);
+        }
+
+        for (int i = 0; i < mk11_header.numSource; i++)
+        {
+            mko_source_header_mk10 src;
+            pFile.read((char*)&src, sizeof(mko_source_header_mk10));
+
+            mk11_srcs.push_back(src);
+        }
+
+        mk11_pointers = std::make_unique<char[]>(mk11_header.total_pointers * 8);
+        pFile.read(mk11_pointers.get(), mk11_header.total_pointers * 8);
+
+        {
+            int64 size = mk11_header.assets * sizeof(int64);
+            std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+            pFile.read(unkData.get(), size);
+        }
+
+        for (int i = 0; i < mk11_header.assets; i++)
+        {
+            mko_asset_mk10 ass;
+            pFile.read((char*)&ass, sizeof(mko_asset_mk10));
+
+            mk11_assets.push_back(ass);
+        }
+
+
+        string_data = std::make_unique<char[]>(mk11_header.string_size);
+        pFile.read(string_data.get(), mk11_header.string_size);
+
+        tweakstring_data = std::make_unique<char[]>(mk11_header.tweakvars_stringSize);
+        pFile.read(tweakstring_data.get(), mk11_header.tweakvars_stringSize);
+
+        m_pDataStartOffset = (uintptr_t)(pFile.tellg());
+
+        pFile.seekg(mk11_header.stack_size, pFile.cur);
+
+        for (int i = 0; i < mk11_header.fixups; i++)
+        {
+            mko_fixup_mk10 fix;
+            pFile.read((char*)&fix, sizeof(mko_fixup_mk10));
+
+            mk11_fixup.push_back(fix);
+        }
+
+        for (int i = 0; i < mk11_header.tweakvars; i++)
+        {
+            mko_tweakvar_dcf2 twk;
+            pFile.read((char*)&twk, sizeof(mko_tweakvar_dcf2));
+
+            mk11_tweakvar.push_back(twk);
         }
 
         return true;
@@ -1098,6 +1400,47 @@ std::string MKOReader::GetFunctionNameMK10(int functionID)
     return func_name;
 }
 
+int MKOReader::GetFunctionIDWithHashMK10(unsigned int hash)
+{
+    int id = -1;
+    for (unsigned int i = 0; i < mk10_funcs.size(); i++)
+    {
+        if (mk10_funcs[i].functionHash == hash)
+        {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
+std::string MKOReader::GetFunctionNameDCF2(int functionID)
+{
+    std::string func_name = (char*)(&string_data[0] + (dcf2_funcs[functionID].nameOffset - 1));
+    return func_name;
+}
+
+int MKOReader::GetFunctionIDWithHashDCF2(unsigned int hash)
+{
+    int id = -1;
+    for (unsigned int i = 0; i < dcf2_funcs.size(); i++)
+    {
+        if (dcf2_funcs[i].functionHash == hash)
+        {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
+std::string MKOReader::GetFunctionNameMK11(int functionID)
+{
+    std::string func_name = (char*)(&string_data[0] + (mk11_funcs[functionID].nameOffset - 1));
+    return func_name;
+}
+
+
 uint32_t MKOReader::GetFunctionOffset(int functionID)
 {
     if (game == Game_DeadlyAlliance)
@@ -1126,6 +1469,16 @@ uint32_t MKOReader::GetFunctionOffsetMK9(int functionID)
 uintptr_t MKOReader::GetFunctionOffsetMK10(int functionID)
 {
     return (mk10_funcs[functionID].functionOffset);
+}
+
+uintptr_t MKOReader::GetFunctionOffsetDCF2(int functionID)
+{
+    return (dcf2_funcs[functionID].functionOffset);
+}
+
+uintptr_t MKOReader::GetFunctionOffsetMK11(int functionID)
+{
+    return (mk11_funcs[functionID].functionOffset);
 }
 
 std::string MKOReader::GetVariableName(int variableID)
@@ -1158,6 +1511,18 @@ std::string MKOReader::GetVariableNameMK10(int variableID)
     return var_name;
 }
 
+std::string MKOReader::GetVariableNameDCF2(int variableID)
+{
+    std::string var_name = MKODict::GetHashString(dcf2_vars[variableID].nameHash);
+    return var_name;
+}
+
+std::string MKOReader::GetVariableNameMK11(int variableID)
+{
+    std::string var_name = MKODict::GetHashString(mk11_vars[variableID].nameHash);
+    return var_name;
+}
+
 uint32_t MKOReader::GetVariableOffset(int variableID)
 {
     return (vars[variableID].offset * 4);
@@ -1181,6 +1546,16 @@ uint32_t MKOReader::GetVariableOffsetDCF(int variableID)
 uint32_t MKOReader::GetVariableOffsetMK10(int variableID)
 {
     return (mk10_vars[variableID].stack_offset);
+}
+
+uint32_t MKOReader::GetVariableOffsetDCF2(int variableID)
+{
+    return (dcf2_vars[variableID].stack_offset);
+}
+
+uint32_t MKOReader::GetVariableOffsetMK11(int variableID)
+{
+    return (mk11_vars[variableID].stack_offset);
 }
 
 std::string MKOReader::GetString(int stringStart)
@@ -1210,8 +1585,10 @@ void MKOReader::ExtractData()
         ExtractDataMK10();
         break;
     case Game_Injustice2:
+        ExtractDataDCF2();
         break;
     case Game_MK11:
+        ExtractDataMK11();
         break;
     default:
         break;
@@ -1548,7 +1925,7 @@ void MKOReader::ExtractDataMK10()
 
 
     std::ofstream pTwk("tweakvstr_data", std::ofstream::binary);
-    pTwk.write(mk10_tweakstring_data.get(), mk10_header.tweakvars_stringSize);
+    pTwk.write(tweakstring_data.get(), mk10_header.tweakvars_stringSize);
     pTwk.close();
 
     std::string folderName = "unpacked";
@@ -1594,6 +1971,148 @@ void MKOReader::ExtractDataMK10()
         std::filesystem::current_path(folderName);
 
         DecompileAllFunctionsMK10();
+        std::filesystem::current_path("..");
+    }
+}
+
+void MKOReader::ExtractDataDCF2()
+{
+    std::string output_folder = m_szInputName;
+    output_folder = output_folder.substr(0, output_folder.length() - strlen(".mko"));
+
+    {
+        if (!std::filesystem::exists(output_folder))
+            std::filesystem::create_directory(output_folder);
+
+        std::filesystem::current_path(output_folder);
+    }
+
+    std::string output = m_szInputName;
+    output = output.substr(0, output.length() - strlen(".mko"));
+
+    std::string info = output + "_info.txt";
+    DumpInfoDCF2(info);
+
+
+    std::ofstream pData("string_data", std::ofstream::binary);
+    pData.write(string_data.get(), dcf2_header.string_size);
+    pData.close();
+
+
+    std::string folderName = "unpacked";
+
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+        UnpackVariablesDCF2();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = VARIABLESFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractVariablesDCF2();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = FUNCTIONFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractFunctionsDCF2();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = "decompiled";
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        DecompileAllFunctionsDCF2();
+        std::filesystem::current_path("..");
+    }
+}
+
+void MKOReader::ExtractDataMK11()
+{
+    std::string output_folder = m_szInputName;
+    output_folder = output_folder.substr(0, output_folder.length() - strlen(".mko"));
+
+    {
+        if (!std::filesystem::exists(output_folder))
+            std::filesystem::create_directory(output_folder);
+
+        std::filesystem::current_path(output_folder);
+    }
+
+    std::string output = m_szInputName;
+    output = output.substr(0, output.length() - strlen(".mko"));
+
+    std::string info = output + "_info.txt";
+    DumpInfoMK11(info);
+
+
+    std::ofstream pData("string_data", std::ofstream::binary);
+    pData.write(string_data.get(), mk11_header.string_size);
+    pData.close();
+
+
+    std::string folderName = "unpacked";
+
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+        UnpackVariablesMK11();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = VARIABLESFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractVariablesMK11();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = FUNCTIONFOLDER_NAME;
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        ExtractFunctionsMK11();
+        std::filesystem::current_path("..");
+    }
+
+    folderName = "decompiled";
+    if (!m_bExtractOnly)
+    {
+        if (!std::filesystem::exists(folderName))
+            std::filesystem::create_directory(folderName);
+
+        std::filesystem::current_path(folderName);
+
+        DecompileAllFunctionsMK11();
         std::filesystem::current_path("..");
     }
 }
@@ -1744,11 +2263,98 @@ void MKOReader::ExtractVariablesMK10()
         pFile.read(data.get(), size);
         oFile.write(data.get(), size);
     }
+    for (unsigned int i = 0; i < mk10_dyn_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + mk10_dyn_vars[i].stack_offset, pFile.beg);
+        int size = mk10_dyn_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = MKODict::GetHashString(mk10_dyn_vars[i].nameHash);
+
+        printf("Extracting dynamic variable %s Size: %d [%d/%d]\n", var_name.c_str(), size, i + 1, mk10_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+}
+
+void MKOReader::ExtractVariablesDCF2()
+{
+    for (unsigned int i = 0; i < dcf2_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + GetVariableOffsetDCF2(i), pFile.beg);
+        int size = dcf2_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = GetVariableNameDCF2(i);
+
+        printf("Extracting variable %s Size: %d [%d/%d]\n", var_name.c_str(), size, i + 1, dcf2_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+    for (unsigned int i = 0; i < dcf2_dyn_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + dcf2_dyn_vars[i].stack_offset, pFile.beg);
+        int size = dcf2_dyn_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = MKODict::GetHashString(dcf2_dyn_vars[i].nameHash);
+
+        printf("Extracting dynamic variable %s Size: %d [%d/%d]\n", var_name.c_str(), size, i + 1, dcf2_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+}
+
+void MKOReader::ExtractVariablesMK11()
+{
+    for (unsigned int i = 0; i < mk11_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + GetVariableOffsetMK11(i), pFile.beg);
+        int size = mk11_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = GetVariableNameMK11(i);
+
+        printf("Extracting variable %s Size: %d [%d/%d]\n", var_name.c_str(), size, i + 1, mk11_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+    for (unsigned int i = 0; i < mk11_dyn_vars.size(); i++)
+    {
+        pFile.seekg(m_pDataStartOffset + mk11_dyn_vars[i].stack_offset, pFile.beg);
+        int size = mk11_dyn_vars[i].size;
+        if (size < 0)
+            size = 0;
+
+        std::string var_name = MKODict::GetHashString(mk11_dyn_vars[i].nameHash);
+
+        printf("Extracting dynamic variable %s Size: %d [%d/%d]\n", var_name.c_str(), size, i + 1, mk11_vars.size());
+
+        std::ofstream oFile(var_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
 }
 
 void MKOReader::ExtractFunctions()
 {
-
     std::string hdr = "..\\";
     hdr += GetFileName() + "_header.ini";
     std::ofstream oInfo(hdr, std::ofstream::app);
@@ -1873,6 +2479,38 @@ void MKOReader::ExtractFunctionsMK10()
         std::string func_name = (char*)(&string_data[0] + (mk10_funcs[i].nameOffset - 1));
 
         printf("Extracting function %s [%d/%d]\n", func_name.c_str(), i + 1, mk10_funcs.size());
+        std::ofstream oFile(func_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+}
+
+void MKOReader::ExtractFunctionsDCF2()
+{
+    for (unsigned int i = 0; i < dcf2_funcs.size(); i++)
+    {
+        pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffsetDCF2(i), pFile.beg);
+        int size = dcf2_funcs[i].size;
+        std::string func_name = (char*)(&string_data[0] + (dcf2_funcs[i].nameOffset - 1));
+
+        printf("Extracting function %s [%d/%d]\n", func_name.c_str(), i + 1, dcf2_funcs.size());
+        std::ofstream oFile(func_name, std::ofstream::binary);
+        std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
+        pFile.read(data.get(), size);
+        oFile.write(data.get(), size);
+    }
+}
+
+void MKOReader::ExtractFunctionsMK11()
+{
+    for (unsigned int i = 0; i < mk11_funcs.size(); i++)
+    {
+        pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffsetMK11(i), pFile.beg);
+        int size = mk11_funcs[i].size;
+        std::string func_name = (char*)(&string_data[0] + (mk11_funcs[i].nameOffset - 1));
+
+        printf("Extracting function %s [%d/%d]\n", func_name.c_str(), i + 1, mk11_funcs.size());
         std::ofstream oFile(func_name, std::ofstream::binary);
         std::unique_ptr<char[]> data = std::make_unique<char[]>(size);
         pFile.read(data.get(), size);
@@ -2217,23 +2855,121 @@ void MKOReader::DecompileFunctionMK10(int functionID)
         for (int i = 0; i < codeData.size(); i++)
         {
             MKOCodeEntry_MK10 c = codeData[i];
+            bool is_my_func_call = false;
+            bool is_callback = false;
+            if (c.type == 12)
+                is_my_func_call = true;
 
-
-
-            MKOFunctionDefinition funcDef;
             if (c.arguments.size() > 0)
             {
                 {
                     std::string functionName = "function";
+                    if (is_my_func_call)
+                    {
+                        int id = GetFunctionIDWithHashMK10(c.arguments[0].integerData);
+
+                        if (MKODict::IsHashAvailable(c.arguments[0].integerData))
+                          functionName = MKODict::GetHashString(c.arguments[0].integerData);
+                        else if (id >= 0)
+                          functionName = GetFunctionNameMK10(id);
+                        else
+                        {
+                            functionName = "call_";
+                            functionName += std::to_string(c.arguments[0].integerData);
+                        }
+                         
+                    }
+                    else
+                    {
+                        functionName += "_t";
+                        functionName += std::to_string(c.type);
+                        functionName += "_s";
+                        functionName += std::to_string(c.subType);
+                        functionName += "_i";
+                        functionName += std::to_string(c.unk2);
+                    }
+                    pMKC << functionName << "(";
+                }
+
+
+                int start_offset = 0;
+                int end_offset = 0;
+                
+                if (is_my_func_call)
+                {
+                    start_offset = 1;
+                    end_offset = 1;
+                }
+
+                for (int a = 0 + start_offset; a < c.arguments.size(); a++)
+                {
+                    {
+                        pMKC << c.arguments[a].integerData;
+                        if (a < c.arguments.size() - 1)
+                            pMKC << ", ";
+                    }
+
+                }
+                if (m_bDebugMKO)
+                    pMKC << "); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << ");" << std::endl;
+            }
+            else
+            {
+                std::string functionName = "function";
+                if (is_my_func_call)
+                {
+                    functionName = MKODict::GetHashString(c.arguments[0].integerData);
+                }
+                else
+                {
                     functionName += "_t";
                     functionName += std::to_string(c.type);
                     functionName += "_s";
                     functionName += std::to_string(c.subType);
                     functionName += "_i";
                     functionName += std::to_string(c.unk2);
-                    pMKC << functionName << "(";
                 }
 
+                pMKC << functionName << "(";
+
+                if (m_bDebugMKO)
+                    pMKC << functionName << "(); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << functionName << "();" << std::endl;
+            }
+        }
+        std::cout << "Decompiled " << output << std::endl;
+        pMKC.close();
+    }
+}
+
+void MKOReader::DecompileFunctionDCF2(int functionID)
+{
+    std::vector<MKOCodeEntry_MK10> codeData;
+    ReadFunctionBytecode_DCF2(codeData, functionID);
+
+    if (codeData.size() > 0)
+    {
+        std::string output = GetFunctionNameDCF2(functionID);
+        output += ".c";
+        std::ofstream pMKC(output);
+
+        for (int i = 0; i < codeData.size(); i++)
+        {
+            MKOCodeEntry_MK10 c = codeData[i];
+
+            if (c.arguments.size() > 0)
+            {
+                std::string functionName = "function";
+                functionName += "_t";
+                functionName += std::to_string(c.type);
+                functionName += "_s";
+                functionName += std::to_string(c.subType);
+                functionName += "_i";
+                functionName += std::to_string(c.unk2);
+                pMKC << functionName << "(";
 
                 for (int a = 0; a < c.arguments.size(); a++)
                 {
@@ -2258,6 +2994,70 @@ void MKOReader::DecompileFunctionMK10(int functionID)
                 functionName += std::to_string(c.subType);
                 functionName += "_i";
                 functionName += std::to_string(c.unk2);
+
+                pMKC << functionName << "(";
+
+                if (m_bDebugMKO)
+                    pMKC << functionName << "(); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << functionName << "();" << std::endl;
+            }
+        }
+        std::cout << "Decompiled " << output << std::endl;
+        pMKC.close();
+    }
+}
+
+void MKOReader::DecompileFunctionMK11(int functionID)
+{
+    std::vector<MKOCodeEntry_MK10> codeData;
+    ReadFunctionBytecode_MK11(codeData, functionID);
+
+    if (codeData.size() > 0)
+    {
+        std::string output = GetFunctionNameMK11(functionID);
+        output += ".c";
+        std::ofstream pMKC(output);
+
+        for (int i = 0; i < codeData.size(); i++)
+        {
+            MKOCodeEntry_MK10 c = codeData[i];
+
+            if (c.arguments.size() > 0)
+            {
+                std::string functionName = "function";
+                functionName += "_t";
+                functionName += std::to_string(c.type);
+                functionName += "_s";
+                functionName += std::to_string(c.subType);
+                functionName += "_i";
+                functionName += std::to_string(c.unk2);
+                pMKC << functionName << "(";
+
+                for (int a = 0; a < c.arguments.size(); a++)
+                {
+                    {
+                        pMKC << c.arguments[a].integerData;
+                        if (a < c.arguments.size() - 1)
+                            pMKC << ", ";
+                    }
+
+                }
+                if (m_bDebugMKO)
+                    pMKC << "); // Offset: " << c.offset << " Size: " << c.size << std::endl;
+                else
+                    pMKC << ");" << std::endl;
+            }
+            else
+            {
+                std::string functionName = "function";
+                functionName += "_t";
+                functionName += std::to_string(c.type);
+                functionName += "_s";
+                functionName += std::to_string(c.subType);
+                functionName += "_i";
+                functionName += std::to_string(c.unk2);
+
                 pMKC << functionName << "(";
 
                 if (m_bDebugMKO)
@@ -2325,6 +3125,18 @@ void MKOReader::UnpackVariableDCF(int variableID)
 void MKOReader::UnpackVariableMK10(int variableID)
 {
     std::string varName = GetVariableNameMK10(variableID);
+    std::cout << "Attempting to unpack " << varName << std::endl;
+}
+
+void MKOReader::UnpackVariableDCF2(int variableID)
+{
+    std::string varName = GetVariableNameDCF2(variableID);
+    std::cout << "Attempting to unpack " << varName << std::endl;
+}
+
+void MKOReader::UnpackVariableMK11(int variableID)
+{
+    std::string varName = GetVariableNameMK11(variableID);
     std::cout << "Attempting to unpack " << varName << std::endl;
 }
 
@@ -2820,6 +3632,24 @@ void MKOReader::DecompileAllFunctionsMK10()
         DecompileFunctionMK10(i);
 }
 
+void MKOReader::DecompileAllFunctionsDCF2()
+{
+    if (!IsDecompSupported())
+        return;
+
+    for (unsigned int i = 0; i < dcf2_funcs.size(); i++)
+        DecompileFunctionDCF2(i);
+}
+
+void MKOReader::DecompileAllFunctionsMK11()
+{
+    if (!IsDecompSupported())
+        return;
+
+    for (unsigned int i = 0; i < mk11_funcs.size(); i++)
+        DecompileFunctionMK11(i);
+}
+
 void MKOReader::UnpackVariables()
 {
     for (unsigned int i = 0; i < vars.size(); i++)
@@ -2850,6 +3680,18 @@ void MKOReader::UnpackVariablesMK10()
         UnpackVariableMK10(i);
 }
 
+void MKOReader::UnpackVariablesDCF2()
+{
+    for (unsigned int i = 0; i < dcf2_vars.size(); i++)
+        UnpackVariableDCF2(i);
+}
+
+void MKOReader::UnpackVariablesMK11()
+{
+    for (unsigned int i = 0; i < mk11_vars.size(); i++)
+        UnpackVariableMK11(i);
+}
+
 
 void MKOReader::PrintInfo()
 {
@@ -2874,8 +3716,10 @@ void MKOReader::PrintInfo()
         PrintInfoMK10();
         break;
     case Game_Injustice2:
+        PrintInfoDCF2();
         break;
     case Game_MK11:
+        PrintInfoMK11();
         break;
     default:
         break;
@@ -3176,6 +4020,154 @@ void MKOReader::PrintInfoMK10()
     }
     printf("===========\n");
     printf("Fixup Entries               : \t%d\n", mk10_fixup.size());
+    printf("===========\n");
+}
+
+void MKOReader::PrintInfoDCF2()
+{
+    printf("Header Info\n");
+    printf("===========\n");
+    printf("String data size        : \t%d\n", dcf2_header.string_size);
+    printf("Tweak string data size        : \t%d\n", dcf2_header.tweakvars_stringSize);
+    printf("===========\n");
+    printf("Function Info\n");
+    printf("===========\n");
+    printf("Functions               : \t%d\n", dcf2_header.functions);
+    for (unsigned int i = 0; i < dcf2_funcs.size(); i++)
+    {
+        std::string func_name = (char*)(&string_data[0] + (dcf2_funcs[i].nameOffset - 1));
+        std::string arg_type = MKODict::GetHashString(dcf2_funcs[i].paramsHash);
+
+        if (MKODict::IsHashAvailable(dcf2_funcs[i].paramsHash))
+        {
+            arg_type = arg_type.substr(0, arg_type.length() - 1);
+            std::replace(arg_type.begin(), arg_type.end(), '.', ',');
+        }
+
+        printf("Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str());
+    }
+    printf("===========\n");
+    printf("Variable Info\n");
+    printf("===========\n");
+    printf("Variables               : \t%d \n", dcf2_header.static_variables);
+    for (unsigned int i = 0; i < dcf2_vars.size(); i++)
+    {
+        std::string name = MKODict::GetHashString(dcf2_vars[i].nameHash);
+        printf("Variable %04d - %s \tSize: %d\n", i, name.c_str(), dcf2_vars[i].size);
+    }
+    printf("Dynamic Variables               : \t%d\n", dcf2_header.dynamic_variables);
+    for (unsigned int i = 0; i < dcf2_dyn_vars.size(); i++)
+    {
+        std::string name = MKODict::GetHashString(dcf2_dyn_vars[i].nameHash);
+        printf("Dynamic Variable %04d - %s \tSize: %d\n", i, name.c_str(), dcf2_vars[i].size);
+    }
+    printf("===========\n");
+    printf("Externs               : \t%d\n", dcf2_header.externs);
+    for (unsigned int i = 0; i < dcf2_externs.size(); i++)
+    {
+        std::string ext_name = MKODict::GetHashString(dcf2_externs[i].nameHash);
+        std::string imp_name = (char*)(&string_data[0] + (dcf2_externs[i].file_name_offset - 1));
+        printf("Extern %04d - %s\t from %s\n", i, ext_name.c_str(), imp_name.c_str());
+    }
+    printf("===========\n");
+    printf("Extern Variables               : \t%d\n", dcf2_header.extern_variables);
+    for (unsigned int i = 0; i < dcf2_extern_vars.size(); i++)
+    {
+        std::string  name = (char*)(&string_data[0] + (dcf2_extern_vars[i].name_offset - 1));
+        printf("Extern %04d - %s\n", i, name.c_str());
+    }
+    printf("===========\n");
+    printf("Assets               : \t%d\n", dcf2_header.assets);
+    for (unsigned int i = 0; i < dcf2_assets.size(); i++)
+    {
+        std::string ass_name = (char*)(&string_data[0] + (dcf2_assets[i].item_name_offset - 1));
+        std::string arch_name = (char*)(&string_data[0] + (dcf2_assets[i].package_name_offset - 1));
+        printf("Asset %04d - %s:%s\n", i, arch_name.c_str(), ass_name.c_str());
+
+    }
+    printf("===========\n");
+    printf("Source Files\n\n");
+    for (unsigned int i = 0; i < dcf2_srcs.size(); i++)
+    {
+        std::string  name = (char*)(&string_data[0] + (dcf2_srcs[i].name_offset - 1));
+        printf("%s\n", name.c_str());
+    }
+    printf("===========\n");
+    printf("Fixup Entries               : \t%d\n", dcf2_fixup.size());
+    printf("===========\n");
+}
+
+void MKOReader::PrintInfoMK11()
+{
+    printf("Header Info\n");
+    printf("===========\n");
+    printf("String data size        : \t%d\n", mk11_header.string_size);
+    printf("Tweak string data size        : \t%d\n", mk11_header.tweakvars_stringSize);
+    printf("===========\n");
+    printf("Function Info\n");
+    printf("===========\n");
+    printf("Functions               : \t%d\n", mk11_header.functions);
+    for (unsigned int i = 0; i < mk11_funcs.size(); i++)
+    {
+        std::string func_name = (char*)(&string_data[0] + (mk11_funcs[i].nameOffset - 1));
+        std::string arg_type = MKODict::GetHashString(mk11_funcs[i].paramsHash);
+
+        if (MKODict::IsHashAvailable(mk11_funcs[i].paramsHash))
+        {
+            arg_type = arg_type.substr(0, arg_type.length() - 1);
+            std::replace(arg_type.begin(), arg_type.end(), '.', ',');
+        }
+
+        printf("Function %04d - %s(%s)\t\n", i, func_name.c_str(), arg_type.c_str());
+    }
+    printf("===========\n");
+    printf("Variable Info\n");
+    printf("===========\n");
+    printf("Variables               : \t%d \n", mk11_header.static_variables);
+    for (unsigned int i = 0; i < mk11_vars.size(); i++)
+    {
+        std::string name = MKODict::GetHashString(mk11_vars[i].nameHash);
+        printf("Variable %04d - %s \tSize: %d\n", i, name.c_str(), mk11_vars[i].size);
+    }
+    printf("Dynamic Variables               : \t%d\n", mk11_header.dynamic_variables);
+    for (unsigned int i = 0; i < mk11_dyn_vars.size(); i++)
+    {
+        std::string name = MKODict::GetHashString(mk11_dyn_vars[i].nameHash);
+        printf("Dynamic Variable %04d - %s \tSize: %d\n", i, name.c_str(), mk11_vars[i].size);
+    }
+    printf("===========\n");
+    printf("Externs               : \t%d\n", mk11_header.externs);
+    for (unsigned int i = 0; i < mk11_externs.size(); i++)
+    {
+        std::string ext_name = MKODict::GetHashString(mk11_externs[i].nameHash);
+        std::string imp_name = (char*)(&string_data[0] + (mk11_externs[i].file_name_offset - 1));
+        printf("Extern %04d - %s\t from %s\n", i, ext_name.c_str(), imp_name.c_str());
+    }
+    printf("===========\n");
+    printf("Extern Variables               : \t%d\n", mk11_header.extern_variables);
+    for (unsigned int i = 0; i < mk11_extern_vars.size(); i++)
+    {
+        std::string  name = (char*)(&string_data[0] + (mk11_extern_vars[i].name_offset - 1));
+        printf("Extern %04d - %s\n", i, name.c_str());
+    }
+    printf("===========\n");
+    printf("Assets               : \t%d\n", mk11_header.assets);
+    for (unsigned int i = 0; i < mk11_assets.size(); i++)
+    {
+        std::string ass_name = (char*)(&string_data[0] + (mk11_assets[i].item_name_offset - 1));
+        std::string arch_name = (char*)(&string_data[0] + (mk11_assets[i].package_name_offset - 1));
+        printf("Asset %04d - %s:%s\n", i, arch_name.c_str(), ass_name.c_str());
+
+    }
+    printf("===========\n");
+    printf("Source Files\n\n");
+    for (unsigned int i = 0; i < mk11_srcs.size(); i++)
+    {
+        std::string  name = (char*)(&string_data[0] + (mk11_srcs[i].name_offset - 1));
+        printf("%s\n", name.c_str());
+    }
+    printf("===========\n");
+    printf("Fixup Entries               : \t%d\n", mk11_fixup.size());
     printf("===========\n");
 }
 
@@ -3648,6 +4640,240 @@ void MKOReader::DumpInfoMK10(std::string name)
     oInfo.close();
 }
 
+void MKOReader::DumpInfoDCF2(std::string name)
+{
+    std::ofstream oInfo(name);
+    if (oInfo) {
+
+        static char pInfo[1024] = {};
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Header Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "String data size        : \t%d\n", dcf2_header.string_size);
+        oInfo << pInfo;
+        sprintf(pInfo, "Tweak string data size        : \t%d\n", dcf2_header.tweakvars_stringSize);
+        oInfo << pInfo;
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Function Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Functions               : \t%d\n", dcf2_header.functions);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_funcs.size(); i++)
+        {
+            std::string func_name = (char*)(&string_data[0] + (dcf2_funcs[i].nameOffset - 1));
+            std::string arg_type = MKODict::GetHashString(dcf2_funcs[i].paramsHash);
+
+            if (MKODict::IsHashAvailable(dcf2_funcs[i].paramsHash))
+            {
+                arg_type = arg_type.substr(0, arg_type.length() - 1);
+                std::replace(arg_type.begin(), arg_type.end(), '.', ',');
+            }
+
+            sprintf(pInfo, "Function %04d - %s(%s) HASH: 0x%X\t\n", i, func_name.c_str(), arg_type.c_str(), dcf2_funcs[i].functionHash);
+            oInfo << pInfo;
+        }
+
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Variable Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Variables               : \t%d \n", dcf2_header.static_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_vars.size(); i++)
+        {
+            std::string name = MKODict::GetHashString(dcf2_vars[i].nameHash);
+            sprintf(pInfo, "Variable %04d - %s \tSize: %d\n", i, name.c_str(), dcf2_vars[i].size);
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Dynamic Variables               : \t%d\n", dcf2_header.dynamic_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_dyn_vars.size(); i++)
+        {
+            std::string name = MKODict::GetHashString(dcf2_dyn_vars[i].nameHash);
+            sprintf(pInfo, "Dynamic Variable %04d - %s \tSize: %d\n", i, name.c_str(), dcf2_vars[i].size);
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Externs               : \t%d\n", dcf2_header.externs);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_externs.size(); i++)
+        {
+            std::string ext_name = MKODict::GetHashString(dcf2_externs[i].nameHash);
+            std::string imp_name = (char*)(&string_data[0] + (dcf2_externs[i].file_name_offset - 1));
+            sprintf(pInfo, "Extern %04d - %s\t from %s\n", i, ext_name.c_str(), imp_name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Extern Variables               : \t%d\n", dcf2_header.extern_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_extern_vars.size(); i++)
+        {
+            std::string  name = (char*)(&string_data[0] + (dcf2_extern_vars[i].name_offset - 1));
+            sprintf(pInfo, "Extern %04d - %s\n", i, name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Assets               : \t%d\n", dcf2_header.assets);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_assets.size(); i++)
+        {
+            std::string ass_name = (char*)(&string_data[0] + (dcf2_assets[i].item_name_offset - 1));
+            std::string arch_name = (char*)(&string_data[0] + (dcf2_assets[i].package_name_offset - 1));
+            sprintf(pInfo, "Asset %04d - %s:%s\n", i, arch_name.c_str(), ass_name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Source Files\n\n");
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < dcf2_srcs.size(); i++)
+        {
+            std::string  name = (char*)(&string_data[0] + (dcf2_srcs[i].name_offset - 1));
+            sprintf(pInfo, "%s\n", name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Fixup Entries               : \t%d\n", dcf2_fixup.size());
+        oInfo << pInfo;
+    }
+
+    oInfo.close();
+}
+
+void MKOReader::DumpInfoMK11(std::string name)
+{
+    std::ofstream oInfo(name);
+    if (oInfo) {
+
+        static char pInfo[1024] = {};
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Header Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "String data size        : \t%d\n", mk11_header.string_size);
+        oInfo << pInfo;
+        sprintf(pInfo, "Tweak string data size        : \t%d\n", mk11_header.tweakvars_stringSize);
+        oInfo << pInfo;
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Function Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Functions               : \t%d\n", mk11_header.functions);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_funcs.size(); i++)
+        {
+            std::string func_name = (char*)(&string_data[0] + (mk11_funcs[i].nameOffset - 1));
+            std::string arg_type = MKODict::GetHashString(mk11_funcs[i].paramsHash);
+
+            if (MKODict::IsHashAvailable(mk11_funcs[i].paramsHash))
+            {
+                arg_type = arg_type.substr(0, arg_type.length() - 1);
+                std::replace(arg_type.begin(), arg_type.end(), '.', ',');
+            }
+
+            sprintf(pInfo, "Function %04d - %s(%s) HASH: 0x%X\t\n", i, func_name.c_str(), arg_type.c_str(), mk11_funcs[i].functionHash);
+            oInfo << pInfo;
+        }
+
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Variable Info\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Variables               : \t%d \n", mk11_header.static_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_vars.size(); i++)
+        {
+            std::string name = MKODict::GetHashString(mk11_vars[i].nameHash);
+            sprintf(pInfo, "Variable %04d - %s \tSize: %d\n", i, name.c_str(), mk11_vars[i].size);
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Dynamic Variables               : \t%d\n", mk11_header.dynamic_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_dyn_vars.size(); i++)
+        {
+            std::string name = MKODict::GetHashString(mk11_dyn_vars[i].nameHash);
+            sprintf(pInfo, "Dynamic Variable %04d - %s \tSize: %d\n", i, name.c_str(), mk11_vars[i].size);
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Externs               : \t%d\n", mk11_header.externs);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_externs.size(); i++)
+        {
+            std::string ext_name = MKODict::GetHashString(mk11_externs[i].nameHash);
+            std::string imp_name = (char*)(&string_data[0] + (mk11_externs[i].file_name_offset - 1));
+            sprintf(pInfo, "Extern %04d - %s\t from %s\n", i, ext_name.c_str(), imp_name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Extern Variables               : \t%d\n", mk11_header.extern_variables);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_extern_vars.size(); i++)
+        {
+            std::string  name = (char*)(&string_data[0] + (mk11_extern_vars[i].name_offset - 1));
+            sprintf(pInfo, "Extern %04d - %s\n", i, name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Assets               : \t%d\n", mk11_header.assets);
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_assets.size(); i++)
+        {
+            std::string ass_name = (char*)(&string_data[0] + (mk11_assets[i].item_name_offset - 1));
+            std::string arch_name = (char*)(&string_data[0] + (mk11_assets[i].package_name_offset - 1));
+            sprintf(pInfo, "Asset %04d - %s:%s\n", i, arch_name.c_str(), ass_name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Source Files\n\n");
+        oInfo << pInfo;
+        for (unsigned int i = 0; i < mk11_srcs.size(); i++)
+        {
+            std::string  name = (char*)(&string_data[0] + (mk11_srcs[i].name_offset - 1));
+            sprintf(pInfo, "%s\n", name.c_str());
+            oInfo << pInfo;
+        }
+        sprintf(pInfo, "===========\n");
+        oInfo << pInfo;
+        sprintf(pInfo, "Fixup Entries               : \t%d\n", mk11_fixup.size());
+        oInfo << pInfo;
+    }
+
+    oInfo.close();
+}
+
 void MKOReader::DumpHeader(std::string name)
 {
     std::ofstream oInfo(name);
@@ -3883,6 +5109,96 @@ void MKOReader::ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, 
     nBytesRead = 0;
 
     int size = mk10_funcs[functionID].size;
+
+
+    while (nBytesRead < size)
+    {
+        MKOCodeEntry_MK10 mko_entry = {};
+        mko_command_mk10 bc = {};
+        if (mko_entry.offset == 0)
+            mko_entry.offset = (int)pFile.tellg();
+
+
+        ParseMKOCommand_MK10(bc);
+        if (bc.is_pad)
+            continue;
+
+        mko_entry.size += pFile.gcount();
+
+        mko_entry.type = bc.type;
+        mko_entry.subType = bc.subType;
+        mko_entry.unk1 = bc.field10;
+        mko_entry.unk2 = bc.field14;
+        mko_entry.pad = bc.is_pad;
+
+
+        if (bc.numVars > 0)
+        {
+            for (int i = 0; i < bc.numVars; i++)
+            {
+                MKOVariable var;
+                pFile.read((char*)&var, sizeof(MKOVariable));
+                nBytesRead += pFile.gcount();
+                mko_entry.size += pFile.gcount();
+                mko_entry.arguments.push_back(var);
+            }
+        }
+
+        data.push_back(mko_entry);
+    }
+}
+
+void MKOReader::ReadFunctionBytecode_DCF2(std::vector<MKOCodeEntry_MK10>& data, int functionID)
+{
+    pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffsetDCF2(functionID), pFile.beg);
+    nBytesRead = 0;
+
+    int size = dcf2_funcs[functionID].size;
+
+
+    while (nBytesRead < size)
+    {
+        MKOCodeEntry_MK10 mko_entry = {};
+        mko_command_mk10 bc = {};
+        if (mko_entry.offset == 0)
+            mko_entry.offset = (int)pFile.tellg();
+
+
+        ParseMKOCommand_MK10(bc);
+        if (bc.is_pad)
+            continue;
+
+        mko_entry.size += pFile.gcount();
+
+        mko_entry.type = bc.type;
+        mko_entry.subType = bc.subType;
+        mko_entry.unk1 = bc.field10;
+        mko_entry.unk2 = bc.field14;
+        mko_entry.pad = bc.is_pad;
+
+
+        if (bc.numVars > 0)
+        {
+            for (int i = 0; i < bc.numVars; i++)
+            {
+                MKOVariable var;
+                pFile.read((char*)&var, sizeof(MKOVariable));
+                nBytesRead += pFile.gcount();
+                mko_entry.size += pFile.gcount();
+                mko_entry.arguments.push_back(var);
+            }
+        }
+
+        data.push_back(mko_entry);
+    }
+}
+
+void MKOReader::ReadFunctionBytecode_MK11(std::vector<MKOCodeEntry_MK10>& data, int functionID)
+{
+    pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffsetMK11(functionID), pFile.beg);
+    nBytesRead = 0;
+
+    int size = mk11_funcs[functionID].size;
 
 
     while (nBytesRead < size)
@@ -4393,6 +5709,10 @@ bool MKOReader::IsDecompSupported()
     case Game_MK9_Vita:
         return true;
     case Game_MK10:
+        return true;
+    case Game_Injustice2:
+        return true;
+    case Game_MK11:
         return true;
     default:
         break;

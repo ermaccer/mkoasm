@@ -33,20 +33,24 @@ struct MKOFunctionDefinition {
 };
 
 
-struct MidwayHashEntry {
+struct HashEntry {
 	unsigned int hash;
-	char name[256] = {};
+	char name[128] = {};
 };
 
+unsigned int _hash(const char* input);
 
 class MKODict {
 public:
 	static EGameMode ms_gameMode;
 
 	static std::vector<MKOFunctionDefinition> ms_vFunctions;
-	static std::vector<MidwayHashEntry> ms_vHashes;
+	static std::vector<HashEntry> ms_vHashes;
 	static void InitDict(EGameMode game);
 	static void InitHashTable();
+
+	static void hash2txt();
+	static void txt2hash();
 
 	static const char* GetInternalName(int functionID);
 	static int GetInternalID(const char* name);

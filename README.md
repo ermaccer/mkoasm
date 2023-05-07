@@ -29,10 +29,11 @@ game mode**
 | MK9 | ✔️ | ✔️ | ✔️|  ❌ |PC, Vita |
 | Injustice | ✔️ | ⚠ | ❌| ❌ | PC |
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
+| Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC|
+| Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC|
 
 **Mortal Kombat X and up requires x64 version of mkoasm!**
 
-Scripts from Injustice 2 and onwards are totally unsuppported.
 
 
 # Decompilation
@@ -90,3 +91,13 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
  - Changed bytecode format
  - Tweakvars exported to a seperate file
  - Merged sounds section with assets like in MKvsDC
+
+## Injustice 2
+ - New tweakvar info section
+ - Moved bytecode section right after header
+ - Otherwise identical to MKX
+
+## Mortal Kombat 11
+ - Changed function entry struct
+ - Changed extern/extern vars entry struct
+ - Otherwise identical to Injustice 2

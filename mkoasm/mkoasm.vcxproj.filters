@@ -83,6 +83,12 @@
     <ClInclude Include="code\MKScript_MK10.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="code\MKScript_DCF2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MKScript_MK11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">

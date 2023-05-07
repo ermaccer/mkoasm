@@ -5,6 +5,9 @@
 #include "code/MKScript_MK9.h"
 #include "code/MKScript_DCF.h"
 #include "code/MKScript_MK10.h"
+#include "code/MKScript_DCF2.h"
+#include "code/MKScript_MK11.h"
+
 #include <fstream>
 #include "code/MKScriptTypes.h"
 #include "code/MKODict.h"
@@ -163,7 +166,35 @@ public:
     std::vector<mko_asset_mk10> mk10_assets;
     std::vector<mko_fixup_mk10> mk10_fixup;
     std::unique_ptr<char[]> mk10_pointers;
-    std::unique_ptr<char[]> mk10_tweakstring_data;
+    std::unique_ptr<char[]> tweakstring_data;
+
+
+    // dcf2 (injustice 2)
+    mko_header_dcf2 dcf2_header;
+    std::vector<mko_function_header_mk10> dcf2_funcs;
+    std::vector<mko_variable_header_mk10> dcf2_vars;
+    std::vector<mko_variable_header_mk10> dcf2_dyn_vars;
+    std::vector<mko_extern_mk10> dcf2_externs;
+    std::vector<mko_extern_var_mk10> dcf2_extern_vars;
+    std::vector<mko_source_header_mk10> dcf2_srcs;
+    std::vector<mko_asset_mk10> dcf2_assets;
+    std::vector<mko_fixup_mk10> dcf2_fixup;
+    std::vector<mko_tweakvar_dcf2> dcf2_tweakvar;
+    std::unique_ptr<char[]> dcf2_pointers;
+
+
+    // mk11
+    mko_header_dcf2 mk11_header;
+    std::vector<mko_function_header_mk11> mk11_funcs;
+    std::vector<mko_variable_header_mk10> mk11_vars;
+    std::vector<mko_variable_header_mk10> mk11_dyn_vars;
+    std::vector<mko_extern_mk11> mk11_externs;
+    std::vector<mko_extern_var_mk11> mk11_extern_vars;
+    std::vector<mko_source_header_mk10> mk11_srcs;
+    std::vector<mko_asset_mk10> mk11_assets;
+    std::vector<mko_fixup_mk10> mk11_fixup;
+    std::vector<mko_tweakvar_dcf2> mk11_tweakvar;
+    std::unique_ptr<char[]> mk11_pointers;
 
     std::unique_ptr<char[]> script_names;
     std::unique_ptr<char[]> string_data;
@@ -182,6 +213,8 @@ public:
     bool ReadMK9();
     bool ReadDCF();
     bool ReadMK10();
+    bool ReadDCF2();
+    bool ReadMK11();
 
 
     std::string GetExtension();
@@ -191,6 +224,7 @@ public:
     int  GetAllVariablesSizeMK8();
     int  GetAllFunctionsSizeMK8();
     int  GetAllFunctionsUnkSizeMK8();
+
     std::string GetFileName();
 
     std::string GetFunctionName(int functionID);
@@ -198,18 +232,26 @@ public:
     std::string GetFunctionNameMK9(int functionID);
     std::string GetFunctionNameDCF(int functionID);
     std::string GetFunctionNameMK10(int functionID);
-
+    int         GetFunctionIDWithHashMK10(unsigned int hash);
+    std::string GetFunctionNameDCF2(int functionID);
+    int         GetFunctionIDWithHashDCF2(unsigned int hash);
+    std::string GetFunctionNameMK11(int functionID);
 
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);
     uint32_t GetFunctionOffsetMK9(int functionID);
     uintptr_t GetFunctionOffsetMK10(int functionID);
+    uintptr_t GetFunctionOffsetDCF2(int functionID);
+    uintptr_t GetFunctionOffsetMK11(int functionID);
+
 
     std::string GetVariableName(int variableID);
     std::string GetVariableNameMK8(int variableID);
     std::string GetVariableNameMK9(int variableID);
     std::string GetVariableNameDCF(int variableID);
     std::string GetVariableNameMK10(int variableID);
+    std::string GetVariableNameDCF2(int variableID);
+    std::string GetVariableNameMK11(int variableID);
 
 
     uint32_t GetVariableOffset(int variableID);
@@ -217,6 +259,9 @@ public:
     uint32_t GetVariableOffsetMK9(int variableID);
     uint32_t GetVariableOffsetDCF(int variableID);
     uint32_t GetVariableOffsetMK10(int variableID);
+    uint32_t GetVariableOffsetDCF2(int variableID);
+    uint32_t GetVariableOffsetMK11(int variableID);
+
 
     std::string GetString(int stringStart);
 
@@ -226,24 +271,31 @@ public:
     void ExtractDataMK9();
     void ExtractDataDCF();
     void ExtractDataMK10();
+    void ExtractDataDCF2();
+    void ExtractDataMK11();
 
     void ExtractVariables();
     void ExtractVariablesMK8();
     void ExtractVariablesMK9();
     void ExtractVariablesDCF();
     void ExtractVariablesMK10();
-
+    void ExtractVariablesDCF2();
+    void ExtractVariablesMK11();
 
     void ExtractFunctions();
     void ExtractFunctionsMK8();
     void ExtractFunctionsMK9();
     void ExtractFunctionsDCF();
     void ExtractFunctionsMK10();
+    void ExtractFunctionsDCF2();
+    void ExtractFunctionsMK11();
 
     void DecompileFunction(int functionID);
     void DecompileFunctionMK8(int functionID);
     void DecompileFunctionMK9(int functionID);
     void DecompileFunctionMK10(int functionID);
+    void DecompileFunctionDCF2(int functionID);
+    void DecompileFunctionMK11(int functionID);
 
 
     void UnpackVariable(int variableID);
@@ -252,6 +304,8 @@ public:
     void UnpackVariableMK9(int variableID);
     void UnpackVariableDCF(int variableID);
     void UnpackVariableMK10(int variableID);
+    void UnpackVariableDCF2(int variableID);
+    void UnpackVariableMK11(int variableID);
 
     // unpackers
     void Unpack_Movelist(int variableID);
@@ -277,11 +331,16 @@ public:
     void DecompileAllFunctionsMK8();
     void DecompileAllFunctionsMK9();
     void DecompileAllFunctionsMK10();
+    void DecompileAllFunctionsDCF2();
+    void DecompileAllFunctionsMK11();
+
     void UnpackVariables();
     void UnpackVariablesMK8();
     void UnpackVariablesMK9();
     void UnpackVariablesDCF();
     void UnpackVariablesMK10();
+    void UnpackVariablesDCF2();
+    void UnpackVariablesMK11();
 
     void PrintInfo();
 
@@ -290,12 +349,16 @@ public:
     void PrintInfoMK9();
     void PrintInfoDCF();
     void PrintInfoMK10();
+    void PrintInfoDCF2();
+    void PrintInfoMK11();
 
     void DumpInfoMKDADU(std::string name);
     void DumpInfoMK8(std::string name);
     void DumpInfoMK9(std::string name);
     void DumpInfoDCF(std::string name);
     void DumpInfoMK10(std::string name);
+    void DumpInfoDCF2(std::string name);
+    void DumpInfoMK11(std::string name);
 
     void DumpHeader(std::string header);
 
@@ -306,12 +369,14 @@ public:
     void ParseMKOCommand_MKDA(mko_command& bc);
 
     void ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID);
+    void ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, int functionID);
+    void ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, int functionID);
+    void ReadFunctionBytecode_DCF2(std::vector<MKOCodeEntry_MK10>& data, int functionID);
+    void ReadFunctionBytecode_MK11(std::vector<MKOCodeEntry_MK10>& data, int functionID);
+
     void ParseMKOCommand_MK8(mko_command_mk8& bc);
     void ParseMKOCommand_MK9_Vita(mko_command_mk8& bc);
 
-    void ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, int functionID);
-
-    void ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, int functionID);
     void ParseMKOCommand_MK10(mko_command_mk10& bc);
     // building
 

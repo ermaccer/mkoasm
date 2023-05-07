@@ -15,6 +15,7 @@
 int main(int argc, char* argv[])
 {
 	bool _d_switch = false;
+	bool _b_switch = false;
 	bool _v_switch = false;
 	bool _e_switch = false;
 	bool _g_switch = false;
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
 
 	if (argc == 1) {
 		std::cout << "Usage: mkoasm <optional params> <file>\n"
+			<< "    -b  Build hash database.\n"
 			<< "    -d	Adds offset and size to every decompiled instruction.\n"
 			<< "    -v  Only prints MKO information.\n"
 			<< "    -g  Gamecube/Wii file.\n"
@@ -34,7 +36,7 @@ int main(int argc, char* argv[])
 			<< "    -a <arg> Argument for variable packer.\n"
 			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, mk9_vita, inj\n"
 #ifdef _M_X64
-			<< "	X64 modes: mkx (mk10)\n"
+			<< "	X64 modes: mkx (mk10), i2 (dcf2), mk11\n"
 #endif // _M_X64
 			;
 
@@ -49,6 +51,8 @@ int main(int argc, char* argv[])
 		}
 		switch (argv[i][1])
 		{
+		case 'b': _b_switch = true;
+			break;
 		case 'd': _d_switch = true;
 			break;
 		case 'v': _v_switch = true;
@@ -76,6 +80,12 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	if (_b_switch)
+	{
+		MKODict::txt2hash();
+		return 0;
+	}
+
 	EGameMode game = Game_Unchained;
 
 	if (m_param == "mkd") game = Game_Deception;
@@ -87,8 +97,11 @@ int main(int argc, char* argv[])
 	if (m_param == "mk9_vita") game = Game_MK9_Vita;
 	if (m_param == "inj") game = Game_Injustice;
 	if (m_param == "mkx" || m_param == "mk10") game = Game_MK10;
+	if (m_param == "dcf2" || m_param == "i2") game = Game_Injustice2;
 
-	if (game == Game_MK10 && !MKOReader::Is64BitSupported())
+	if (m_param == "mk11") game = Game_MK11;
+
+	if (game >= Game_MK10 && !MKOReader::Is64BitSupported())
 	{
 		std::cout << "ERROR: MK10+ is only supported in 64bit version of mkoasm!" << std::endl;
 		return 0;

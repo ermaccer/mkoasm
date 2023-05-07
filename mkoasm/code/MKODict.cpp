@@ -1,6 +1,8 @@
 #include "MKODict.h"
 #include <memory>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 
 const char* szInternalNames[] = {
     "copy_register_to_instruction",
@@ -30,7 +32,7 @@ const char* szInternalNames[] = {
 };
 
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
-std::vector<MidwayHashEntry> MKODict::ms_vHashes;
+std::vector<HashEntry> MKODict::ms_vHashes;
 
 EGameMode MKODict::ms_gameMode;
 
@@ -148,27 +150,67 @@ void MKODict::InitDict(EGameMode game)
 
 void MKODict::InitHashTable()
 {
-    FILE* pFile = fopen("data\\hashtable.txt", "rb");
+    std::ifstream pFile("data\\hashdb.bin", std::ifstream::binary);
+
+    if (pFile)
+    {
+        int hashNum = 0;
+
+        pFile.read((char*)&hashNum, sizeof(int));
+
+        for (int i = 0; i < hashNum; i++)
+        {
+            HashEntry h;
+            pFile.read((char*)&h, sizeof(HashEntry));
+            ms_vHashes.push_back(h);
+        }
+
+    }
+    else
+    {
+        std::cout << "INFO: Could not open hashdb.bin!" << std::endl;
+    }
+    std::cout << "INFO: Read " << ms_vHashes.size() << " hash entries!" << std::endl;
+}
+
+void MKODict::hash2txt()
+{
+
+}
+
+void MKODict::txt2hash()
+{
+    FILE* pFile = fopen("data\\hashlist.txt", "rb");
     if (pFile)
     {
         char szLine[2048] = {};
-        int  errorCheck = 0;
         while (fgets(szLine, sizeof(szLine), pFile))
         {
             if (szLine[0] == ';' || szLine[0] == '#' || szLine[0] == '\n')
                 continue;
 
             char name[256] = {};
-            unsigned int hash = 0;
-            sscanf(szLine, "0x%X %s", &hash, &name);
 
-            MidwayHashEntry h;
-            h.hash = hash;
+            sscanf(szLine, "%s", &name);
+
+            HashEntry h;
+            h.hash = _hash(name);
             sprintf(h.name, name);
             ms_vHashes.push_back(h);
         }
         fclose(pFile);
     }
+    std::ofstream oFile("data\\hashdb.bin", std::ofstream::binary);
+
+    int hashNum = ms_vHashes.size();
+    oFile.write((char*)&hashNum, sizeof(int));
+
+    for (unsigned int i = 0; i < ms_vHashes.size(); i++)
+    {
+        oFile.write((char*)&ms_vHashes[i], sizeof(HashEntry));
+    }
+
+    std::cout << "INFO: Built " << ms_vHashes.size() << " hash entries!" << std::endl;
 }
 
 
@@ -308,4 +350,26 @@ bool MKODict::IsHashAvailable(unsigned int hash)
         }
     }
     return false;
+}
+
+unsigned int _hash(const char* input)
+{
+    unsigned int result;
+    int stringLength;
+    int character;
+
+    if (!input)
+        return 0;
+    stringLength = -1;
+
+    do
+        ++stringLength;
+    while (input[stringLength]);
+
+    for (result = 0x811C9DC5; stringLength; --stringLength)
+    {
+        character = *(unsigned char*)input++;
+        result = character ^ (unsigned int)(0x1000193 * result);
+    }
+    return result;
 }
