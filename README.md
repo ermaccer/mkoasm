@@ -24,7 +24,7 @@ game mode**
 | Injustice | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| PC|
 
-Scripts from MKX and onwards are totally unsuppported.
+Scripts from Injustice 2 and onwards are totally unsuppported.
 
 
 # Decompilation

@@ -56,6 +56,22 @@ struct MKOCodeEntry_MK8 {
     int localOffset;
 };
 
+struct MKOCodeEntry_MK9 {
+    int type;
+    int subType;
+    int unk1;
+    int unk2;
+    int pad;
+    std::vector<MKOVariable> arguments;
+
+    // debug/helper
+    int offset;
+    int size;
+    int localOffset;
+};
+
+
+
 
 struct MKOCodeEntry_MK10 {
     int type;
@@ -70,6 +86,7 @@ struct MKOCodeEntry_MK10 {
     int size;
     int localOffset;
 };
+
 
 struct MKOFunctionEntry {
     std::string name;
@@ -120,11 +137,11 @@ public:
     mko_header_mk9 mk9_header;
     std::vector<mko_function_header_mk9> mk9_funcs;
     std::vector<mko_variable_header_mk9> mk9_vars;
-    std::vector<mko_variable_header_mk9> mk9_dyn_vars;
+    std::vector<mko_variable_header_mk9> mk9_extern_vars;
     std::vector<mko_extern_mk9> mk9_externs;
     std::vector<mko_asset_mk9> mk9_assets;
     std::vector<mko_sound_asset_mk9> mk9_sounds;
-    std::vector<mko_unknown_mk9> mk9_unknowns;
+    std::vector<mko_fixup_mk9> mk9_fixup;
 
     // dcf1 (injustice)
     mko_header_dcf dcf_header;
@@ -185,6 +202,7 @@ public:
 
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);
+    uint32_t GetFunctionOffsetMK9(int functionID);
     uintptr_t GetFunctionOffsetMK10(int functionID);
 
     std::string GetVariableName(int variableID);
@@ -224,6 +242,7 @@ public:
 
     void DecompileFunction(int functionID);
     void DecompileFunctionMK8(int functionID);
+    void DecompileFunctionMK9(int functionID);
     void DecompileFunctionMK10(int functionID);
 
 
@@ -256,6 +275,7 @@ public:
 
     void DecompileAllFunctions();
     void DecompileAllFunctionsMK8();
+    void DecompileAllFunctionsMK9();
     void DecompileAllFunctionsMK10();
     void UnpackVariables();
     void UnpackVariablesMK8();
@@ -287,6 +307,8 @@ public:
 
     void ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID);
     void ParseMKOCommand_MK8(mko_command_mk8& bc);
+
+    void ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, int functionID);
 
     void ReadFunctionBytecode_MK10(std::vector<MKOCodeEntry_MK10>& data, int functionID);
     void ParseMKOCommand_MK10(mko_command_mk10& bc);

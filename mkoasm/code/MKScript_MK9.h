@@ -11,8 +11,8 @@ struct mko_header_mk9 {
 	int field28;
 	int bytecodeSize;
 	int string_size;
-	int functionsOffset;
-	int unknowns;
+	int stack_size;
+	int fixups;
 	int tweakVarsOffset;
 	int tweakVarsSize;
 
@@ -21,14 +21,14 @@ struct mko_header_mk9 {
 struct mko_function_header_mk9 {
 	int nameOffset;
 	unsigned int functionHash;
-	int field8;
+	int functionOffset;
 	int size;
 	int field16;
 	int field20;
 	int field24;
 	int field28;
-	int id;
-	int numUnk;
+	int function_index;
+	int local_fixup_count;
 	int field40;
 	unsigned int paramsHash;
 };
@@ -82,7 +82,7 @@ struct mko_variable_header_mk9 {
 };
 
 
-struct mko_unknown_mk9 {
+struct mko_fixup_mk9 {
 	int field0;
 	int offset; // ?
 	int name_offset;

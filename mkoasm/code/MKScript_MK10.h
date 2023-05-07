@@ -94,3 +94,12 @@ struct mko_fixup_mk10 {
 enum mko_bc_type_mk10 {
 	MK10_BC_Type_MKO = 1
 };
+
+struct mko_command_mk10 {
+	int64 type;
+	short subType;
+	short field10;
+	short numVars;
+	short field14;
+	bool is_pad;
+};
