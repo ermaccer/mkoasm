@@ -51,6 +51,7 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
             m_bIsValid = ReadMK8();
             break;
         case Game_MK9:
+        case Game_MK9_Vita:
             m_bIsValid = ReadMK9();
             break;
         case Game_Injustice:
@@ -462,6 +463,9 @@ bool MKOReader::ReadMK9()
         SwapINT(&mk9_header.fixups);
         SwapINT(&mk9_header.tweakVarsOffset);
         SwapINT(&mk9_header.tweakVarsSize);
+        int vitaData = 0;
+        if (game == Game_MK9_Vita)
+            pFile.read((char*)&vitaData, sizeof(int));
 
 
         // same as mka
@@ -563,6 +567,15 @@ bool MKOReader::ReadMK9()
             mk9_extern_vars.push_back(var);
         }
 
+        {
+            if (vitaData > 0)
+            {
+                int size = vitaData * sizeof(int);
+                std::unique_ptr<char[]> unkData = std::make_unique<char[]>(size);
+                pFile.read(unkData.get(), size);
+            }
+
+        }
 
         {
             int size = mk9_header.field28 * (sizeof(int) * 2);
@@ -1181,14 +1194,28 @@ void MKOReader::ExtractData()
     if (game < Game_MKVSDC)
         ExtractDataMKDADU();
 
-    if (game == Game_MKVSDC)
+    switch (game)
+    {
+    case Game_MKVSDC:
         ExtractDataMK8();
-    if (game == Game_MK9)
+        break;
+    case Game_MK9:
+    case Game_MK9_Vita:
         ExtractDataMK9();
-    if (game == Game_Injustice)
+        break;
+    case Game_Injustice:
         ExtractDataDCF();
-    if (game == Game_MK10)
+        break;
+    case Game_MK10:
         ExtractDataMK10();
+        break;
+    case Game_Injustice2:
+        break;
+    case Game_MK11:
+        break;
+    default:
+        break;
+    }
 }
 
 void MKOReader::ExtractDataMKDADU()
@@ -3772,6 +3799,34 @@ void MKOReader::ParseMKOCommand_MK8(mko_command_mk8& bc)
 
 }
 
+void MKOReader::ParseMKOCommand_MK9_Vita(mko_command_mk8& bc)
+{
+    int a1, a2, a3;
+    pFile.read((char*)&a1, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+
+    if (a1 == 0)
+    {
+        bc.is_pad = true;
+        return;
+    }
+
+    pFile.read((char*)&a2, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+
+    pFile.read((char*)&a3, sizeof(int));
+    nBytesRead += pFile.gcount();
+
+
+    bc.field0 = a1;
+    bc.field4 = HIWORD(a2);
+    bc.numData = LOWORD(a2);
+    bc.functionID = HIWORD(a3);
+    bc.functionType = LOWORD(a3);
+}
+
 void MKOReader::ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, int functionID)
 {
     pFile.seekg(m_pFunctionsStartOffset + GetFunctionOffsetMK9(functionID), pFile.beg);
@@ -3788,7 +3843,10 @@ void MKOReader::ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, in
             mko_entry.offset = (int)pFile.tellg();
 
 
-        ParseMKOCommand_MK8(bc);
+        if (game == Game_MK9_Vita)
+            ParseMKOCommand_MK9_Vita(bc);
+        else
+            ParseMKOCommand_MK8(bc);
         if (bc.is_pad)
             continue;
 
@@ -4332,6 +4390,7 @@ bool MKOReader::IsDecompSupported()
     case Game_MKVSDC:
         return true;
     case Game_MK9:
+    case Game_MK9_Vita:
         return true;
     case Game_MK10:
         return true;

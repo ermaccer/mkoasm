@@ -12,17 +12,23 @@ Run without params to get usage.
 **Note: There's no way to detect the format of the MKO script, use -m param to change
 game mode**
 
+| Icon | Description |
+|       ---       |       ---       | 
+| ✔️ | Full support |
+| ⚠ | Partial support, data might not be extracted correctly |
+| ❌ | Not supported |
 
-| Game | View | Extract | Decompile | Platforms |
-|       ---       |       ---       |       ---       |       ---       |       ---       |
-| MK Deadly Alliance | ✔️ | ✔️ | ✔️| Only tested with PS2 |
-| MK Deception | ✔️ | ✔️ | ✔️| PS2, GC, XBOX (not tested) |
-| MK Unchained | ✔️ | ✔️ | ✔️| PSP|
-| MK Armageddon | ✔️ | ✔️ | ✔️|PS2, Wii (not tested), XBOX (not tested)|
-| MK VS DC | ✔️ | ✔️ | ✔️|PS3|
-| MK9 | ✔️ | ✔️ | ✔️| PC |
-| Injustice | ✔️ | ⚠ | ❌| PC, data might not be extracted properly |
-| Mortal Kombat X | ✔️ | ✔️ | ✔️| PC|
+
+| Game | View | Extract | Decompile |  Compile | Platforms |
+|       ---       |       ---       |       ---       |       ---       |      ---       |      ---       |
+| MK Deadly Alliance | ✔️ | ✔️ | ✔️| ❌ | PS2 |
+| MK Deception | ✔️ | ✔️ | ✔️|  ✔️ |PS2, GC, XBOX  |
+| MK Unchained | ✔️ | ✔️ | ✔️|  ✔️ |PSP|
+| MK Armageddon | ✔️ | ✔️ | ✔️| ❌ |PS2, Wii, XBOX|
+| MK VS DC | ✔️ | ✔️ | ✔️| ❌ |PS3|
+| MK9 | ✔️ | ✔️ | ✔️|  ❌ |PC, Vita |
+| Injustice | ✔️ | ⚠ | ❌| ❌ | PC |
+| Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
 
 Scripts from Injustice 2 and onwards are totally unsuppported.
 
@@ -72,6 +78,7 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
  - Added seperate sounds asset section which includes character specific sounds
  - Added variable name hashing (FNV1)
  - Added tweakvars section which allows quick access to important variables
+ - Added "fixup" section for quick file patches/edits
 
 ## Injustice
  - Basically identical to MK9 structure wise

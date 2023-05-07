@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 			<< "    -c  Compile specified file.\n"
 			<< "    -p  Pack variable.\n"
 			<< "    -a <arg> Argument for variable packer.\n"
-			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, inj\n"
+			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, mk9_vita, inj\n"
 #ifdef _M_X64
 			<< "	X64 modes: mkx (mk10)\n"
 #endif // _M_X64
@@ -84,6 +84,7 @@ int main(int argc, char* argv[])
 	if (m_param == "mkda") game = Game_DeadlyAlliance;
 	if (m_param == "mkvsdc") game = Game_MKVSDC;
 	if (m_param == "mk9") game = Game_MK9;
+	if (m_param == "mk9_vita") game = Game_MK9_Vita;
 	if (m_param == "inj") game = Game_Injustice;
 	if (m_param == "mkx" || m_param == "mk10") game = Game_MK10;
 

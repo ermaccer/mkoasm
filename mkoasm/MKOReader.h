@@ -307,6 +307,7 @@ public:
 
     void ReadFunctionBytecode_MK8(std::vector<MKOCodeEntry_MK8>& data, int functionID);
     void ParseMKOCommand_MK8(mko_command_mk8& bc);
+    void ParseMKOCommand_MK9_Vita(mko_command_mk8& bc);
 
     void ReadFunctionBytecode_MK9(std::vector<MKOCodeEntry_MK8>& data, int functionID);
 
