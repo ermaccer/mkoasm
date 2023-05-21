@@ -3068,9 +3068,17 @@ void MKOReader::DecompileFunctionMK11(int functionID)
                         else if (funcDef.args[a] == EMKOFAD_UInt)
                             pMKC << c.arguments[a].uintData;
                         else if (funcDef.args[a] == EMKOFAD_String)
-                            pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
+                        {
+                            if (c.arguments[a].integerData >= 1 && c.arguments[a].integerData < mk11_header.string_size)
+                                pMKC << "\"" << GetString(c.arguments[a].integerData) << "\"";
+                            else
+                                pMKC << c.arguments[a].integerData;
+                        }
+   
                         else if (funcDef.args[a] == EMKOFAD_Hex)
                             pMKC << std::hex << "0x" << c.arguments[a].uintData << std::dec;
+                        else if (funcDef.args[a] == EMKOFAD_Int64)
+                            pMKC << std::hex << "0x" << c.arguments[a].qwordData << std::dec;
                         else if (funcDef.args[a] == EMKOFAD_Hash)
                             pMKC << MKODict::GetHashString(c.arguments[a].uintData);
                         else if (funcDef.args[a] == EMKOFAD_HashFunction)

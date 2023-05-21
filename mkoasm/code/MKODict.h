@@ -14,7 +14,8 @@ enum EMKOFunctionArgumentDefinition_Type {
 	EMKOFAD_Hex,
 	EMKOFAD_Hash,
 	EMKOFAD_HashFunction,
-	EMKOFAD_ScriptHashFunction
+	EMKOFAD_ScriptHashFunction,
+	EMKOFAD_Int64
 };
 
 struct MKOFunctionArgumentDefinition {

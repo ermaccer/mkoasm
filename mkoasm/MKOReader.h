@@ -25,9 +25,7 @@ union MKOVariable {
     float floatData;
     unsigned short shortData;
     unsigned int uintData;
-#ifdef _M_X64
     int64 qwordData;
-#endif // _X_M64
 
 };
 
