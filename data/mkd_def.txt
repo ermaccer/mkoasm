@@ -192,8 +192,8 @@ limb_sever_set_motion 1415 11 5 0 0 1 5 0 1 0 1 0 0 0
 limb_sever_find_existing_update_proc 1416 3 5 0 0
 mks_limb_sever 1417 3 5 0 0
 ft_fake_bone_matcher 1425 8 5 5 0 0 0 0 0 0
-play_his_random_voice 1432 1 0
-play_his_snd_req 1433 1 0
+play_his_random_voice 1431 1 0
+play_his_snd_req 1432 1 0
 advance_to_weapon_style 1437 1 5
 show_single_weapon 1440 2 5 0
 weapon_reflection_show_hide 1441 3 5 0 0
