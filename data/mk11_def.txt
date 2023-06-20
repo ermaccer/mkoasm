@@ -1,0 +1,17 @@
+; MK11 definition file
+; format: name functionType functionSet id numArgs argTypes
+; 
+; 
+;
+;
+;
+jump 15 0 1 1 0
+push_arg 1 0 529 3 0 0 0
+get_stack_addr 7 0 4096 1 9
+set_stack_val 1 0 513 2 0 9
+load_and_run_script_function 1 0 533 3 0 4 6
+call_script_function 11 0 517 2 8 1
+call_script_function 11 0 5 2 8 1
+call_builtin_function 12 0 2561 1 7
+call_builtin_function 12 0 2049 1 7
+
