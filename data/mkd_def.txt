@@ -17,6 +17,7 @@ two_player_animation 26 2 0 1
 two_player_animation_match_attacker 27 2 0 1 
 two_player_animation_flip 28 2 0 1 
 attack_to_frame_x 29 8 0 1 1 1 1 0 0 0 
+launch_n_land_ani 31 8 0 1 1 1 0 1 1 1
 glitch_to_ani 33 2 0 0 
 glitch_him_to_ani 34 2 0 0 
 set_player_step 40 1 1 
@@ -62,6 +63,7 @@ force_away 158 4 1 0 1 0
 shake_camera 159 2 0 1 
 snd_req 161 1 2 
 random_voice 168 1 0 
+random_foot 169 1 0
 snd_stop 170 1 5
 shake_hit_voice 172 4 0 1 0 0 
 random_hit 174 1 0 
@@ -118,6 +120,7 @@ mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 319 0
 ; end clothing
 jab_attach_point_light_to_obj_bone 552 3 0 5 0
 jab_spawn_point_light_at_world_pos 553 2 0 0
+player_has_item 653 2 0 0
 set_active_projectile_block_script 669 1 0
 kick_the_camera 676 0
 get_collision_result 711 0

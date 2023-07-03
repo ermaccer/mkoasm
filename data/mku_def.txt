@@ -17,6 +17,7 @@ two_player_animation 26 2 0 1
 two_player_animation_match_attacker 27 2 0 1 
 two_player_animation_flip 28 2 0 1 
 attack_to_frame_x 29 8 0 1 1 1 1 0 0 0 
+launch_n_land_ani 31 8 0 1 1 1 0 1 1 1
 glitch_to_ani 33 2 0 0 
 glitch_him_to_ani 34 2 0 0 
 set_player_step 40 1 1 
