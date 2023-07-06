@@ -18,17 +18,25 @@ branch 									1 2 1 0
 script_exit 							1 9 1 0
 get_new_mkobj 							1 40 1 5 
 insert_item_obj 						1 41 2 5 5 
+ck_item_obj 							1 43 1 5 
 destroy_item_obj 						1 52 1 5 
+update_mkobj 							1 57 1 5
 set_obj_flag 							1 56 3 5 0 0 
 shake_camera 							1 82 2 0 1 
 snd_req 								1 87 1 2 
 random_voice 							1 95 1 0 
-obj_set_scale 							1 195 2 5 5 
+obj_set_scale 							1 195 2 5 5
+obj_set_pos_vel 						1 219 2 5 5
+get_adjusted_speed 						1 260 2 1 1
 get_bid_with_flip 						1 271 2 5 0 
 insert_particle_mkobj 					1 357 1 5
 start_blood_particles 					1 398 4 0 0 5 5
 pfxhandle_spawn_at_bid_next 			1 416 3 5 5 0 
 pfxhandle_spawn_at_bid 					1 417 3 0 5 5
+pfxhandle_spawn_at_bid_next_bind_render 1 420 3 5 5 5
+obj_set_pos 							1 434 2 5 5
+obj_set_light_flag 						1 448 2 5 0
+scale_v3 								1 461 3 5 5 5
 ; BACKGROUND TABLE 
 bgnd_place_point_light_for_ticks 		2 282 4 5 0 5 0
 ; GAME TABLE 		
@@ -44,9 +52,12 @@ was_button_and_direction 				3 34 2 0 0
 true_branch_next_style 					3 36 1 0 
 if_switching_to 						3 37 1 0 
 exit_attack_with 						3 44 6 0 0 0 0 0 0 
+ani_col_abort 							3 45 7 1 0 1 1 0 1 0
 attack_opponent_with 					3 46 3 0 5 0 
 get_current_player_number 				3 50 0 
 set_player_step 						3 52 1 1 
+disable_grounding 						3 54 0
+disable_grounding2 						3 55 0
 blend_to_ani 							3 56 3 0 0 1 
 glitch_to_ani 							3 57 2 0 0 
 back_to_normal 							3 82 0
@@ -60,14 +71,18 @@ init_ground_move 						3 90 0
 init_ground_move_no_aniproc 			3 91 0
 init_air_move 							3 93 0
 init_air_move_no_aniproc 				3 94 0 
+init_3d_move 							3 96 0
 tightrope_restrictions_off 				3 100 0
 launch_me_up 							3 101 2 1 1 
 ani_to_end 								3 108 0 
 shake_hit_voice 						3 116 4 0 1 0 0 
 random_hit 								3 118 1 0 
+plyr_snd_req 							3 119 1 0 
 stop_me 								3 121 0 
 random_voice_him 						3 128 1 0
+clear_my_face_opponent_flag 			3 135 0
 disable_this_move_exec 					3 138 2 0 0 
+damage_me 								3 141 1 1
 damage_him 								3 142 1 1 
 ejb_release_other_player 				3 147 1 0 
 player_feet_land_chores 				3 152 0 
@@ -76,7 +91,11 @@ rotate_towards_him 						3 156 1 1
 force_away 								3 113 4 1 0 1 0 
 myvel_my_angle_y 						3 157 3 1 1 1 
 weapon_trail_off 						3 173 0
+adjust_my_damage_multiplier 			3 185 1 1
+if_collision_autoface_me 				3 188 0
+if_collision_autoface_him 				3 189 0
 ani_to_frame_x_col 						3 190 7 1 0 1 1 0 1 0 
+got_hit_fx 								3 191 7 0 0 0 0 0 0 0
 special_move_cam_setup 					3 197 8 1 1 1 1 1 0 0 0 
 set_block_requirement 					3 199 1 0
 mks_cloth_bones_init_by_tbl 			3 231 2 5 0 
@@ -89,27 +108,36 @@ mks_cb1_add_coll_pt 					3 239 3 1 1 1
 mks_cb1_set_coll_offset_x 				3 240 2 1 1
 mks_cc1_eq_insert_cloth_coll 			3 243 2 0 1
 mks_ccp1_eq_insert_cloth_coll_plane 	3 245 5 0 1 1 1 1
-mks_ccp1_insert_cb1 					3 247 0
 mks_cc1_insert_cb1 						3 246 0
+mks_ccp1_insert_cb1 					3 247 0
+taunt_increase_life 					3 301 2 1 1 
 do_victory_camera 						3 310 1 5
 get_victory_flip_flags 					3 312 0
 do_i_have_life_left 					3 315 0
+get_my_particle_player_bank_num 		3 323 0
 start_baraka_blades_monitor 			3 326 0
 register_baraka_cb_functions 			3 327 0
 plyr_start_script_in_proc 				3 328 2 0 0
 ani_1_frame 							3 330 0
 ani_loop_more_frames 					3 332 1 1
+head_tracking_off 						3 335 0
 player_area_collision_ticks 			3 347 8 1 1 0 1 0 1 0 1
 is_local_plyr 							3 369 0
+local_collision_allowed_plyr_pdata 		3 371 0
 start_special_weapon_monitor 			3 383 1 0
 is_he_airborn 							3 387 0
+single_frame_collision_check 			3 388 6 0 1 0 0 0 1
 wait_for_collision_result 				3 396 0
+clear_collision_result 					3 397 0
 collision_result_dont_care 				3 398 0
 get_projectile_script_plyr_num  		3 399 0
+get_projectile_script_plyr_pdata 		3 401 0
 get_projectile_script_last_pos 			3 403 1 5
 get_projectile_script_velocity 			3 404 1 5
+set_active_projectile_continue_thru_hit 3 409 0
 set_active_projectile_tracking_light 	3 410 1 5 
 set_active_projectile_collision_info 	3 411 4 1 0 1 1
+start_plyr_attack 						3 412 1 0
 ani_x_more_frames 						3 421 1 1
 resume_effect_at_obj_bid 				3 424 5 5 5 5 0 0  
 start_projectile_from_plyr_bone 		3 454 6 5 0 0 1 1 5 
@@ -119,6 +147,7 @@ set_active_projectile_end_script 		3 460 1 0
 active_projectile_setup_done 			3 465 0 
 set_active_projectile_sound 			3 473 3 0 2 2 
 mks_debug_display_cloth_ontop 			3 482 1 0
+check_to_register_miss 					3 484 0
 advance_to_weapon_style 				3 503 1 5
 get_his_plyr_obj 						3 541 0
 get_my_plyr_obj 						3 542 0
@@ -141,6 +170,7 @@ emit_value 								128 39 2 0 1
 spawn_random_size 						128 47 1 5
 fx_reset 								128 50 1 5
 fx_resume_emit 							128 52 1 5
+fx_pause_emit 							128 53 1 5
 fx_reset_emit 							128 54 1 5
 update_add 								128 68 2 0 0
 update_copy 							128 69 1 0
