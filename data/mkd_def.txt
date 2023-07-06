@@ -28,6 +28,7 @@ was_button_and_direction 45 2 0 0
 ani_col_abort 46 7 1 0 1 1 0 1 0
 true_branch_next_style 48 1 0 
 if_switching_to 50 1 0 
+disable_grounding 52 0
 camera_set_lookat_focus 58 1 0
 camera_set_movement_focus 59 1 0
 attack_opponent_with 70 3 0 0 0 
@@ -42,6 +43,7 @@ ck_item_obj 98 1 5
 destroy_item_obj 99 1 5 
 set_obj_flag 102 3 5 0 0 
 update_mkobj 103 1 5
+plyr_spawn_his_anim_limb 111 7 5 5 0 0 0 0 1
 start_gusher 112 5 5 5 0 0 0
 ani_to_frame_x 128 1 1 
 ani_to_blend_frame 129 1 1 
@@ -56,6 +58,7 @@ init_ground_move_no_aniproc 140 0
 init_air_move 142 0 
 init_air_move_no_aniproc 143 0 
 init_3d_move 145 0
+tightrope_restrictions_off 149 0
 launch_me_up 150 2 1 1 
 face_opponent_now 153 0
 ani_to_end 155 0 
@@ -70,6 +73,7 @@ random_hit 174 1 0
 plyr_snd_req 175 1 0 
 get_mode_of_play 178 0 
 stop_me 181 0 
+myvel_his_angle_y 182 3 0 1 1
 random_voice_him 188 1 0
 step_throw_into_check 190 0 
 clear_my_face_opponent_flag 193 0
@@ -113,9 +117,14 @@ mks_cb2_eq_cloth_bone 305 1 0
 mks_insert_cloth_force_bones 306 2 1 1
 mks_set_ground_y_all_cloth_bones 307 1 1
 mks_cb1_set_ground_y 308 1 1
+mks_cb1_add_coll_pt 309 3 1 1 1
+mks_cb1_set_coll_offset_x 310 2 1 1
+mks_cb1_set_scale 312 4 0 1 1 1
 mks_cc1_eq_insert_cloth_coll 313 2 0 1
 mks_cc1_expand_cyl 314 2 1 1 
+mks_ccp1_eq_insert_cloth_coll_plane 315 5 0 1 1 1 1
 mks_cc1_insert_cb1 316 0
+mks_ccp1_insert_cb1 317 0
 mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 319 0
 ; end clothing
 jab_attach_point_light_to_obj_bone 552 3 0 5 0
@@ -123,6 +132,7 @@ jab_spawn_point_light_at_world_pos 553 2 0 0
 player_has_item 653 2 0 0
 set_active_projectile_block_script 669 1 0
 kick_the_camera 676 0
+pz_fighter_create_space_between_fighters_for_special_moves 700 0
 get_collision_result 711 0
 taunt_increase_life 712 2 1 1
 face_ang_from_pos_to_him 720 3 5 0 0
@@ -130,9 +140,12 @@ do_victory_camera 726 1 0
 get_my_plyr_num 727 0
 get_victory_flip_flags 729 0
 do_i_have_life_left 732 0
+bgnd_place_point_light_for_ticks 744 4 0 0 1 0
 high_flash_check 745 0
 medium_flash_check 746 0
 get_my_particle_player_bank_num 752 0
+start_baraka_blades_monitor 769 0
+register_baraka_cb_functions 770 0
 plyr_start_script_in_proc 776 2 0 0
 frand 778 1 1
 ani_1_frame 786 0
@@ -140,14 +153,19 @@ ani_loop_more_frames 787 1 1
 load_aux_weapon 788 1 0
 obj_set_scale 806 2 5 0
 bgnd_preload_named_model 809 2 0 0 
+pz_fighter_reaction_xfer_him 816 1 0
 restart_effect 872 1 0
 sfrand 894 1 1
+bgnd_current_rx_get_info 912 1 0
 get_adjusted_speed 1105 2 1 1
 player_area_collision_ticks 1106 6 1 1 0 1 0 1
 flying_collision 1107 10 0 1 0 0 0 1 1 1 1 1
 set_constrain_last_pos_pdata 1110 1 0
 pan_vol_pitch_snd_req 1136 4 0 0 1 1
+is_local_plyr 1139 0
 local_collision_allowed_plyr_pdata 1141 0
+xz_distance_between_players 1149 0
+start_special_weapon_monitor 1150 1 0
 is_he_airborn 1154 0
 player_area_collision_check 1156 5 1 1 0 0 0
 reaction_sync_advance 1163 0
@@ -184,6 +202,7 @@ obj_set_gravity 1299 2 5 1
 obj_turn_gravity_off 1300 1 5
 destroy_mkobj 1301 1 5
 pfx_plyr_bankowner 1375 1 5
+obj_get_bid_for_tid 1384 2 5 5
 insert_particle_mkobj 1386 1 5
 check_to_register_miss 1398 0
 mks_animpdata_set_cur_frame 1400 2 5 1
@@ -194,9 +213,11 @@ limb_sever_update_slide_end_coeff 1414 2 5 1
 limb_sever_set_motion 1415 11 5 0 0 1 5 0 1 0 1 0 0 0
 limb_sever_find_existing_update_proc 1416 3 5 0 0
 mks_limb_sever 1417 3 5 0 0
+limb_sever_pop_head_up 1418 5 5 0 1 1 0
+limb_sever_bone_attach 1419 8 5 5 0 0 5 0 0 0
 ft_fake_bone_matcher 1425 8 5 5 0 0 0 0 0 0
-play_his_random_voice 1432 1 0
-play_his_snd_req 1433 1 0
+play_his_random_voice 1431 1 0
+play_his_snd_req 1432 1 0
 advance_to_weapon_style 1437 1 5
 show_single_weapon 1440 2 5 0
 weapon_reflection_show_hide 1441 3 5 0 0
@@ -214,6 +235,7 @@ pfx_spawn_at_bid 1469 3 0 5 0
 pfxhandle_spawn_at_bid_next 1470 3 5 5 0 
 pfxhandle_spawn_at_bid 1471 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1473 3 5 5 0
+show_baraka_one_blade_only 1476 2 5 5
 mkscripts_destroy_bonematcher 1500 1 0
 obj_set_pos 1522 2 5 0
 obj_get_pos 1523 2 5 0
@@ -226,10 +248,12 @@ get_my_plyr_pdata 1542 0
 get_my_plyr_anim_pdata 1543 0
 plyr_pdata_get_his_plyr_pdata 1546 1 5
 plyr_pdata_get_plyr_obj 1547 1 5
+plyr_pdata_get_cmo 1550 1 5
 plyr_pdata_get_plyr_num 1551 1 5
 plyr_pdata_get_pchr 1553 1 5
 obj_set_pos_vel 1558 2 5 0
 obj_set_ang_vel 1559 2 5 0
+obj_get_ang_vel 1560 2 5 0
 start_bone_matcher 1561 5 5 0 0 0 0
 bone_matcher_parent_set_offset 1562 2 5 0
 bone_matcher_child_set_offset 1563 2 5 0
