@@ -2594,27 +2594,32 @@ void MKOReader::DecompileFunction(int functionID)
                 {
                     if (definitionAvailable)
                     {
-                        if (funcDef.args[a] == EMKOFAD_Float)
-                            pMKC << c.arguments[a].floatData;
-                        else if (funcDef.args[a] == EMKOFAD_Short)
-                            pMKC << c.arguments[a].shortData;
-                        else if (funcDef.args[a] == EMKOFAD_UInt)
-                            pMKC << c.arguments[a].uintData;
-                        else if (funcDef.args[a] == EMKOFAD_String)
+                        if (a < funcDef.args.size())
                         {
-                            if (!(game == Game_DeadlyAlliance))
+                            if (funcDef.args[a] == EMKOFAD_Float)
+                                pMKC << c.arguments[a].floatData;
+                            else if (funcDef.args[a] == EMKOFAD_Short)
+                                pMKC << c.arguments[a].shortData;
+                            else if (funcDef.args[a] == EMKOFAD_UInt)
+                                pMKC << c.arguments[a].uintData;
+                            else if (funcDef.args[a] == EMKOFAD_String)
                             {
-                                if (c.arguments[a].integerData > 0)
-                                    pMKC << "\"" << GetString(c.arguments[a].integerData) << "\"";
+                                if (!(game == Game_DeadlyAlliance))
+                                {
+                                    if (c.arguments[a].integerData > 0)
+                                        pMKC << "\"" << GetString(c.arguments[a].integerData) << "\"";
+                                    else
+                                        pMKC << c.arguments[a].integerData;
+                                }
                                 else
-                                    pMKC << c.arguments[a].integerData;
-                            }
-                            else
-                                pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
+                                    pMKC << "\"" << GetString(c.arguments[a].integerData + 1) << "\"";
 
+                            }
+                            else if (funcDef.args[a] == EMKOFAD_Hex)
+                                pMKC << std::hex << "0x" << c.arguments[a].uintData << std::dec;
+                            else
+                                pMKC << c.arguments[a].integerData;
                         }
-                        else if (funcDef.args[a] == EMKOFAD_Hex)
-                            pMKC << std::hex << "0x" << c.arguments[a].uintData << std::dec;
                         else
                             pMKC << c.arguments[a].integerData;
 
