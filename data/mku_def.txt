@@ -69,6 +69,7 @@ shake_camera 159 2 0 1
 snd_req 161 1 2 
 pan_vol_pitch_random_hit 166 4 0 1 1 1
 random_voice 168 1 0 
+random_foot 169 1 0
 snd_stop 170 1 5
 shake_hit_voice 172 4 0 1 0 0 
 random_hit 174 1 0 
@@ -79,7 +80,9 @@ myvel_his_angle_y 182 3 0 1 1
 random_voice_him 188 1 0
 step_throw_into_check 190 0 
 clear_my_face_opponent_flag 193 0
+clear_my_face_opponent_flag 194 0
 disable_this_move_exec 196 2 0 0 
+turn_me_pi 197 0
 damage_me 199 1 1
 damage_him 200 1 1 
 ejb_release_other_player 201 1 0 
@@ -107,6 +110,7 @@ got_hit_fx 292 7 0 0 0 0 0 0 0
 whoosh_fx 296 1 0
 special_move_cam_setup 297 8 1 1 1 1 1 0 0 0 
 set_block_requirement 299 1 0 
+is_he_blocking 301 0
 mks_set_flipped_bones 302 1 0
 mks_start_goro_arms_fixup 303 0
 mks_cloth_bones_init_by_tbl 304 2 0 0
@@ -189,6 +193,7 @@ get_adjusted_speed 1117 2 1 1
 player_area_collision_ticks 1118 6 1 1 0 1 0 1
 flying_collision 1119 10 0 1 0 0 0 1 1 1 1 1
 set_constrain_last_pos_pdata 1122 1 0
+switch_plyr_positions 1126 0
 force_ai_style 1147 1 0
 pan_vol_pitch_snd_req 1148 4 0 0 1 1
 is_local_plyr 1151 0
@@ -264,7 +269,10 @@ start_blood_particles 1465 4 0 0 5 5
 start_sweat_particles 1466 4 0 0 5 5
 start_blood_particles_scripts 1467 2 0 0
 fatality_explode_victim 1470 3 5 1 1
+start_bodyslam_bodysplat 1472 5 5 5 1 1 1
 start_gore2_pebbles 1473 11 0 0 5 5 5 0 0 0 5 5 5 
+attach_gore2_obj 1474 5 5 0 0 0 0
+destroy_gore2_obj 1475 2 0 5
 limb_sever_show_z_meat_chunks 1480 3 5 0 0
 limb_sever_throw_away 1482 3 5 0 0
 auto_calc_limbobj_bone_world_pos 1481 2 5 0
@@ -274,6 +282,7 @@ pfxhandle_spawn_at_bid 1485 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1487 3 5 5 0
 show_baraka_one_blade_only 1490 2 5 5
 mkscripts_destroy_bonematcher 1515 1 0
+mkscripts_destroy_gusher 1517 1 5
 obj_set_pos 1538 2 5 0
 obj_get_pos 1539 2 5 0
 obj_set_ang 1540 2 5 0
@@ -296,7 +305,8 @@ start_bone_matcher 1577 5 5 0 0 0 0
 bone_matcher_parent_set_offset 1578 2 5 0 
 bone_matcher_child_set_offset 1579 2 5 0
 get_bone_world_pos 1580 3 5 0 0
-mkobj_get_matrix 1586 1 5
+force_calc_bone_world_mat 1584 2 5 0
+mkobj_get_matrix 1586 2 5 0
 mkobj_get_matrix_right 1588 2 5 0
 v3_x_mat 1590 3 0 0 5
 v3_sub_v3 1591 3 0 0 0

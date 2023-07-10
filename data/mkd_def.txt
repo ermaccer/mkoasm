@@ -273,7 +273,7 @@ start_bone_matcher 1561 5 5 0 0 0 0
 bone_matcher_parent_set_offset 1562 2 5 0
 bone_matcher_child_set_offset 1563 2 5 0
 get_bone_world_pos 1564 3 5 0 0
-mkobj_get_matrix 1569 1 5
+mkobj_get_matrix 1569 2 5 0
 mkobj_get_matrix_right 1571 2 5 0
 v3_x_mat 1573 3 0 0 5
 v3_sub_v3 1574 3 0 0 0
