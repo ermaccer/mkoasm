@@ -30,6 +30,7 @@ obj_set_pos_vel 						1 219 2 5 5
 get_adjusted_speed 						1 260 2 1 1
 get_bid_with_flip 						1 271 2 5 0 
 insert_particle_mkobj 					1 357 1 5
+is_boss_character 						1 391 1 5
 start_blood_particles 					1 398 4 0 0 5 5
 pfxhandle_spawn_at_bid_next 			1 416 3 5 5 0 
 pfxhandle_spawn_at_bid 					1 417 3 0 5 5
@@ -75,10 +76,12 @@ init_3d_move 							3 96 0
 tightrope_restrictions_off 				3 100 0
 launch_me_up 							3 101 2 1 1 
 ani_to_end 								3 108 0 
+force_away 								3 113 4 1 0 1 0 
 shake_hit_voice 						3 116 4 0 1 0 0 
 random_hit 								3 118 1 0 
 plyr_snd_req 							3 119 1 0 
 stop_me 								3 121 0 
+plyr_rotate_obj_y180 					3 124 0
 random_voice_him 						3 128 1 0
 clear_my_face_opponent_flag 			3 135 0
 disable_this_move_exec 					3 138 2 0 0 
@@ -88,14 +91,16 @@ ejb_release_other_player 				3 147 1 0
 player_feet_land_chores 				3 152 0 
 disable_both_repel_flags 				3 154 0
 rotate_towards_him 						3 156 1 1
-force_away 								3 113 4 1 0 1 0 
+ejb_call 								3 158 1 0 
 myvel_my_angle_y 						3 157 3 1 1 1 
+set_ani_weight 							3 171 1 1
 weapon_trail_off 						3 173 0
 adjust_my_damage_multiplier 			3 185 1 1
 if_collision_autoface_me 				3 188 0
 if_collision_autoface_him 				3 189 0
 ani_to_frame_x_col 						3 190 7 1 0 1 1 0 1 0 
 got_hit_fx 								3 191 7 0 0 0 0 0 0 0
+whoosh_fx 								3 195 1 0
 special_move_cam_setup 					3 197 8 1 1 1 1 1 0 0 0 
 set_block_requirement 					3 199 1 0
 mks_cloth_bones_init_by_tbl 			3 231 2 5 0 

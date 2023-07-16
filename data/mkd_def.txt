@@ -76,6 +76,7 @@ random_hit 174 1 0
 plyr_snd_req 175 1 0 
 get_mode_of_play 178 0 
 stop_me 181 0 
+plyr_rotate_obj_y180 184 0
 myvel_his_angle_y 182 3 0 1 1
 random_voice_him 188 1 0
 step_throw_into_check 190 0 
