@@ -871,7 +871,7 @@ bool MKOReader::ReadMK10()
 
         if (!is_raw)
         {
-            std::cout << "ERROR: Compressed MKX mkos are not supported!" << std::endl;
+            std::cout << "ERROR: BE MKX mkos are not supported!" << std::endl;
             return false;
         }
 
@@ -1020,7 +1020,7 @@ bool MKOReader::ReadDCF2()
 
         if (!is_raw)
         {
-            std::cout << "ERROR: Compressed DCF2 mkos are not supported!" << std::endl;
+            std::cout << "ERROR: BE DCF2 mkos are not supported!" << std::endl;
             return false;
         }
 
@@ -1173,7 +1173,7 @@ bool MKOReader::ReadMK11()
 
         if (!is_raw)
         {
-            std::cout << "ERROR: Compressed MK11 mkos are not supported!" << std::endl;
+            std::cout << "ERROR: BE MK11 mkos are not supported!" << std::endl;
             return false;
         }
 

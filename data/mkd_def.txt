@@ -12,6 +12,7 @@ exit_react 12 6 0 0 0 0 0 0
 blend_to_ani 13 3 0 0 1 
 am_i_flipped 15 00
 am_i_on_the_left 18 0 
+am_i_airborn 23 0
 was_button_pressed 24 1 0 
 two_player_animation 26 2 0 1 
 two_player_animation_match_attacker 27 2 0 1 
@@ -64,6 +65,7 @@ tightrope_restrictions_off 149 0
 launch_me_up 150 2 1 1 
 face_opponent_now 153 0
 ani_to_end 155 0 
+ani_through_end 156 0
 force_away 158 4 1 0 1 0 
 shake_camera 159 2 0 1 
 snd_req 161 1 2 
@@ -82,9 +84,11 @@ random_voice_him 188 1 0
 step_throw_into_check 190 0 
 clear_my_face_opponent_flag 193 0
 disable_this_move_exec 196 2 0 0 
+turn_me_pi 197 0
 damage_me 199 1 1
 damage_him 200 1 1 
 ejb_release_other_player 201 1 0 
+ejb_too_close_repell 202 0
 player_feet_land_chores 205 0 
 wait_to_land 206 0 
 disable_both_repel_flags 207 0
@@ -94,6 +98,7 @@ ejb_call 210 1 0
 back_rollup_check 212 0
 set_ani_weight 221 1 1
 weapon_trail_off 223 0
+plyr_weapon_grab 224 2 5 1
 face_bleed_me 227 1 0
 wall_eligible_on 228 0
 wall_eligible_off 229 0

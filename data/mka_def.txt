@@ -32,6 +32,7 @@ get_bid_with_flip 						1 271 2 5 0
 insert_particle_mkobj 					1 357 1 5
 is_boss_character 						1 391 1 5
 start_blood_particles 					1 398 4 0 0 5 5
+start_blood_particles_scripts 			1 400 2 0 0
 pfxhandle_spawn_at_bid_next 			1 416 3 5 5 0 
 pfxhandle_spawn_at_bid 					1 417 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1 420 3 5 5 5
@@ -43,9 +44,11 @@ bgnd_place_point_light_for_ticks 		2 282 4 5 0 5 0
 ; GAME TABLE 		
 exit_react 								3 5 6 0 0 0 0 0 0 			
 am_i_flipped 							3 7 0
+am_i_airborn 							3 15 0
 was_button_pressed 						3 16 1 0 
 two_player_animation 					3 19 2 0 1 
-attack_to_frame_x 						3 26 8 0 1 1 1 1 0 0 0 
+attack_to_frame_x 						3 26 8 0 1 1 1 1 0 0 0
+launch_n_land_ani 						3 27 8 0 1 1 1 0 1 1 1 
 miss_branch 							3 31 1 0 
 block_branch 							3 32 1 0 
 hit_branch 								3 33 1 0
@@ -75,7 +78,9 @@ init_air_move_no_aniproc 				3 94 0
 init_3d_move 							3 96 0
 tightrope_restrictions_off 				3 100 0
 launch_me_up 							3 101 2 1 1 
+face_opponent_now 						3 105 0
 ani_to_end 								3 108 0 
+ani_through_end 						3 109 0
 force_away 								3 113 4 1 0 1 0 
 shake_hit_voice 						3 116 4 0 1 0 0 
 random_hit 								3 118 1 0 
@@ -85,16 +90,23 @@ plyr_rotate_obj_y180 					3 124 0
 random_voice_him 						3 128 1 0
 clear_my_face_opponent_flag 			3 135 0
 disable_this_move_exec 					3 138 2 0 0 
+turn_me_pi 								3 139 0
 damage_me 								3 141 1 1
 damage_him 								3 142 1 1 
 ejb_release_other_player 				3 147 1 0 
+ejb_too_close_repell 					3 148 0
 player_feet_land_chores 				3 152 0 
+wait_to_land 							3 153 0 
 disable_both_repel_flags 				3 154 0
 rotate_towards_him 						3 156 1 1
 ejb_call 								3 158 1 0 
+back_rollup_check 						3 160 0
 myvel_my_angle_y 						3 157 3 1 1 1 
 set_ani_weight 							3 171 1 1
 weapon_trail_off 						3 173 0
+plyr_weapon_grab 						3 174 2 5 1
+face_bleed_me 							3 180 1 0
+wall_eligible_on 						3 181 0
 adjust_my_damage_multiplier 			3 185 1 1
 if_collision_autoface_me 				3 188 0
 if_collision_autoface_him 				3 189 0
@@ -103,6 +115,8 @@ got_hit_fx 								3 191 7 0 0 0 0 0 0 0
 whoosh_fx 								3 195 1 0
 special_move_cam_setup 					3 197 8 1 1 1 1 1 0 0 0 
 set_block_requirement 					3 199 1 0
+mks_set_flipped_bones 					3 229 1 0
+mks_start_goro_arms_fixup 				3 230 0
 mks_cloth_bones_init_by_tbl 			3 231 2 5 0 
 mks_mat_id_set_zbias 					3 233 2 0 1
 mks_cb1_eq_cloth_bone 					3 234 1 0
@@ -119,6 +133,8 @@ taunt_increase_life 					3 301 2 1 1
 do_victory_camera 						3 310 1 5
 get_victory_flip_flags 					3 312 0
 do_i_have_life_left 					3 315 0
+high_flash_check 						3 316 0
+medium_flash_check 						3 317 0
 get_my_particle_player_bank_num 		3 323 0
 start_baraka_blades_monitor 			3 326 0
 register_baraka_cb_functions 			3 327 0
@@ -132,6 +148,7 @@ local_collision_allowed_plyr_pdata 		3 371 0
 start_special_weapon_monitor 			3 383 1 0
 is_he_airborn 							3 387 0
 single_frame_collision_check 			3 388 6 0 1 0 0 0 1
+reaction_sync_advance 					3 395 0
 wait_for_collision_result 				3 396 0
 clear_collision_result 					3 397 0
 collision_result_dont_care 				3 398 0
@@ -145,6 +162,7 @@ set_active_projectile_collision_info 	3 411 4 1 0 1 1
 start_plyr_attack 						3 412 1 0
 ani_x_more_frames 						3 421 1 1
 resume_effect_at_obj_bid 				3 424 5 5 5 5 0 0  
+reaction_xfer_him 						3 445 3 0 1 0
 start_projectile_from_plyr_bone 		3 454 6 5 0 0 1 1 5 
 set_active_projectile_rx_info 			3 455 3 0 1 0 
 set_active_projectile_hit_script 		3 458 1 0 
@@ -159,6 +177,8 @@ get_my_plyr_obj 						3 542 0
 get_his_plyr_pdata 						3 544 0
 get_my_plyr_pdata 						3 545 0
 plyr_pdata_get_cmo 						3 556 1 5
+plyr_pdata_get_plyr_num 				3 557 1 5
+plyr_pdata_get_pchr 					3 558 1 5
 get_bone_world_pos 						3 566 3 5 0 5
 ; FX TABLE
 fx 										128 0 1 0 
