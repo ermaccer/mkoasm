@@ -325,6 +325,7 @@ update_add_constant 1659 2 0 1
 update_fade_alpha 1662 4 0 0 1 1
 update_fade_alpha2 1663 6 0 0 0 1 0 0
 update_lerp_color 1664 6 0 0 1 0 0 0
+update_texanim 1665 5 0 0 1 0 0
 update_texanim_hold 1666 5 0 0 1 0 0
 update_bounce 1667 4 0 0 0 1
 update_attract 1668 3 0 0 1
@@ -354,3 +355,4 @@ reset_fake_bone_matcher 1904 7 0 5 0 5 0 5 1
 jax_taunt 2001 0
 freeze_victim 2002 0
 force_fatality_end 2003 0
+camera_setup_simple_rotation 2004 2 1 0

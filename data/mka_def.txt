@@ -126,9 +126,11 @@ mks_cb1_set_ground_y 					3 238 1 1
 mks_cb1_add_coll_pt 					3 239 3 1 1 1
 mks_cb1_set_coll_offset_x 				3 240 2 1 1
 mks_cc1_eq_insert_cloth_coll 			3 243 2 0 1
+mks_cc1_expand_cyl 						3 244 2 1 1
 mks_ccp1_eq_insert_cloth_coll_plane 	3 245 5 0 1 1 1 1
 mks_cc1_insert_cb1 						3 246 0
 mks_ccp1_insert_cb1 					3 247 0
+mks_cc1_set_coll_fnc_eq_cloth_coll_point_cyl_abs 3 249 0
 taunt_increase_life 					3 301 2 1 1 
 do_victory_camera 						3 310 1 5
 get_victory_flip_flags 					3 312 0
@@ -203,6 +205,9 @@ update_add_constant_v3 					128 70 4 0 1 1 1
 update_add_constant 					128 71 2 0 1
 update_fade_alpha 						128 76 4 0 0 1 1
 update_fade_alpha2 						128 77 6 0 0 0 1 0 0
+update_lerp_color 						128 78 6 0 0 1 0 0 0
+update_texanim 							128 79 5 0 0 1 0 0
+update_texanim_hold						128 80 5 0 0 1 0 0
 kill_on_greater 						128 86 2 0 1
 fx_set_param_v3 						128 97 5 5 0 1 1 1
 fx_set_render_priority 					128 101 2 5 0
