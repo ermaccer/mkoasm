@@ -28,6 +28,7 @@ random_voice 							1 95 1 0
 obj_set_scale 							1 195 2 5 5
 obj_set_pos_vel 						1 219 2 5 5
 get_adjusted_speed 						1 260 2 1 1
+flying_collision 						1 262 10 0 1 0 0 0 1 1 1 1 1
 get_bid_with_flip 						1 271 2 5 0 
 insert_particle_mkobj 					1 357 1 5
 is_boss_character 						1 391 1 5
@@ -37,6 +38,7 @@ pfxhandle_spawn_at_bid_next 			1 416 3 5 5 0
 pfxhandle_spawn_at_bid 					1 417 3 0 5 5
 pfxhandle_spawn_at_bid_next_bind_render 1 420 3 5 5 5
 obj_set_pos 							1 434 2 5 5
+obj_get_pos 							1 435 2 5 0
 obj_set_light_flag 						1 448 2 5 0
 scale_v3 								1 461 3 5 5 5
 ; BACKGROUND TABLE 
@@ -47,6 +49,7 @@ am_i_flipped 							3 7 0
 am_i_airborn 							3 15 0
 was_button_pressed 						3 16 1 0 
 two_player_animation 					3 19 2 0 1 
+two_player_animation_flip 				3 25 2 0 1
 attack_to_frame_x 						3 26 8 0 1 1 1 1 0 0 0
 launch_n_land_ani 						3 27 8 0 1 1 1 0 1 1 1 
 miss_branch 							3 31 1 0 
@@ -64,6 +67,7 @@ disable_grounding 						3 54 0
 disable_grounding2 						3 55 0
 blend_to_ani 							3 56 3 0 0 1 
 glitch_to_ani 							3 57 2 0 0 
+blend_to_ani_frame 						3 59 4 0 0 1 1
 back_to_normal 							3 82 0
 set_my_state 							3 83 1 0 
 set_my_secondary_state 					3 87 1 0 

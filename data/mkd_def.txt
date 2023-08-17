@@ -21,6 +21,7 @@ attack_to_frame_x 29 8 0 1 1 1 1 0 0 0
 launch_n_land_ani 31 8 0 1 1 1 0 1 1 1
 glitch_to_ani 33 2 0 0 
 glitch_him_to_ani 34 2 0 0 
+blend_to_ani_frame 35 4 0 0 1 1
 set_player_step 40 1 1 
 miss_branch 42 1 0 
 block_branch 43 1 0 
@@ -164,6 +165,7 @@ ani_1_frame 786 0
 ani_loop_more_frames 787 1 1
 load_aux_weapon 788 1 0
 head_tracking_off 789 0
+head_tracking_on 790 0
 obj_set_scale 806 2 5 0
 bgnd_preload_named_model 809 2 0 0 
 pz_fighter_reaction_xfer_him 816 1 0
@@ -205,6 +207,7 @@ set_active_projectile_not_duckable 1231 0
 set_active_projectile_hit_script 1233 1 0 
 set_active_projectile_end_script 1234 1 0 
 active_projectile_setup_done 1236 0 
+set_active_projectile_velocity 1237 1 0
 set_active_projectile_target_ground 1238 3 1 1 1
 set_active_projectile_sound 1244 3 0 0 0 
 start_plyr_attack 1249 1 0
@@ -224,6 +227,7 @@ insert_particle_mkobj 1386 1 5
 check_to_register_miss 1398 0
 mks_animpdata_set_cur_frame 1400 2 5 1
 plyr_turn_off_mirrorguy 1407 1 5
+plyr_turn_on_mirrorguy 1408 1 5
 plyr_turn_off_shadowbox 1409 1 5
 set_pdata_anim_step 1412 2 5 1
 limb_sever_update_slide_end_coeff 1414 2 5 1
@@ -262,6 +266,7 @@ obj_get_pos 1523 2 5 0
 obj_set_ang 1524 2 5 0
 obj_get_ang 1525 2 5 0
 obj_set_light_flag 1534 2 5 0
+get_plyr_info 1536 0
 get_his_plyr_obj 1537 0
 get_my_plyr_obj 1538 0
 get_his_plyr_pdata 1541 0
@@ -356,3 +361,4 @@ jax_taunt 2001 0
 freeze_victim 2002 0
 force_fatality_end 2003 0
 camera_setup_simple_rotation 2004 2 1 0
+quan_teleport 2006 2 5 0
