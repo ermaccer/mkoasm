@@ -1646,6 +1646,7 @@ void MKOReader::ExtractDataMKDADU()
 
     std::string folderName = "unpacked";
 
+
     if (!m_bExtractOnly)
     {
         if (!std::filesystem::exists(folderName))
@@ -1677,7 +1678,6 @@ void MKOReader::ExtractDataMKDADU()
         ExtractFunctions();
         std::filesystem::current_path("..");
     }
-
 
     folderName = "decompiled";
     if (!m_bExtractOnly)
@@ -2134,6 +2134,7 @@ void MKOReader::ExtractDataMK11()
 void MKOReader::ExtractVariables()
 {
     pFile.seekg(m_pDataStartOffset, pFile.beg);
+
     std::string hdr = "..\\";
     hdr += GetFileName() + "_header.ini";
     std::ofstream oInfo(hdr, std::ofstream::app);
@@ -2144,7 +2145,12 @@ void MKOReader::ExtractVariables()
         if (size < 0)
             size = 0;
         if (game == Game_Armageddon)
-          pFile.seekg(m_pDataStartOffset + GetVariableOffset(i) - 4, pFile.beg);
+        {
+            unsigned int varOffset = m_pDataStartOffset + GetVariableOffset(i);
+            pFile.clear();
+            pFile.seekg(varOffset, pFile.beg);
+        }
+          
 
         std::string var_name = (char*)(&script_names[0] + (vars[i].name_offset - 1));
         int varID = 0;
