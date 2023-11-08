@@ -84,5 +84,6 @@ enum EMKOAICommandButton {
 enum EMKOAICommandType {
 	EAICommandType_Button,
 	EAICommandType_ChangeStyle,
-	EAICommandType_SpecialMove = 4
+	EAICommandType_SpecialMove = 4,
+	EAICommandType_WaitAfterPopup = 20,
 };
