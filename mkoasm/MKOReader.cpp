@@ -2147,6 +2147,7 @@ void MKOReader::ExtractVariables()
         if (game == Game_Armageddon)
         {
             unsigned int varOffset = m_pDataStartOffset + GetVariableOffset(i);
+            varOffset -= sizeof(int);
             pFile.clear();
             pFile.seekg(varOffset, pFile.beg);
         }
