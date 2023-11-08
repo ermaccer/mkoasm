@@ -47,3 +47,42 @@ struct mko_command {
 	// padding for jumps
 	bool is_pad;
 };
+
+
+enum EMKOAICommandButton {
+	EAICommandButton_Attack1,
+	EAICommandButton_Attack1Up,
+	EAICommandButton_Attack1Down,
+	EAICommandButton_Attack1Towards,
+	EAICommandButton_Attack1Away,
+
+	EAICommandButton_Attack2,
+	EAICommandButton_Attack2Up,
+	EAICommandButton_Attack2Down,
+	EAICommandButton_Attack2Towards,
+	EAICommandButton_Attack2Away,
+
+	EAICommandButton_Attack3,
+	EAICommandButton_Attack3Up,
+	EAICommandButton_Attack3Down,
+	EAICommandButton_Attack3Towards,
+	EAICommandButton_Attack3Away,
+
+	EAICommandButton_Attack4,
+	EAICommandButton_Attack4Up,
+	EAICommandButton_Attack4Down,
+	EAICommandButton_Attack4Towards,
+	EAICommandButton_Attack4Away,
+
+	EAICommandButton_Attack5,
+	EAICommandButton_Attack5Up,
+	EAICommandButton_Attack5Down,
+	EAICommandButton_Attack5Towards,
+	EAICommandButton_Attack5Away,
+};
+
+enum EMKOAICommandType {
+	EAICommandType_Button,
+	EAICommandType_ChangeStyle,
+	EAICommandType_SpecialMove = 4
+};
