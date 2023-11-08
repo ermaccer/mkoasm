@@ -207,7 +207,7 @@ set_active_projectile_not_duckable 1231 0
 set_active_projectile_hit_script 1233 1 0 
 set_active_projectile_end_script 1234 1 0 
 active_projectile_setup_done 1236 0 
-set_active_projectile_velocity 1237 1 0
+set_active_projectile_velocity 1237 1 0 
 set_active_projectile_target_ground 1238 3 1 1 1
 set_active_projectile_sound 1244 3 0 0 0 
 start_plyr_attack 1249 1 0
@@ -356,9 +356,15 @@ increment_taunts_performed 1901 0
 mks_set_flipped_bones 1902 1 0
 mks_start_goro_arms_fixup 1903 0
 reset_fake_bone_matcher 1904 7 0 5 0 5 0 5 1
+; edits
+obj_bone_collapse_set 1905 3 5 0 0
+hide_aux_weapon 1906 1 5
+show_aux_weapon 1907 1 5
 ; umkd
 jax_taunt 2001 0
 freeze_victim 2002 0
 force_fatality_end 2003 0
 camera_setup_simple_rotation 2004 2 1 0
 quan_teleport 2006 2 5 0
+start_shang_balls 2008 2 5 0
+shang_explode_ball 2009 1 0

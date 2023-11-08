@@ -60,5 +60,5 @@ camera_special_function 206 1 0
 add_move_desc 208 3 0 4 4
 set_attack_type 214 1 0
 drone_super_combo 216 1 0
-special_move_cam_setup 222 8 1 1 1 1 1 0 0
+special_move_cam_setup 222 8 1 1 1 1 1 0 0 0
 

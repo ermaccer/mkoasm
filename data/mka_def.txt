@@ -26,12 +26,14 @@ shake_camera 							1 82 2 0 1
 snd_req 								1 87 1 2 
 random_voice 							1 95 1 0 
 obj_set_scale 							1 195 2 5 5
+obj_get_pos_vel 						1 218 2 5 5
 obj_set_pos_vel 						1 219 2 5 5
 get_adjusted_speed 						1 260 2 1 1
 flying_collision 						1 262 10 0 1 0 0 0 1 1 1 1 1
 get_bid_with_flip 						1 271 2 5 0 
 insert_particle_mkobj 					1 357 1 5
 is_boss_character 						1 391 1 5
+is_super_boss_character 				1 392 1 5
 start_blood_particles 					1 398 4 0 0 5 5
 start_blood_particles_scripts 			1 400 2 0 0
 pfxhandle_spawn_at_bid_next 			1 416 3 5 5 0 
@@ -171,8 +173,10 @@ resume_effect_at_obj_bid 				3 424 5 5 5 5 0 0
 reaction_xfer_him 						3 445 3 0 1 0
 start_projectile_from_plyr_bone 		3 454 6 5 0 0 1 1 5 
 set_active_projectile_rx_info 			3 455 3 0 1 0 
+set_active_projectile_not_duckable 		3 456 0
 set_active_projectile_hit_script 		3 458 1 0 
 set_active_projectile_end_script 		3 460 1 0 
+set_active_projectile_hit_gnd_script    3 461 1 0
 active_projectile_setup_done 			3 465 0 
 set_active_projectile_sound 			3 473 3 0 2 2 
 mks_debug_display_cloth_ontop 			3 482 1 0
@@ -186,6 +190,7 @@ plyr_pdata_get_cmo 						3 556 1 5
 plyr_pdata_get_plyr_num 				3 557 1 5
 plyr_pdata_get_pchr 					3 558 1 5
 get_bone_world_pos 						3 566 3 5 0 5
+get_bone_offset_world_pos 				3 567 4 5 0 5 5
 ; FX TABLE
 fx 										128 0 1 0 
 create_step_fx 							128 7 2 5 0 
