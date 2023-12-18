@@ -9,7 +9,8 @@ enum EGameMode {
     Game_MK9_Vita,
     Game_Injustice,
     Game_MK10,
-    // todo
     Game_Injustice2,
-    Game_MK11
+    Game_MK11,
+    // todo
+    Game_MK12
 };

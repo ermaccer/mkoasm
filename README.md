@@ -31,7 +31,7 @@ game mode**
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC|
-
+| Mortal Kombat 12 (1) | ❌ | ❌ | ❌| ❌ | Work in progress|
 **Mortal Kombat X and up requires x64 version of mkoasm!**
 
 
@@ -101,3 +101,7 @@ MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
  - Changed function entry struct
  - Changed extern/extern vars entry struct
  - Otherwise identical to Injustice 2
+
+## Mortal Kombat 12 (1)
+ - Removed variable and function name hashing
+ - Functions now require multiple callback types (Brutality, Victory etc.)
