@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\lz4">
+      <UniqueIdentifier>{784deded-dc6f-4f5a-94f7-339bd502252c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mkoasm.cpp">
@@ -88,6 +91,15 @@
     </ClInclude>
     <ClInclude Include="code\MKScript_MK11.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lz4\lz4.h">
+      <Filter>Header Files\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="lz4\lz4frame.h">
+      <Filter>Header Files\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="lz4\lz4hc.h">
+      <Filter>Header Files\lz4</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

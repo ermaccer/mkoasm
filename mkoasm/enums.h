@@ -11,6 +11,5 @@ enum EGameMode {
     Game_MK10,
     Game_Injustice2,
     Game_MK11,
-    // todo
     Game_MK12
 };

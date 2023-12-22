@@ -213,7 +213,7 @@ public:
     bool ReadMK10();
     bool ReadDCF2();
     bool ReadMK11();
-
+    bool ReadMK12();
 
     std::string GetExtension();
 

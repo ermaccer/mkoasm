@@ -10,6 +10,11 @@
 #include <algorithm>
 #include <string>
 
+#ifdef _M_X64
+#include "lz4/lz4.h"
+#pragma comment(lib, "lz4/liblz4_static.lib")
+#endif
+
 MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
 {
     std::string path = file;
@@ -65,6 +70,9 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
             break;
         case Game_MK11:
             m_bIsValid = ReadMK11();
+            break;
+        case Game_MK12:
+            m_bIsValid = ReadMK12();
             break;
         default:
             break;
@@ -1302,6 +1310,41 @@ bool MKOReader::ReadMK11()
 
             mk11_tweakvar.push_back(twk);
         }
+
+        return true;
+    }
+    return false;
+}
+
+bool MKOReader::ReadMK12()
+{
+    pFile.open(m_szInputName, std::ifstream::binary);
+    if (pFile.is_open())
+    {
+        std::cout << "INFO: MK12 supports only decompression!" << std::endl;
+
+
+        unsigned int rawSize;
+        pFile.read((char*)&rawSize, sizeof(unsigned int));
+
+        unsigned int size = getSizeToEnd(pFile);
+
+        std::unique_ptr<char[]> dataBuff = std::make_unique<char[]>(rawSize);
+        std::unique_ptr<char[]> compBuff = std::make_unique<char[]>(size);
+
+        pFile.read(compBuff.get(), size);
+
+        int lz4_result = LZ4_decompress_safe(compBuff.get(), dataBuff.get(), size, rawSize);
+        if (lz4_result > 0)
+        {
+            std::string output = m_szInputName;
+            output.insert(0, "raw_");
+            std::ofstream oFile(output, std::ofstream::binary);
+            oFile.write(dataBuff.get(), rawSize);
+
+            std::cout << "INFO: Decompressed " << m_szInputName << " as " << output << "!" << std::endl;
+        }
+
 
         return true;
     }

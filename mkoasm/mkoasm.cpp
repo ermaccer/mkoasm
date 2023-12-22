@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 			<< "    -a <arg> Argument for variable packer.\n"
 			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, mk9_vita, inj\n"
 #ifdef _M_X64
-			<< "	X64 modes: mkx (mk10), i2 (dcf2), mk11\n"
+			<< "	X64 modes: mkx (mk10), i2 (dcf2), mk11, mk12\n"
 #endif // _M_X64
 			;
 
@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
 	if (m_param == "inj") game = Game_Injustice;
 	if (m_param == "mkx" || m_param == "mk10") game = Game_MK10;
 	if (m_param == "dcf2" || m_param == "i2") game = Game_Injustice2;
-
 	if (m_param == "mk11") game = Game_MK11;
+	if (m_param == "mk12") game = Game_MK12;
 
 	if (game >= Game_MK10 && !MKOReader::Is64BitSupported())
 	{

@@ -31,7 +31,7 @@ game mode**
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC|
-| Mortal Kombat 12 (1) | ❌ | ❌ | ❌| ❌ | Work in progress|
+| Mortal Kombat 12 (1) | ❌ | ❌ | ❌| ❌ | PC (decompression only)|
 
 **Mortal Kombat X and up requires x64 version of mkoasm!**
 

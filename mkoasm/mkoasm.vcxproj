@@ -170,6 +170,9 @@
     <ClInclude Include="enums.h" />
     <ClInclude Include="ini.h" />
     <ClInclude Include="INIReader.h" />
+    <ClInclude Include="lz4\lz4.h" />
+    <ClInclude Include="lz4\lz4frame.h" />
+    <ClInclude Include="lz4\lz4hc.h" />
     <ClInclude Include="MKOReader.h" />
   </ItemGroup>
   <ItemGroup>
