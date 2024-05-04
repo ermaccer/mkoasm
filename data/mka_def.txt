@@ -213,6 +213,7 @@ fx_reset 								128 50 1 5
 fx_resume_emit 							128 52 1 5
 fx_pause_emit 							128 53 1 5
 fx_reset_emit 							128 54 1 5
+initial_set_float 						128 66 3 0 0 0
 update_add 								128 68 2 0 0
 update_copy 							128 69 1 0
 update_add_constant_v3 					128 70 4 0 1 1 1

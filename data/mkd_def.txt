@@ -153,24 +153,34 @@ do_victory_camera 726 1 0
 get_my_plyr_num 727 0
 get_victory_flip_flags 729 0
 do_i_have_life_left 732 0
+bgnd_create_danger_zone 734 5 0 0 0 1 0
+bgnd_enable_danger_zone 735 2 0 0
+bgnd_set_danger_zone_center_position 736 3 1 1 1
+bgnd_set_danger_zone_radius 741 1 1
+bgnd_delete_danger_zone 743 1 0
 bgnd_place_point_light_for_ticks 744 4 0 0 1 0
 high_flash_check 745 0
 medium_flash_check 746 0
 get_my_particle_player_bank_num 752 0
 start_baraka_blades_monitor 769 0
 register_baraka_cb_functions 770 0
+bgnd_start_sobj_uv_scroll 773 6 0 1 1 0 0 0
 plyr_start_script_in_proc 776 2 0 0
 frand 778 1 1
 ani_1_frame 786 0
 ani_loop_more_frames 787 1 1
 load_aux_weapon 788 1 0
 head_tracking_off 789 0
+bgnd_hide_sobj_and_children 793 1 0
+bgnd_unhide_sobj_and_children 794 1 0
 obj_set_scale 806 2 5 0
 bgnd_preload_named_model 809 2 0 0 
 pz_fighter_reaction_xfer_him 816 1 0
 restart_effect 872 1 0
 sfrand 894 1 1
 bgnd_current_rx_get_info 912 1 0
+set_background_obstacle_repel_flag 922 2 0 0
+set_background_obstacle_disable_flag 923 2 0 0
 get_adjusted_speed 1105 2 1 1
 player_area_collision_ticks 1106 6 1 1 0 1 0 1
 flying_collision 1107 10 0 1 0 0 0 1 1 1 1 1
@@ -213,6 +223,7 @@ set_active_projectile_sound 1244 3 0 0 0
 start_plyr_attack 1249 1 0
 get_bid_with_flip 1250 2 5 0 
 mks_debug_display_cloth_ontop 1252 1 0
+bgnd_get_int 1255 1 0
 bgnd_get_float 1257 1 0
 set_obj_light_flags 1293 2 0 0
 load_named_model_for_player 1296 4 0 5 0 0
@@ -237,6 +248,7 @@ limb_sever_pop_head_up 1418 5 5 0 1 1 0
 limb_sever_bone_attach 1419 8 5 5 0 0 5 0 0 0
 fatality_release_other_player 1423 0
 ft_fake_bone_matcher 1425 8 5 5 0 0 0 0 0 0
+fat_bgnd_char_setup_radius_check 1427 1 0
 bm_force_fake_child_bid 1428 2 5 5
 play_his_random_voice 1431 1 0
 play_his_snd_req 1432 1 0
@@ -265,6 +277,7 @@ obj_get_pos 1523 2 5 0
 obj_set_ang 1524 2 5 0
 obj_get_ang 1525 2 5 0
 obj_set_light_flag 1534 2 5 0
+obj_find_sobj_by_id 1535 2 5 0
 get_his_plyr_obj 1537 0
 get_my_plyr_obj 1538 0
 get_his_plyr_pdata 1541 0
@@ -360,6 +373,8 @@ obj_bone_collapse_set 1905 3 5 0 0
 hide_aux_weapon 1906 1 5
 show_aux_weapon 1907 1 5
 set_active_projectile_ball_effect 1908 2 1 1
+am_i_alt_costume 1909 0
+set_robot_voice 1910 2 5 0
 ; umkd
 jax_taunt 2001 0
 freeze_victim 2002 0
@@ -367,3 +382,5 @@ force_fatality_end 2003 0
 camera_setup_simple_rotation 2004 2 1 0
 start_shang_balls 2008 2 5 0
 shang_explode_ball 2009 1 0
+rain_teleport 2010 0
+sektor_set_chest_status 2011 2 0 0
