@@ -62,6 +62,7 @@ init_ground_move_no_aniproc 140 0
 init_air_move 142 0 
 init_air_move_no_aniproc 143 0 
 init_3d_move 145 0
+tightrope_restrictions_on 148 0
 tightrope_restrictions_off 149 0
 launch_me_up 150 2 1 1 
 face_opponent_now 153 0
@@ -238,6 +239,7 @@ insert_particle_mkobj 1386 1 5
 check_to_register_miss 1398 0
 mks_animpdata_set_cur_frame 1400 2 5 1
 plyr_turn_off_mirrorguy 1407 1 5
+plyr_turn_on_mirrorguy 1408 1 5
 plyr_turn_off_shadowbox 1409 1 5
 set_pdata_anim_step 1412 2 5 1
 limb_sever_update_slide_end_coeff 1414 2 5 1
@@ -278,6 +280,7 @@ obj_set_ang 1524 2 5 0
 obj_get_ang 1525 2 5 0
 obj_set_light_flag 1534 2 5 0
 obj_find_sobj_by_id 1535 2 5 0
+get_plyr_info 1536 0
 get_his_plyr_obj 1537 0
 get_my_plyr_obj 1538 0
 get_his_plyr_pdata 1541 0

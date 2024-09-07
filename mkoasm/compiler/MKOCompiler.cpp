@@ -1,5 +1,6 @@
 #include "MKOCompiler.h"
 #include "..\code\MKODict.h"
+#include "..\code\misc.h"
 
 #include <iostream>
 #include <string>
@@ -9,7 +10,7 @@
 #include <Windows.h>
 #endif // _WIN32
 
-void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file)
+void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file, EGameMode game)
 {
 	char buff[512] = {};
 	char args[1024] = {};
@@ -23,6 +24,7 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 	std::string fullLine = line;
 	
 	int funcID = -1;
+	int funcSet = -1;
 	int numArgs = 0;
 	int expectedArgs = 0;
 	bool isInternal = false;
@@ -35,12 +37,18 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 	{
 		def = MKODict::GetDefinition(functionName.c_str());
 		funcID = def.functionID;
+
+		if (game == Game_Armageddon)
+			funcSet = def.functionSet;
+
 		expectedArgs = def.args.size();
 	}
 	else if (MKODict::IsFunctionInternal(functionName.c_str()))
 	{
 		funcID = MKODict::GetInternalID(functionName.c_str());
 		isInternal = true;
+		if (game == Game_Armageddon)
+			funcSet = 0;
 	}
 	else
 	{
@@ -48,9 +56,27 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 		printf("WARNING: Definition for %s is not available! Detailed information is not available.\n", functionName.c_str());
 		if (size_t pos = functionName.find("function_") != std::string::npos)
 		{
-			std::string number = functionName.substr(functionName.find_last_of("function_") + 1);
-			std::stringstream ss(number);
-			ss >> funcID;
+			if (game == Game_Deception)
+			{
+				std::string number = functionName.substr(functionName.find_last_of("function_") + 1);
+				std::stringstream ss(number);
+				ss >> funcID;
+			}
+		
+
+			if (game == Game_Armageddon)
+			{
+				std::string combo = functionName.substr(strlen("function_"));
+				std::string setStr = combo.substr(0, combo.find_first_of("_"));
+				std::string funcStr = combo.substr(combo.find_last_of("_") + 1);
+
+				std::stringstream set(setStr);
+				set >> funcSet;
+
+				std::stringstream func(funcStr);
+				func >> funcID;
+
+			}
 		}
 		else
 		{
@@ -61,9 +87,7 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 		}
 
 	}
-
 	SetColor(CT_Reset);
-
 
 	// arguments
 	pLine = strtok(NULL, ")");
@@ -141,9 +165,25 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 	printf_s("INFO: %-35s\t Args: %03d Definition: %s\n", functionName.c_str(), numArgs, def_available ? "yes" : "no");
 
 
-	int a1 = MAKELONG(funcID + 1, isInternal ? 0xFF00 : 0);
+	int a1 = 0;
+	int a2 = 0;
+
+
+
+	if (game == Game_Deception || game == Game_Unchained)
+		a1 = MAKELONG(funcID + 1, isInternal ? 0xFF00 : 0);
+	else if (game == Game_Armageddon)
+	{
+		short outSet = funcSet;
+		changeEndSHORT(&outSet);
+		a1 = MAKELONG(funcID + 1, outSet);
+	}
+
+
+
 	file.write((char*)&a1, sizeof(int));
-	int a2 = MAKELONG(numArgs, -1);
+
+	a2 = MAKELONG(numArgs, -1);
 	file.write((char*)&a2, sizeof(int));
 
 	for (unsigned int i = 0; i < argsData.size(); i++)
@@ -208,7 +248,7 @@ void MKOCompiler::ParseFunctionLine(char* line, bool& error, std::ofstream& file
 	SetColor(CT_Reset);
 }
 
-void MKOCompiler::CompileFile(const char* file)
+void MKOCompiler::CompileFile(const char* file, EGameMode game)
 {
 	FILE* pFile = fopen(file, "rb");
 	if (pFile)
@@ -232,7 +272,7 @@ void MKOCompiler::CompileFile(const char* file)
 
 
 			MKOCodeEntry c;
-			ParseFunctionLine(szLine, error, oFile);
+			ParseFunctionLine(szLine, error, oFile, game);
 
 			SetColor(CT_Reset);
 			if (error)

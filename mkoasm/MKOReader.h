@@ -93,6 +93,12 @@ struct MKOFunctionEntry {
     std::string name;
     mko_function_header func = {};
     float flt;
+    int mka_size;
+};
+
+struct MKODataLink {
+    int type;
+    int value;
 };
 
 struct MKOVariableEntry {
@@ -124,6 +130,7 @@ public:
     mko_header header;
 
 
+    std::vector<int> mka_funcSizes;
     std::vector<std::vector<int>> mka_funcLinks;
     std::vector<std::vector<int>> mka_varLinks;
 
@@ -380,6 +387,7 @@ public:
     // building
 
     bool Build();
+    bool IsBuildingSupported(EGameMode game);
 
     bool IsDecompSupported();
     static bool Is64BitSupported();

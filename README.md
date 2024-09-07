@@ -24,7 +24,7 @@ game mode**
 | MK Deadly Alliance | ✔️ | ✔️ | ✔️| ❌ | PS2 |
 | MK Deception | ✔️ | ✔️ | ✔️|  ✔️ |PS2, GC, XBOX  |
 | MK Unchained | ✔️ | ✔️ | ✔️|  ✔️ |PSP|
-| MK Armageddon | ✔️ | ✔️ | ✔️| ❌ |PS2, Wii, XBOX|
+| MK Armageddon | ✔️ | ✔️ | ✔️| ✔️ |PS2, Wii, XBOX|
 | MK VS DC | ✔️ | ✔️ | ✔️| ❌ |PS3|
 | MK9 | ✔️ | ✔️ | ✔️|  ❌ |PC, Vita |
 | Injustice | ✔️ | ⚠ | ❌| ❌ | PC |
@@ -46,7 +46,12 @@ output.
 
 # Building
 
-MKOASM can only build new MKOS for MK Deception/MK Unchained as of now.
+| Game | Note | 
+|       ---       |       ---       |  
+| MK Deception | Works |
+| MK Unchained | Works | 
+| MK Armageddon | Works, some MKOs will be larger than original | 
+
 
 
 # MKO Overview

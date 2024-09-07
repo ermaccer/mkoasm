@@ -13,8 +13,8 @@ enum EColorType {
 class MKOCompiler {
 public:
 
-	static void ParseFunctionLine(char* line, bool& error, std::ofstream& file);
-	static void CompileFile(const char* file);
+	static void ParseFunctionLine(char* line, bool& error, std::ofstream& file, EGameMode game = Game_Deception);
+	static void CompileFile(const char* file, EGameMode game = Game_Deception);
 
 	static void SetColor(EColorType ct);
 };

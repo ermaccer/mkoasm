@@ -26,15 +26,16 @@ MKOReader::MKOReader(const char* file, bool isGameCube, EGameMode _game)
     }
     else
         m_szInputName = file;
+
     m_bGameCube = isGameCube;
     game = _game;
 
     bool build = std::filesystem::is_directory(m_szInputName);
 
-    if (build && !(game == Game_Deception || game == Game_Unchained))
+    if (build && !IsBuildingSupported(_game))
     {
         build = false;
-        std::cout << "ERROR: Building is only supported for MKD or MKU." << std::endl;
+        std::cout << "ERROR: Building is not supported for selected game." << std::endl;
         m_bIsValid = false;
         return;
     }
@@ -144,9 +145,13 @@ bool MKOReader::Read(const char* file)
                 int field12, field16;
                 pFile.read((char*)&field12, sizeof(int));
                 pFile.read((char*)&field16, sizeof(int));
+                mka_funcSizes.push_back(func.unknown);
 
                 SwapINT(&field12);
                 SwapINT(&field16);
+
+                func.unknown = field12;
+
                 for (int a = 0; a < field16; a++)
                 {
                     int funcLink = 0;
@@ -1318,6 +1323,7 @@ bool MKOReader::ReadMK11()
 
 bool MKOReader::ReadMK12()
 {
+#ifdef _M_X64
     pFile.open(m_szInputName, std::ifstream::binary);
     if (pFile.is_open())
     {
@@ -1348,6 +1354,7 @@ bool MKOReader::ReadMK12()
 
         return true;
     }
+#endif
     return false;
 }
 
@@ -2221,11 +2228,17 @@ void MKOReader::ExtractVariables()
                     int linkType = HIWORD(link);
 
                     if (linkType & 0x8000)
-                        oInfo << "Link" << a << " = " << linkVal << " [VAR] " << "; " << GetVariableName(linkVal - 1) << std::endl;
+                    {
+                        oInfo << "; " << GetVariableName(linkVal - 1) << std::endl;
+                        oInfo << "Link" << a << " = " << linkVal << std::endl;
+                        oInfo << "Link" << a << "Type = " << linkType << std::endl;
+                    }
                     else
                     {
                         std::string link_name = (char*)(&string_data[0] + (linkVal));
-                        oInfo << "Link" << a << " = " << link_name << " [STR]" << std::endl;
+                        oInfo << "; " << link_name << std::endl;
+                        oInfo << "Link" << a << " = " << linkVal << std::endl;
+                        oInfo << "Link" << a << "Type = " << linkType << std::endl;
                     }
                     
                 }
@@ -2427,8 +2440,12 @@ void MKOReader::ExtractFunctions()
         int size = func_sizes[i];
         if (game == Game_Armageddon)
         {
+            int mka_size = mka_funcSizes[i];
+
             pFile.seekg(m_pFunctionsStartOffset + (funcs[i].offset * 4), pFile.beg);
-            size = funcs[i].unknown;
+            if (mka_size >= sizeof(int))
+                mka_size -= sizeof(int);
+            size = mka_size;
         }
 
 
@@ -2461,11 +2478,17 @@ void MKOReader::ExtractFunctions()
                     int linkType = HIWORD(link);
 
                     if (linkType & 0x8000)
-                        oInfo << "Link" << a << " = " << linkVal << " [VAR] " << "; " << GetVariableName(linkVal - 1) << std::endl;
+                    {
+                        oInfo << "; " << GetVariableName(linkVal - 1) << std::endl;
+                        oInfo << "Link" << a << " = " << linkVal << std::endl;
+                        oInfo << "Link" << a << "Type = " << linkType << std::endl;
+                    }
                     else
                     {
                         std::string link_name = (char*)(&string_data[0] + (linkVal));
-                        oInfo << "Link" << a << " = " << link_name << " [STR]" << std::endl;
+                        oInfo << "; " << link_name << std::endl;
+                        oInfo << "Link" << a << " = " << linkVal << std::endl;
+                        oInfo << "Link" << a << "Type = " << linkType << std::endl;
                     }
 
                 }
@@ -5521,6 +5544,11 @@ bool MKOReader::Build()
         return false;
     }
 
+    std::string gameName = "MK Deception/Unchained";
+    if (game == Game_Armageddon)
+        gameName = "MK Armageddon";
+
+    std::cout << "Building mode: " << gameName << std::endl;
     std::cout << "Reading header: " << ini_name << std::endl;
  
     header.functions = ini.GetInteger("Header", "Functions", 0);
@@ -5528,6 +5556,7 @@ bool MKOReader::Build()
     header.field20 = ini.GetInteger("Header", "field20", 0);
 
     std::vector<MKOVariableEntry> variables;
+    std::vector<std::vector<MKODataLink>> variableLinks;
 
     for (int i = 0; i < header.static_variables; i++)
     {
@@ -5539,12 +5568,33 @@ bool MKOReader::Build()
         var.var.numElems = ini.GetInteger(section, "NumElems", 0);
         var.var.unknown = ini.GetInteger(section, "Unknown", 0);
         variables.push_back(var);
+
+        if (game == Game_Armageddon)
+        {
+            std::vector<MKODataLink> tempLinks;
+
+            int numLinks = ini.GetInteger(section, "NumLinks", 0);
+
+            for (int a = 0; a < numLinks; a++)
+            {
+                MKODataLink link;
+                char linkName[128] = {};
+                snprintf(linkName, sizeof(linkName), "Link%d", a);
+                link.value = ini.GetInteger(section, linkName, 0);
+
+                snprintf(linkName, sizeof(linkName), "Link%dType", a);
+                link.type = ini.GetInteger(section, linkName, 0);
+                tempLinks.push_back(link);
+            }
+            variableLinks.push_back(tempLinks);
+        }
     }
 
     std::cout << "Read " << variables.size() << " variable headers" << std::endl;
 
 
     std::vector<MKOFunctionEntry> functions;
+    std::vector<std::vector<MKODataLink>> functionLinks;
 
     for (int i = 0; i < header.functions; i++)
     {
@@ -5555,6 +5605,26 @@ bool MKOReader::Build()
         func.func.name_offset = ini.GetInteger(section, "NameOffset", 0);
         func.func.unknown = ini.GetInteger(section, "Unknown", 0);
         functions.push_back(func);
+
+        if (game == Game_Armageddon)
+        {
+            std::vector<MKODataLink> tempLinks;
+
+            int numLinks = ini.GetInteger(section, "NumLinks", 0);
+
+            for (int a = 0; a < numLinks; a++)
+            {
+                MKODataLink link;
+                char linkName[128] = {};
+                snprintf(linkName, sizeof(linkName), "Link%d", a);
+                link.value = ini.GetInteger(section, linkName, 0);
+
+                snprintf(linkName, sizeof(linkName), "Link%dType", a);
+                link.type = ini.GetInteger(section, linkName, 0);
+                tempLinks.push_back(link);
+            }
+            functionLinks.push_back(tempLinks);
+        }
     }
 
     std::cout << "Read " << functions.size() << " function headers" << std::endl;
@@ -5574,7 +5644,10 @@ bool MKOReader::Build()
                 return false;
             }
             int size = std::filesystem::file_size(variables[i].name);
-            size += sizeof(int);
+
+            if (!(size == 0 && game == Game_Armageddon))
+               size += sizeof(int);
+
             varSizes.push_back(size);
         }
 
@@ -5602,6 +5675,9 @@ bool MKOReader::Build()
                 return false;
             }
             int size = std::filesystem::file_size(functions[i].name);
+            if (game == Game_Armageddon)
+                functions[i].mka_size= size;
+
             size += sizeof(int);
             funcSizes.push_back(size);
         }
@@ -5672,16 +5748,50 @@ bool MKOReader::Build()
     int totalSize = sizeof(mko_header);
     oFile.write((char*)&header, sizeof(mko_header));
 
+    if (game == Game_Armageddon)
+    {
+        int pad = 0;
+        for (int i = 0; i < functions.size(); i++)
+            oFile.write((char*)&pad, sizeof(int));
+    }
+
     int offset = 0;
     for (int i = 0; i < functions.size(); i++)
     {
         mko_function_header f = functions[i].func;
+        int tmpUnknown = f.unknown;
+        if (game == Game_Armageddon)
+          f.unknown = functions[i].mka_size;
+
         f.offset = offset;
         oFile.write((char*)&f, sizeof(mko_function_header));
+
         offset += funcSizes[i] / 4;
         totalSize += sizeof(mko_function_header);
-    }
 
+        if (game == Game_Armageddon)
+        {
+            int unk = tmpUnknown;
+            oFile.write((char*)&unk, sizeof(int));
+
+            int numLinks = functionLinks[i].size();
+            oFile.write((char*)&numLinks, sizeof(int));
+            for (int a = 0; a < numLinks; a++)
+            {
+                int linkValue = functionLinks[i][a].value;
+                int linkType = functionLinks[i][a].type;
+
+                int link = MAKELONG(linkValue, linkType);
+                oFile.write((char*)&link, sizeof(int));
+            }
+        }
+    }
+    if (game == Game_Armageddon)
+    {
+        int pad = 0;
+        for (int i = 0; i < variables.size(); i++)
+            oFile.write((char*)&pad, sizeof(int));
+    }
 
     offset = 1;
     for (int i = 0; i < variables.size(); i++)
@@ -5694,9 +5804,21 @@ bool MKOReader::Build()
         oFile.write((char*)&v, sizeof(mko_variable_header));
         offset += varSizes[i] / 4;
         totalSize += sizeof(mko_variable_header);
+
+        if (game == Game_Armageddon)
+        {
+            int numLinks = variableLinks[i].size();
+            oFile.write((char*)&numLinks, sizeof(int));
+            for (int a = 0; a < numLinks; a++)
+            {
+                int linkValue = variableLinks[i][a].value;
+                int linkType = variableLinks[i][a].type;
+
+                int link = MAKELONG(linkValue, linkType);
+                oFile.write((char*)&link, sizeof(int));
+            }
+        }
     }
-
-
 
 
     std::cout << std::filesystem::current_path() << std::endl;
@@ -5745,6 +5867,11 @@ bool MKOReader::Build()
         std::filesystem::current_path(VARIABLESFOLDER_NAME);
         for (int i = 0; i < variables.size(); i++)
         {
+            int size = std::filesystem::file_size(variables[i].name);
+
+            if (size == 0 && game == Game_Armageddon)
+                continue;
+
             mko_variable_header v = variables[i].var;
             int varID = variables[i].scriptID;
             oFile.write((char*)&varID, sizeof(int));
@@ -5755,7 +5882,7 @@ bool MKOReader::Build()
                 std::cout << "ERROR: Variable " << variables[i].name << " could not be open!" << std::endl;
                 return false;
             }
-            int size = std::filesystem::file_size(variables[i].name);
+
             std::unique_ptr<char[]> pVarData = std::make_unique<char[]>(size);
             pVar.read(pVarData.get(), size);
             oFile.write(pVarData.get(), size);
@@ -5775,6 +5902,7 @@ bool MKOReader::Build()
             float funcFloat = functions[i].flt;
             oFile.write((char*)&funcFloat, sizeof(float));
             totalSize += sizeof(float);
+
             std::ifstream pFunc(functions[i].name, std::ifstream::binary);
             if (!pFunc)
             {
@@ -5793,6 +5921,37 @@ bool MKOReader::Build()
         std::filesystem::current_path("..");
     }
 
+    if (game == Game_Armageddon)
+    {
+        int varLinksSize = 0;
+        for (unsigned int i = 0; i < variableLinks.size(); i++)
+        {
+            for (unsigned int a = 0; a < variableLinks[i].size(); a++)
+            {
+                varLinksSize += sizeof(int);
+            }
+        }
+        varLinksSize += sizeof(int) * variableLinks.size();
+
+        int funcLinksSize = 0;
+        for (unsigned int i = 0; i < functionLinks.size(); i++)
+        {
+            for (unsigned int a = 0; a < functionLinks[i].size(); a++)
+            {
+                funcLinksSize += sizeof(int);
+            }
+        }
+        funcLinksSize += sizeof(int) * functionLinks.size();
+
+        totalSize += varLinksSize;
+        totalSize += funcLinksSize;
+        // pad areas
+        totalSize += sizeof(int) * variables.size();
+        totalSize += sizeof(int) * functions.size();
+        // unknown funcs member
+        totalSize += sizeof(int) * functions.size();
+    }
+
     std::cout << "Output MKO size " << totalSize << std::endl;
     int pad = makePad(totalSize, 32);
     std::cout << "Padded MKO size " << pad << std::endl;
@@ -5803,6 +5962,43 @@ bool MKOReader::Build()
 
     std::cout << "Finished." << std::endl;
     return true;
+}
+
+bool MKOReader::IsBuildingSupported(EGameMode game)
+{
+    switch (game)
+    {
+    case Game_Deception:
+        return true;
+        break;
+    case Game_Armageddon:
+        return true;
+        break;
+    case Game_DeadlyAlliance:
+        break;
+    case Game_Unchained:
+        return true;
+        break;
+    case Game_MKVSDC:
+        break;
+    case Game_MK9:
+        break;
+    case Game_MK9_Vita:
+        break;
+    case Game_Injustice:
+        break;
+    case Game_MK10:
+        break;
+    case Game_Injustice2:
+        break;
+    case Game_MK11:
+        break;
+    case Game_MK12:
+        break;
+    default:
+        break;
+    }
+    return false;
 }
 
 bool MKOReader::IsDecompSupported()

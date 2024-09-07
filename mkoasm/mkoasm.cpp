@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	EGameMode game = Game_Unchained;
+	EGameMode game = Game_Deception;
 
 	if (m_param == "mkd") game = Game_Deception;
 	if (m_param == "mku") game = Game_Unchained;
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 
 	if (_c_switch)
 	{
-		MKOCompiler::CompileFile(path);
+		MKOCompiler::CompileFile(path, game);
 		return 0;
 	}
 
