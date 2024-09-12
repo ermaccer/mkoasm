@@ -5761,7 +5761,10 @@ bool MKOReader::Build()
         mko_function_header f = functions[i].func;
         int tmpUnknown = f.unknown;
         if (game == Game_Armageddon)
-          f.unknown = functions[i].mka_size;
+        {
+            f.unknown = functions[i].mka_size + sizeof(int);
+        }
+
 
         f.offset = offset;
         oFile.write((char*)&f, sizeof(mko_function_header));
