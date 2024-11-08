@@ -64,6 +64,9 @@ void MKODict::InitDict(EGameMode game)
     case Game_MK11:
         file = "data\\mk11_def.txt";
         break;
+    case Game_MK12:
+        file = "data\\mk12_def.txt";
+        break;
     default:
         break;
     }
@@ -94,13 +97,13 @@ void MKODict::InitDict(EGameMode game)
                 int funcSet = 0;
                 int funcType = 0;
 
-                if (game == Game_MK11)
+                if (game == Game_MK11 || game == Game_MK12)
                 {
                     tempLine = strtok(NULL, " ");
                     sscanf(tempLine, "%d", &funcType);
                 }
 
-                if (game == Game_Armageddon || game == Game_MK11)
+                if (game == Game_Armageddon || game == Game_MK11 || game == Game_MK12)
                 {
                     tempLine = strtok(NULL, " ");
                     sscanf(tempLine, "%d", &funcSet);
@@ -296,7 +299,12 @@ bool MKODict::IsDefinitionAvailable(int functionID, int functionSet, int functio
 {
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
-        if (ms_gameMode == Game_MK11)
+        if (ms_gameMode == Game_MK12)
+        {
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionType == functionType)
+                return true;
+        }
+        else if (ms_gameMode == Game_MK11)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
                 return true;
@@ -335,6 +343,14 @@ MKOFunctionDefinition MKODict::GetDefinition(int functionID, int functionSet, in
         if (ms_gameMode == Game_MK11)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
+            {
+                def = ms_vFunctions[i];
+                break;
+            }
+        }
+        if (ms_gameMode == Game_MK12)
+        {
+            if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionType == functionType)
             {
                 def = ms_vFunctions[i];
                 break;

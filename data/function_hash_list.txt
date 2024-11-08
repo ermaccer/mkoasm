@@ -35,3 +35,7 @@
 0x9E37968  UIEndOfMatchScreen_GetScreenInstance
 0xCEF1CD2  FGAudio_StopMusic
 0x49BA402F FGGameInfo_MustGetActivePlayerInfoFromTeamC
+; MK12
+0x700CC6D2 MKCharacter_IsQuickUppercutRecoveryEnabled
+0x1F23F5F0 MKCharacter_IsSupermoveAllowed
+0x455735B7 MK12BrutalityBlood_Start

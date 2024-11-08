@@ -1,0 +1,13 @@
+; MK12 definition file
+; format: name functionType functionSet id numArgs argTypes
+; 
+; 
+;
+;
+;
+push_arg 5 0 20 3 0 0 5
+push_single_to_stack 1 0 517 2 0 0
+push_to_stack 1 0 513 1 0
+call_script_function 11 0 5 2 8 0
+call_builtin_function 12 0 2561 1 7
+call_builtin_function 12 0 2049 1 7

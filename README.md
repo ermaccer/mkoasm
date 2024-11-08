@@ -31,9 +31,9 @@ game mode**
 | Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC|
 | Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC|
-| Mortal Kombat 12 (1) | ❌ | ❌ | ❌| ❌ | PC (decompression only)|
+| Mortal Kombat 12 (1) | ✔️ | ✔️ | ✔️| ❌ | PC|
 
-**Mortal Kombat X and up requires x64 version of mkoasm!**
+**Mortal Kombat X and up requires x64 version of mkoasm! For MK12, the MKO file will be decompressed if it doesn't have "raw_" in fiename. Only use "raw_" files for MK12 mode!**
 
 
 
@@ -111,3 +111,7 @@ output.
 ## Mortal Kombat 12 (1)
  - Removed variable and function name hashing
  - Functions now require multiple callback types (Brutality, Victory etc.)
+ - All data is now directly after size/amount
+ - Changed function entry struct, bytecode is now in function struct
+ - Variables data was moved into `__global__` stack data
+ - Otherwise identical to Mortal Kombat 11

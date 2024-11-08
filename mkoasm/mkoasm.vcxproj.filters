@@ -101,6 +101,9 @@
     <ClInclude Include="lz4\lz4hc.h">
       <Filter>Header Files\lz4</Filter>
     </ClInclude>
+    <ClInclude Include="code\MKScript_MK12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
