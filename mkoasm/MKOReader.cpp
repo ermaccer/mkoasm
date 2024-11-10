@@ -1368,17 +1368,6 @@ bool MKOReader::ReadMK12()
         {
             mko_function_header_mk12 func;
 
-            int nameOffset;
-            unsigned int functionHash;
-            int nameOffset2;
-            int field12;
-            int field16;
-            int linkedStrings;
-            int numArgs;
-            int byteCodeSize;
-            int stackSize;
-            char unkData[24];
-
             pFile.read((char*)&func.nameOffset, sizeof(int));
             pFile.read((char*)&func.functionHash, sizeof(int));
             pFile.read((char*)&func.nameOffset2, sizeof(int));
