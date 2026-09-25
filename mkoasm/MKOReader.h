@@ -15,6 +15,7 @@
 
 #include "enums.h"
 
+#define TWEAKVARSFOLDER_NAME "twkvars"
 #define VARIABLESFOLDER_NAME "vars"
 #define FUNCTIONFOLDER_NAME "funcs"
 
@@ -30,6 +31,20 @@ union MKOVariable {
 
 };
 
+struct MKOFixup {
+    int type;
+    std::string ref;
+    std::string base;
+    int offset;
+    int data;
+    int extra;
+};
+
+struct MKOGlobal {
+    std::string name;
+    int offset;
+};
+
 
 struct MKOCodeEntry {
     int functionID;
@@ -41,6 +56,7 @@ struct MKOCodeEntry {
     int offset;
     int size;
     int localOffset;
+    bool isPadding;
 
 };
 
@@ -50,6 +66,7 @@ struct MKOCodeEntry_MK8 {
     int unk1;
     int unk2;
     int pad;
+    bool isInternal;
     std::vector<MKOVariable> arguments;
 
     // debug/helper
@@ -92,9 +109,13 @@ struct MKOCodeEntry_MK10 {
 
 struct MKOFunctionEntry {
     std::string name;
+    std::string rawName;
     mko_function_header func = {};
+    mko_function_header_mk9 func_mk9 = {};
+    std::string stackData;
+    int stackOffset;
     float flt;
-    int mka_size;
+    int functionSize;
 };
 
 struct MKODataLink {
@@ -105,7 +126,13 @@ struct MKODataLink {
 struct MKOVariableEntry {
     std::string name;
     mko_variable_header var = {};
+    mko_variable_header_mk9 var_mk9 = {};
     int scriptID;
+    bool isTweakvar;
+    int size;
+    int pad;
+    int offset;
+    int data;
 };
 
 
@@ -145,12 +172,17 @@ public:
     // mk9
     mko_header_mk9 mk9_header;
     std::vector<mko_function_header_mk9> mk9_funcs;
+    std::vector<std::vector<mko_fixup_mk9>> mk9_local_fixups;
     std::vector<mko_variable_header_mk9> mk9_vars;
     std::vector<mko_variable_header_mk9> mk9_extern_vars;
     std::vector<mko_extern_mk9> mk9_externs;
     std::vector<mko_asset_mk9> mk9_assets;
     std::vector<mko_sound_asset_mk9> mk9_sounds;
     std::vector<mko_fixup_mk9> mk9_fixup;
+    std::vector<mko_global_object_mk9> mk9_globals;
+
+    int startOfTweakvars = 0;
+    int headerHash = 0;
 
     // dcf1 (injustice)
     mko_header_dcf dcf_header;
@@ -245,6 +277,7 @@ public:
     std::string GetFunctionName(int functionID);
     std::string GetFunctionNameMK8(int functionID);
     std::string GetFunctionNameMK9(int functionID);
+    std::string GetFunctionNameMK9Actual(int functionID);
     std::string GetFunctionNameDCF(int functionID);
     std::string GetFunctionNameMK10(int functionID);
     int         GetFunctionIDWithHashMK10(unsigned int hash);
@@ -258,6 +291,8 @@ public:
     uint32_t GetFunctionOffset(int functionID);
     uint32_t GetFunctionOffsetMK8(int functionID);
     uint32_t GetFunctionOffsetMK9(int functionID);
+    uint32_t GetFunctionForBytecodeOffsetMK9(int offset);
+    uint32_t GetFunctionForStackOffsetMK9(int offset);
     uintptr_t GetFunctionOffsetMK10(int functionID);
     uintptr_t GetFunctionOffsetDCF2(int functionID);
     uintptr_t GetFunctionOffsetMK11(int functionID);
@@ -275,6 +310,7 @@ public:
     uint32_t GetVariableOffset(int variableID);
     uint32_t GetVariableOffsetMK8(int variableID);
     uint32_t GetVariableOffsetMK9(int variableID);
+    int GetVariableForOffsetMK9(int offset);
     uint32_t GetVariableOffsetDCF(int variableID);
     uint32_t GetVariableOffsetMK10(int variableID);
     uint32_t GetVariableOffsetDCF2(int variableID);
@@ -296,6 +332,7 @@ public:
     void ExtractVariables();
     void ExtractVariablesMK8();
     void ExtractVariablesMK9();
+    void ExtractDynVariablesMK9();
     void ExtractVariablesDCF();
     void ExtractVariablesMK10();
     void ExtractVariablesDCF2();
@@ -314,6 +351,8 @@ public:
     void DecompileFunction(int functionID);
     void DecompileFunctionMK8(int functionID);
     void DecompileFunctionMK9(int functionID);
+    int  GetBytecodeFixupMK9(int offset);
+
     void DecompileFunctionMK10(int functionID);
     void DecompileFunctionDCF2(int functionID);
     void DecompileFunctionMK11(int functionID);
@@ -364,6 +403,15 @@ public:
     void UnpackVariablesDCF2();
     void UnpackVariablesMK11();
 
+
+    bool IsBytecodeFixupMK9(int fixup);
+    void DumpFixupsMK9(std::string name);
+    void DumpLocalFixupsMK9(std::string name);
+    void DumpGlobalsMK9(std::string name);
+    void DumpExternsMK9(std::string name);
+    void DumpVariablesMK9(std::string name);
+    void DumpFunctionsMK9(std::string name);
+
     void PrintInfo();
 
     void PrintInfoMKDADU();
@@ -385,6 +433,8 @@ public:
     void DumpInfoMK12(std::string name);
 
     void DumpHeader(std::string header);
+    void DumpHeaderMK9(std::string header, std::string fixups, std::string fixupsLocal, std::string externs, std::string globals, std::string variables, std::string functions);
+    void DumpRestMK9(std::string name);
 
     void ReadFunctionBytecode(std::vector<MKOCodeEntry>& data, int functionID);
     void ParseMKOCommand(mko_command& bc);
@@ -401,17 +451,24 @@ public:
 
 
     void ParseMKOCommand_MK8(mko_command_mk8& bc);
+    void ParseMKOCommand_MK9(mko_command_mk8& bc);
     void ParseMKOCommand_MK9_Vita(mko_command_mk8& bc);
 
     void ParseMKOCommand_MK10(mko_command_mk10& bc);
     // building
-
+    static bool ReadFixupsMK9(std::string file, std::vector<MKOFixup>& dest);
+    static bool ReadExternsMK9(std::string file, std::vector<mko_extern_mk9>& dest);
+    static bool ReadGlobalsMK9(std::string file, std::vector<MKOGlobal>& dest);
+    static bool ReadVariablesMK9(std::string file, std::vector<MKOVariableEntry>& dest);
+    static bool ReadFunctionsMK9(std::string file, std::vector<MKOFunctionEntry>& dest);
     bool Build();
+    bool BuildMK9();
     bool IsBuildingSupported(EGameMode game);
 
     bool IsDecompSupported();
     static bool Is64BitSupported();
 
+    static unsigned int HashStringAware(std::string input);
 
     // packing
 

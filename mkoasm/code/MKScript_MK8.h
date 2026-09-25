@@ -82,5 +82,7 @@ struct mko_command_mk8 {
 	int numData;
 	int functionID;
 	int functionType;
+	int functionFlags;
+	int type; // mk9 encodes type different to mkvsdc
 	bool is_pad;
 };

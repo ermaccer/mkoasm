@@ -31,6 +31,105 @@ const char* szInternalNames[] = {
     "load_string_variable",
 };
 
+const char* szInternalNamesMK9[] = {
+    "copy_register_to_instruction",
+    "copy_register_to_register",
+    "copy_int_to_offset",
+    "copy_float_to_offset",
+
+    // presumably condition, compares before un/conditional
+    "copy_condition_register",
+    "set_condition_register",
+
+    "copy_column_address_to_registe",
+    "internal_8",
+    "internal_9",
+    "internal_10",
+    "internal_11",
+    "internal_12",
+    "internal_13",
+    "internal_14",
+    "internal_15",
+    "internal_16",
+    "internal_17",
+    "internal_18",
+    "internal_19",
+    "internal_20",
+    "internal_21",
+    "internal_22",
+    "internal_23",
+    "internal_24",
+    "internal_25",
+    "internal_26",
+    "internal_27",
+    "internal_28",
+    "internal_29",
+    "internal_30",
+    "internal_31",
+    "internal_32",
+    "internal_33",
+    "internal_34",
+    "internal_35",
+    "internal_36",
+    "internal_37",
+    "internal_38",
+    "internal_39",
+    "internal_40",
+    "internal_41",
+    "internal_42",
+    "internal_43",
+    "internal_44",
+    "internal_45",
+    "internal_46",
+    "internal_47",
+    "internal_48",
+    "internal_49",
+    "internal_50",
+    "internal_51",
+    "internal_52",
+    "internal_53",
+    "internal_54",
+    "internal_55",
+    "internal_56",
+    "internal_57",
+    "internal_58",
+    "internal_59",
+    "conditional_branch",
+    "unconditional_branch",
+    "call_script_function",
+    "call_extern_function",
+    "internal_64",
+    "internal_65",
+    "internal_66",
+    "internal_67",
+    "internal_68",
+    "internal_69",
+    "internal_70",
+    "internal_71",
+    "internal_72",
+    "internal_73",
+    "internal_74",
+    "internal_75",
+    "internal_76",
+    "internal_77",
+    "internal_78",
+    "internal_79",
+    "internal_80",
+    "internal_81",
+    "internal_82",
+    "internal_83",
+    "internal_84",
+    "internal_85",
+    "internal_86",
+    "internal_87",
+    "internal_88",
+    "internal_89",
+    "internal_90",
+    "internal_91",
+    "internal_92",
+    "internal_93",
+};
+
 std::vector<MKOFunctionDefinition> MKODict::ms_vFunctions;
 std::vector<HashEntry> MKODict::ms_vHashes;
 std::vector<HashEntry> MKODict::ms_vFunctionHashes;
@@ -60,6 +159,9 @@ void MKODict::InitDict(EGameMode game)
         break;
     case Game_Unchained:
         file = "data\\mku_def.txt";
+        break;
+    case Game_MK9:
+        file = "data\\mk9_def.txt";
         break;
     case Game_MK11:
         file = "data\\mk11_def.txt";
@@ -96,17 +198,23 @@ void MKODict::InitDict(EGameMode game)
                 int numArgs = 0;
                 int funcSet = 0;
                 int funcType = 0;
-
-                if (game == Game_MK11 || game == Game_MK12)
+                int funcFlags = 0;
+                if (game == Game_MK9 || game == Game_MK11 || game == Game_MK12)
                 {
                     tempLine = strtok(NULL, " ");
                     sscanf(tempLine, "%d", &funcType);
                 }
 
-                if (game == Game_Armageddon || game == Game_MK11 || game == Game_MK12)
+                if (game == Game_Armageddon || game == Game_MK9 || game == Game_MK11 || game == Game_MK12)
                 {
                     tempLine = strtok(NULL, " ");
                     sscanf(tempLine, "%d", &funcSet);
+                }
+
+                if (game == Game_MK9)
+                {
+                    tempLine = strtok(NULL, " ");
+                    sscanf(tempLine, "%d", &funcFlags);
                 }
 
                 tempLine = strtok(NULL, " ");
@@ -135,6 +243,7 @@ void MKODict::InitDict(EGameMode game)
                 def.functionID = funcID;
                 def.functionSet = funcSet;
                 def.functionType = funcType;
+                def.functionFlags = funcFlags;
 
                 for (int i = 0; i < numArgs; i++)
                 {
@@ -218,7 +327,35 @@ void MKODict::InitFunctionHashes()
 
 void MKODict::hash2txt()
 {
-  
+    std::ifstream pFile("data\\hashdb.bin", std::ofstream::binary);
+    std::vector<HashEntry> hashes;
+    if (pFile)
+    {
+        int hashNum = 0;
+        pFile.read((char*)&hashNum, sizeof(int));
+        printf("Hash num in file: %d\n", hashNum);
+
+        for (int i = 0; i < hashNum; i++)
+        {
+            HashEntry h;
+            pFile.read((char*)&h, sizeof(HashEntry));
+            hashes.push_back(h);
+        }
+
+        pFile.close();    
+    }
+
+    printf("Hash num :%d\n", hashes.size());
+
+    if (!(hashes.size() > 0))
+        return;
+
+    FILE* oFile = fopen("output_list.txt", "a+");
+    for (int i = 0; i < hashes.size(); i++)
+    {
+        fprintf(oFile, "%s\n", hashes[i].name);
+    }
+    fclose(oFile);
 }
 
 void MKODict::txt2hash()
@@ -257,41 +394,58 @@ void MKODict::txt2hash()
 }
 
 
+const char** MKODict::GetInternalTable(EGameMode game, int& size)
+{
+    if (game == Game_MK9)
+    {
+        size = sizeof(szInternalNamesMK9) / sizeof(szInternalNamesMK9[0]);
+        return szInternalNamesMK9;
+    }
+
+    size = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+    return szInternalNames;
+}
+
 const char* MKODict::GetInternalName(int functionID)
 {
-    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+    int size = 0;
+    const char** array = GetInternalTable(ms_gameMode, size);
 
-    if (functionID > internalSize)
+    if (functionID < 1 || functionID > size)
     {
         static char buff[128] = {};
         sprintf(buff, "internal_%d", functionID);
         return buff;
     }
-    else
-     return szInternalNames[functionID - 1];
+
+    return array[functionID - 1];
 }
 
 int MKODict::GetInternalID(const char* name)
 {
-    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+    int size = 0;
+    const char** array = GetInternalTable(ms_gameMode, size);
 
-    for (int i = 0; i < internalSize; i++)
+    for (int i = 0; i < size; i++)
     {
-        if (strcmp(name, szInternalNames[i]) == 0)
+        if (strcmp(name, array[i]) == 0)
             return i;
     }
+
     return 0;
 }
 
 bool MKODict::IsFunctionInternal(const char* name)
 {
-    static int internalSize = sizeof(szInternalNames) / sizeof(szInternalNames[0]);
+    int size = 0;
+    const char** array = GetInternalTable(ms_gameMode, size);
 
-    for (int i = 0; i < internalSize; i++)
+    for (int i = 0; i < size; i++)
     {
-        if (strcmp(name, szInternalNames[i]) == 0)
+        if (strcmp(name, array[i]) == 0)
             return true;
     }
+
     return false;
 }
 
@@ -304,7 +458,7 @@ bool MKODict::IsDefinitionAvailable(int functionID, int functionSet, int functio
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionType == functionType)
                 return true;
         }
-        else if (ms_gameMode == Game_MK11)
+        else if (ms_gameMode == Game_MK9 ||ms_gameMode == Game_MK11)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
                 return true;
@@ -340,7 +494,7 @@ MKOFunctionDefinition MKODict::GetDefinition(int functionID, int functionSet, in
 
     for (unsigned int i = 0; i < ms_vFunctions.size(); i++)
     {
-        if (ms_gameMode == Game_MK11)
+        if (ms_gameMode == Game_MK9 || ms_gameMode == Game_MK11)
         {
             if (ms_vFunctions[i].functionID == functionID && ms_vFunctions[i].functionSet == functionSet && ms_vFunctions[i].functionType == functionType)
             {

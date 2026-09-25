@@ -19,19 +19,19 @@ game mode**
 | ❌ | Not supported |
 
 
-| Game | View | Extract | Decompile |  Compile | Platforms |
-|       ---       |       ---       |       ---       |       ---       |      ---       |      ---       |
-| MK Deadly Alliance | ✔️ | ✔️ | ✔️| ❌ | PS2 |
-| MK Deception | ✔️ | ✔️ | ✔️|  ✔️ |PS2, GC, XBOX  |
-| MK Unchained | ✔️ | ✔️ | ✔️|  ✔️ |PSP|
-| MK Armageddon | ✔️ | ✔️ | ✔️| ✔️ |PS2, Wii, XBOX|
-| MK VS DC | ✔️ | ✔️ | ✔️| ❌ |PS3|
-| MK9 | ✔️ | ✔️ | ✔️|  ❌ |PC, Vita |
-| Injustice | ✔️ | ⚠ | ❌| ❌ | PC |
-| Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC|
-| Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC|
-| Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC|
-| Mortal Kombat 12 (1) | ✔️ | ✔️ | ✔️| ❌ | PC|
+| Game | View | Extract | Decompile |  Compile | Platforms | Compile Platforms |
+|       ---       |       ---       |       ---       |       ---       |      ---       |      ---       |      ---       |
+| MK Deadly Alliance | ✔️ | ✔️ | ✔️| ❌ | PS2 | |
+| MK Deception | ✔️ | ✔️ | ✔️|  ✔️ |PS2, GC, XBOX  | PS2, XBOX |
+| MK Unchained | ✔️ | ✔️ | ✔️|  ✔️ |PSP| PSP|
+| MK Armageddon | ✔️ | ✔️ | ✔️| ✔️ |PS2, Wii, XBOX| PS2, XBOX |
+| MK VS DC | ✔️ | ✔️ | ✔️| ❌ |PS3| |
+| MK9 | ✔️ | ✔️ | ✔️|  ✔️ |PC, PS3, Vita | PC |
+| Injustice | ✔️ | ⚠ | ❌| ❌ | PC | | 
+| Mortal Kombat X | ✔️ | ✔️ | ✔️| ❌ | PC| |
+| Injustice 2 | ✔️ | ✔️ | ✔️| ❌ | PC| |
+| Mortal Kombat 11 | ✔️ | ✔️ | ✔️| ❌ | PC| | 
+| Mortal Kombat 12 (1) | ✔️ | ✔️ | ✔️| ❌ | PC| |
 
 **Mortal Kombat X and up requires x64 version of mkoasm! For MK12, the MKO file will be decompressed if it doesn't have "raw_" in fiename. Only use "raw_" files for MK12 mode!**
 
@@ -51,7 +51,7 @@ output.
 | MK Deception | Works |
 | MK Unchained | Works | 
 | MK Armageddon | Works, some MKOs will be larger than original | 
-
+| MK9 | Works | 
 
 
 # MKO Overview

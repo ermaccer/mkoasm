@@ -33,6 +33,7 @@ struct MKOFunctionDefinition {
 	int functionID;
 	int functionType;
 	int functionSet;
+	int functionFlags;
 	int num_arguments;
 	std::vector<EMKOFunctionArgumentDefinition_Type> args;
 };
@@ -59,7 +60,8 @@ public:
 	static void hash2txt();
 	static void txt2hash();
 
-	static const char* GetInternalName(int functionID);
+	static const char** GetInternalTable(EGameMode game, int& size);
+;	static const char* GetInternalName(int functionID);
 	static int GetInternalID(const char* name);
 	static bool IsFunctionInternal(const char* name);
 

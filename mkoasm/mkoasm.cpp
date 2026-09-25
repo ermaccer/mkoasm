@@ -21,8 +21,10 @@ int main(int argc, char* argv[])
 	bool _g_switch = false;
 	bool _c_switch = false;
 	bool _p_switch = false;
+	bool _h_switch = false;
 	std::string m_param;
 	std::string a_param;
+	std::string x_param;
 
 	if (argc == 1) {
 		std::cout << "Usage: mkoasm <optional params> <file>\n"
@@ -33,8 +35,11 @@ int main(int argc, char* argv[])
 			<< "    -e  Extracts data only.\n"
 			<< "    -c  Compile specified file.\n"
 			<< "    -p  Pack variable.\n"
+			<< "    -h  Hash (uses file as input).\n"
+			<< "    -x <file>  Specify variables file for MK9+ compilation.\n"
 			<< "    -a <arg> Argument for variable packer.\n"
 			<< "    -m <mode>  Set mode: mku, mkd, mka, mkda, mkvsdc, mk9, mk9_vita, inj\n"
+
 #ifdef _M_X64
 			<< "	X64 modes: mkx (mk10), i2 (dcf2), mk11, mk12\n"
 #endif // _M_X64
@@ -65,6 +70,8 @@ int main(int argc, char* argv[])
 			break;
 		case 'p': _p_switch = true;
 			break;
+		case 'h': _h_switch = true;
+			break;
 		case 'm':
 			i++;
 			m_param = argv[i];
@@ -73,12 +80,17 @@ int main(int argc, char* argv[])
 			i++;
 			a_param = argv[i];
 			break;
+		case 'x':
+			i++;
+			x_param = argv[i];
+			break;
 		default:
 			std::cout << "ERROR: Param does not exist: " << argv[i] << std::endl;
 			return 0;
 			break;
 		}
 	}
+
 
 	if (_b_switch)
 	{
@@ -117,6 +129,13 @@ int main(int argc, char* argv[])
 	if (!path)
 		return 0;
 
+	if (_h_switch)
+	{
+		unsigned int hash = _hash(path);
+		printf("%s: h: 0x%X i: %d ui: %u\n",path, hash,hash,hash);
+		return 0;
+	}
+
 
 	MKODict::InitDict(game);
 	if (game > Game_MKVSDC)
@@ -131,7 +150,8 @@ int main(int argc, char* argv[])
 
 	if (_c_switch)
 	{
-		MKOCompiler::CompileFile(path, game);
+		printf("args %s\n", x_param.c_str());
+		MKOCompiler::CompileFile(path, game, x_param.c_str());
 		return 0;
 	}
 
